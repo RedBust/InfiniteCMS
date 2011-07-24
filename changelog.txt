@@ -1,0 +1,269 @@
+﻿(AJaX = pas de rechargement de la page)
+@todo
+ban ips
+guildmember.rights
+contact form
+remove APPEND_FORM_TAG ? to put it by default ...
+link to account's profile from character's profile
+1.3(?):
+ Added a complete event system. You can add events via datetimepicker, choose a name.
+  Then, navigate between months / years with a calendar (from monday to saturday, empty cases (if the month starts at wednesday, i.e.) are filled with prev month's events).
+  JS OFF : There's a like "register" / "unregister" (or no link if event.elapsed) beside the event's name (2 buds + a sign "+" / a sign "-")
+  JS ON : There's a link "participate" (image of 2 buds), beside the event's name (unless event.elapsed && no participants). 
+   From here, there's a list of participants. Your character (if registered) will be in red.
+ Added a complete PM system.
+  You can add many receivers (but only the ones who have you got you as a friend). Using jQuery.tokenInput facebook style to autocomplete.
+  You can't add / remove a receiver during the conversation (even it would take only 3/4 lines, I don't want)
+  The "box" view marks all pm, starting with "!!" if someone already replied to the PM, the title + the receivers (you excluded)
+  The pm view is a board thread-view like. You have username (profile dialog) + created timestamp, message. Paginated.
+  When you answer, you're redirected and a notification is created for each receiver IF the receiver don't have already a notif for this thread.
+  When you come to the CMS while having new PM, you get the link "[x] new PM(s)". X is a direct link to the FIRST message he have to read.
+   ie : You create a thread. You're at page 1
+   Someone answers. Page 1, still
+   ... Answering by many people like that, without you coming, to page 3.
+   You come. You see "_1_ new pm". You click on the _1_ link, you'll get to the page 1, not to the page 3.
+  At each AJaX page refresh, the PM counter is refreshed.
+ Search character in ladder
+ Totally rewrote almost every relations in the CMS. The database "base" have been deleted, and everything is now in the ancestra_other database.
+  Class Compte deleted, now it's User. You can now do UserTable::getInstance()->fromGuid(1) instead of using Member class. You can also chain relations
+  like $Poll->Polleds[0]->Account->Characters[0]->GuildMember->Guild->Members[3]->Character->Account->User;
+ With precedent change, reduced a lot of external queries added by multi-database querying
+ BRAND NEW cache system ! may reduce the loading in big proportions (still not using ATM ... he he)
+ Fixed a lot of JS memory leak
+ Fixed some Query memory leaks
+ Renamed "Index" folder to "News", and add handling of getController*() in default c/a/e
+ Refactored some code
+ Added the ability to give something to a character from the character view page (as a liveaction)
+ Added the ability to chose the title structure
+ Added a *decent* exception handling :D
+ Fixed a possible break in _include
+ Refactored tons of code in config.php (everything.) + in Account/join
+ Fixed a typo in Account/show
+ Fixed a break in Collection::_charsInit
+ Fixed a save() (as redirect() use exit) in Account/vote
+ Moved to utf8 + removed strip_accents
+ Renamed a lot of files (+classes) to follow standarts
+ Refactored News/show to add a better author's handling
+ Fixed make_link to automatically disable JS if LOAD_TYPE is NONE
+ Refactored auth "review::can?" by moving the code to Compte::canReview
+ Fixed a possible break in News/show when author's account have been deleted
+ Added a totally new system of Poll, i18n-able, which has many options and options has many Polleds (auto %). editInPlace
+  with name. Edit (+in place) with calendar (jQuery UI Widget) + restrict date range. Only showing "opened" poll unless admin?
+ Fixed Shop/search because of new item system, and refactored : if cost is given -> cost >= [cost]. If cost2 is given with cost, cost >= [cost] && cost <= [cost2]
+ Fixed Shop/update when adding new effects
+ Added the comment author
+ Renamed so DB aliases.
+ Refactored SQL code, to use Doctrine's generation.
+ Updated to jQuery 1.5 and jQuery UI to 1.9
+ Fixed way the router handles /Controller/action/NOT NUMBER/xxx (no more XXX = mode !)
+ Removed the level in Account/ladder_vote (use modal view instead)
+ Added the ability to disable the GuestBook with config.RATES_BY_PAGE to -1
+ Little modifications on "modules" title (tpl/[left, right].php)
+ Fixed a bug forbidding registration
+ Removed deprecated call to info()
+ Fixed a dialog's close() method preventing following link false with LOAD_TYPE to NONE
+ Refactored the way title is generated (now editable in config.php)
+ Fixed a bug with _charsInit (not using $config)
+ Fixed Shop/delete effect
+ Moved Account/join regexp's to an strtr control. Also changed configuration with launcher links
+ Added date + date_range in input's types
+ Added pagination on Shop/search
+ Removed ALL $nl
+ Added format to guild's xp
+ Added a fallback in IG::getStat in case there is no value for this stat
+ Added an error if action starts with _
+ Hide the news.updated_at if equals to news.created_at
+ Refactored table in Guild/show and Character/show-spells to add an overflow on the tbody
+ Changed Guild/show's query to properly order by ranks
+ Refactored way average level is calculated in Guild/show
+ Refactored all table's class to use ::getInstance() method
+ Refactored Multiton pattern to use get_called_class instead of duplicating code
+ Ladder's position is now properly calculated by the page n°
+ Updated doctrine.php to be able to generate classes + sql
+ Refactored the way Emblem tag is generated (for multiple "calls" to the same emblem)
+ Added a visitCart mode for Characters : Character/show/[id].png or Character/show/[column]/[value].png
+  ie : Character/show/name/Vende.png
+ Showing : Character name. Account pseudo. Breed + gender + level. Guild infos (name + lvl).
+  Alignment infos (name + rank + honor + dishonor if >0). Kamas + statsPoints + spellsPoints.
+  Stats : int, wisdom, str, agi, luck, vita. AP + MP. Add if >0 : CC, +dmg, %dmg
+ Added a stats page, with 2 pie charts (genders + breeds) and a lot of informations (counters, averages, ...)
+ Integrated AJaX system with history.pushState, if disponible
+1.2.2:
+ Many others bugs fixed (I'm thinking about validating inputs one-by-one ...)
+ Removed the possibility to put the same title in comment by setting "-1" (how ugly !)
+ Added the ability to disable comments
+1.2.1c:
+ Many bugs fixed
+ Little refactoring on stats handling (character - show)
+1.2.1b:
+ Added the ability to delete an effect
+ Added a "blank" type value in "edit effect", allowing to not-add value when editing an item
+1.2.1a:
+ Fix a little bug because of a "l" ...
+ Added a mass-mailer
+1.2.1:
+ Added a home-made guild panel with emblem
+ a log of bug fixed: shop, news, account edit, starpass, point edit ...
+ jQueryUI updated to 1.8.5
+ Added a GuestBook
+ Added an armury
+1.2.0a:
+ Many many bugfixes.
+1.2.0:
+ added ability to disable pass / shop. | Ajout de la possibilité de désactiver le créditage / la boutique
+ added: starpass | ajout de starpass comme moyen de payement
+ fixed webopass | fix sur webopass
+ totally refactor the "pass" system: two switch (one for show link, another for check code submitter) |
+  Refonte totale du système de créditage: 2 switch (un pour montrer les liens/numéros, un autre pour vérifier le code)
+ totally recoded "search item": Now you can search by many filters, activate/desactivate them,
+  filters has autocomplete etç. | Recodage total de "recherche d'item" (boutique): vous pouvez maintenant
+  utiliser plusieurs filtres, les activer, avec un auto-complete
+ fix "search character" | Fix de "Recherche de personnage"
+ AJaX now integrated to link from AJaX-request ! and reload the same page/load a new page during a page load
+  is no more possible | Les liens provenants de requêtes AJaX sont maintenant eux-aussi AJaX et il n'est plus
+  possible de recharger la page sur laquelle on est / de charger une page pendant le chargement d'une autre
+ fix for "label" | Fix pour le label
+ the first field is now selected when loading page with form | Quand une page à un formulaire, le 1er champ
+  est sélectionné au chargemenet de celle-ci
+ Began a bugTracker (will never be finished, the bugs are everytime the same.)
+  | Début d'un bugTracker (ne sera jamais finis: les serveurs utilisant tous Ancestra ou une reprise,
+  les développeurs des reprises savent quels bugs sont sur leurs émulateurs)
+ when shop is off, admin can use it | Quand la boutique est désactivée, les admins peuvent l'utiliser
+ added ability to disable registration | Ajout de la possibilité de désactiver les inscriptions
+ server state is now refreshed with AJaX | l'état du serveur (on/off) est maintenant rafraichit en AJaX
+ added a new system of check-level for special pages. It's really better,
+  much more flexible, and more - DRY. allow check-level on all page, on all BUT exclude, or just some pages
+  | Ajout d'un tout nouveau système d'autorisation. C'est mieux, plus flexibles, moins de code,
+  cela permet de mettre des vérifications sur: toutes les pages / juste quelques pages / toutes sauf
+  certaines pages, affichage d'un message d'erreur personnalisé / utilisation d'une erreur personnalisée
+ reduced A LOT memory used (a lot of un-used classes, model loading, Routing): divised by _THREE_ | la
+  mémoire utilisée à été divisée par trois, j'ai supprimée des classes inutiles, changé le chargement et j'ai
+  totallement refait le routing (routing: /Misc/staff => actions/Misc/staff.php)
+ added a JavaScript check for login form (not empty) | Quand le formulaire de connexion est vide, on ne peut
+  essayer de se connecter
+ added a JavaScript effect (open a info-box (jQuery UI Dialog)) when user click on a pseudo:
+  - news
+  - ladder vote | Ajout d'une boîte de dialogue lorsqu'on clique sur un pseudo dans le ladder,
+  les news, etç.
+ added a page for information on an account (used by the precedent changelog line / by news etç.)
+  with a list of Char (box-effect too) | Ajout d'une page avec les informations sur un compte (aussi avec
+  une boîte de dialogue)
+ added a page to get info on a character, in a dialog as for Accounts | Ajout d'une page pour avoir des
+  informations sur un personnage, dans une boîte de dialogue, comme pour les comptes
+ added ability to censor a comment | Il est possible de censurer les commentaires
+ added url-rewriting : /Accounts/new instead of ?controller=Accounts&action=new
+  with the ability to disable it if your host doesn't support it.
+  Disponible ways: /controller - /controller/action - /controller/action/id | Ajout de la ré-écriture
+  d'adresses : /Accounts/new instead of ?controller=Accounts&action=new (désactivable). Possiblités:
+  - /.{ext} - /{Controller}/ - /{Controller}.{ext}
+  - /{Controller}/{Action} - /{Controller}/{Action}.{ext}
+  - /{Controller}/{Action}/{id / page}
+  with the ability to specify the extension of a page, as Index/index.atom (no Dofus 1.29-valid XML)
+  or Index/index.json, which gives 5 lasts News (you can specify the number) | Ajout de la possibilité
+  de spécifier une extension à une page, comme Index/index.atom (flux RSS, pas valide Dofus) ou .json
+  Les pages sont dans actions/{Controller (Index)}/{action (index)}.{extension: atom/json/...).php
+ added ability to disable AJaX | Ajout de la possibilité de désactiver l'AJaX
+ added fieldset to some forms, you can change this as you want
+  with toggle move => slideUp / slideDown, legend always visible | Ajout de certains "field sets"
+  (champs regroupés dans des zones) avec un mouvement de toggle lors du clic sur la légende
+ lang moved to external files, a dir by lang, default: common | langues déplacées
+  vers des fichiers externe: langs/{lang}/{fichier}.php, défaut: common (fichier)
+ fixed images class in ladder | Les images dans le ladder ont été fixés
+ added pages links in ladder + fixed | Ajout de la pagination dans le ladder
+ I created a new class "slideMenu" which add a slideToggle effect on next elem. when click on a elem
+  this HTML class is on all menu ATM (at this moment) | J'ai crée un classe HTML nommée "slideMenu"
+  qui ajoute un effet de toggle sur le prochain élément lors du clic sur le menu
+ now totally compatible with mAncestra (shop) & mAncestra 2.0 (registration) ! | Ajout de la compatibilité
+  avec mAncestra (boutique) et mAncestra 2.0 (inscription) !
+ fix of shop deletion | Fix de la suppression d'objets dans le shop
+ a banned pseudo is now striker | Un pseudo d'un compte bannis est maintenant barré
+ Final fix on registration: email/pseudo/ip used? | Fix définitif sur l'inscription: email/pseudo/ip utilisée?
+ added ability to edit title just by clicking it when showing a news, edit the content of a
+  comment, in ALL SHOP fields (except Description), and edit points/level [all the inputs "points"/"level"
+  which is on the compte refreshed will be changed too] | Ajout de la possibilité d'éditer le titre juste en
+  cliquant dessus lors de la vue d'une news, d'éditer le contenu des commentaires (même manière), d'éditer
+  TOUS les champs de la boutique (sauf description) (idem), d'éditer les points/le level (idem)
+  [Tous les champs "points"/"level" qui portaient sur ce compte seront alors mis à jour !]
+ The widgets (popups, edit in place, AJaX) with same action are just declared one time |
+  Les gadgets (popups, édition sur place, AJaX) avec le même effet ne sont plus déclarés qu'une fois
+ Added the ability to show edit form (popup) when not in edit page (disabled because of a bug of TinyMCE) | Ajout de la possibilité d'afficher le
+  formulaire d'édition dans une popup, hors de la page d'édition (désactivé à cause d'un bug de TinyMCE)
+ Added the possibility to add special codes, which works everytime, for test (can be limited to a user level) | Ajout de la possibilité de
+  spécifier des codes spéciaux, qui marcheront toujours (pour le test !)(vous pouvez demander un certain niveau utilisateur pour les utiliser)
+ Added the ability to link staff <=> account, by using the ID of the account instead of a string | Ajout de
+   la possibilité de lier un membre du staff à un compte, en utilisant l'ID du compte a la place du pseudo
+ Added the ability to TOTALLY disable JS (widgets, modal dialog boxes, accordion, edit In Place, ...) | Ajout de la possibilité de désactiver
+ totalement le JavaScript (widgets, boîte de dialogues, accordeon, AJaX, edit In Place, ...)
+ Fix for the email check (registration) | Fix pour la vérification de l'e-mail (inscription)
+ When submitting login form, pseudo / pass and banned? are checked | Quand on envoi le formulaire de
+  connexion, une pré-vérification se fait: nom de compte / mot de passe valide et bannis ?
+ Fix: magic_quotes(PHP "feature") are now correctly disabled (' was replaced by \') | Fix: les "magic quotes"
+  sont maintenant bien désactivées (' étaient remplacées par \') ("fonctionnalité" PHP)
+ Refactor: tpl/header.php and tpl/footer.php has merged into tpl/layout.php ! More flexibility ! | Changement
+  tpl/header.php et tpl/footer.php ont fusionné par tpl/layout.php, plus flexible !
+ Refactor: JS & CSS are out of PHP functions now able to use your IDE autocomplete / help | Changement:
+  le JS et le CSS sont hors de fonctions PHP et vos éditeurs peuvent maintenant utiliser l'autocomplete (cf
+   lib/rewrite.xml) class Router totally recoded, Controllers/Actions/Exts can now have alias, alias can be
+  used by the CMS instead of the real name (use="1" in .xml file), and It's possible to create routes too,
+  with replacement as {action} in REPLACE section | La classe de routing a été totallement recodée, on peut
+  maintenant assigner des alias aux controleurs/actions/extensions, les faire utiliser par le CMS a la place
+  du vrai nom (use="1", voir le .xml) et il est aussi possible de créer des routes (avec des remplacements,
+   comme par exemple {action} dans <replace> qui sera remplacé par l'action donnée) (exemple dans le fichier)
+ added ability to disable board | Ajout de la possiblité de désactiver le forum
+ added a readme with thanks & all | ajout d'un readme avec les remerciements, etç.
+ Doctrine CLI restaurated | Console Doctrine (pour développeurs) restaurée
+ Added a guild panel, as the Dofus 1.29.1 Guild Panel, with members, mean level, guild lvl, %xp guild for next level, %xp given by a character,
+   xp given, class ... [not added now, because of Dawyde] | Ajout d'un panneau de guilde comme dans Dofus 1.29.1, avec les membres, niveau moyen,
+   niveau de la guilde, % jusqu'au prochain, membres: %xp donnée, xp donnée au total, classe ... [Pas encore ajouté, à cause de Dawyde]
+ begin modification of "Ladder" class | début de la modification de la classe Ladder, qui peut générer des ladder comme vous les voulez
+ Member are no more a static class, refactoring API | "Member" n'est plus une classe statique, refactorisation de l'API
+ Router are no more a static class, refactoring | "Router" n'est plus une classe statique, refactorisation de l'API
+ changes Pagination type (Jumping => Sliding) | Pagination: Type de Jumping à Sliding
+ Images of items are now showed in the shop | Dans la boutique, les images des objets sont maintenant affichées :) !
+ It's now possible to add multiple items to a "pack" | Il est maintenant possible d'ajouter plusieurs objets pour faire des "packs"
+  (objets uniquement actuellement)
+ Fixed doctrine.php Doctrine_Manager::getConnection issue | Fix du bug avec Doctrine_Manager::getConnection
+ Moved ob_get_contents() + ob_end_clean() to ob_get_clean() | Remplacement de ob_get_contents() + ob_end_clean() pour ob_get_clean()
+ Add some comments to code lines | Ajouts de commentaires à certaines lignes, hors-fonctions
+ Merged lib/fonctions.php in lib/bootstrap.php | Scission de lib/fonctions.php pour lib/bootstrap.php
+ Updated jQuery-UI to 1.8.4
+ Little workaround for jQuery UI Accordion : hide "comment" link when opening the form to add one
+1.1.1a:
+ webopass fix
+ fix "$account is not instance of Accounts" when submitting login form without fill inputs
+ fix 'value=""' when submitting login form with bad informations
+ beginning multi-type of account credit (just webopass ATM)
+1.1.1:
+ now only webopass-compatible ... But much much more security !
+ now 3 types of AJaX-loading are disponibles: nothing, loading message, loading dialog
+ fixing some missing AJaX links
+ title is now refreshed with the page !
+ fixing a lot of bugs (because of refreshing schema)
+1.1.0:
+ added ability to give something to somebody (alpha)
+ added ability to search an item in shop (not tested)
+ fix the pagination in shop (ugly hack) and in news (not working)
+ InfiniteCMS is now FULL-AJaX ! It works perfectly ! With a loading message ...
+  The link which can not have AJaX (as for log-out) has not
+  JS is readed as needed ... jQuery live() is used for JS link ...
+  PERFECT AJaX INTEGRATION !
+1.0.2b:
+ if TS is closed, the link is not shown
+ some changes to copyright
+1.0.2a:
+ added a warning
+ finally fix the sprintf() error (cause of %-escaping)
+ added a check for doctrine.php (use doctrine-CLI or just gen. models)
+1.0.2:
+ fixed lang key on join
+ addded functionnality to search by a nick
+ added ability to use a global include (as for pre-check)
+1.0.1a:
+ fixed bug with sprintf() for join
+1.0.1:
+ adding option on comments (unlimited)
+ fixing some bugs
+ moving allopass form text to config
+ deleting ugly hacks in config.php
+1:
+ First release

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rules>
+	<rewrite>
+		<controllers>
+			<controller name="Account">
+				<alias>Compte</alias>
+			</controller>
+			<controller name="News">
+				<alias use="1">Index</alias>
+			</controller>
+			<controller name="PrivateMessage">
+				<alias use="1">PM</alias>
+			</controller>
+		</controllers>
+		<actions>
+			<action name="show">
+				<alias>vue</alias>
+			</action>
+		</actions>
+		<exts>
+			<ext name="atom">
+				<alias>rss</alias>
+			</ext>
+		</exts>
+	</rewrite>
+	<routes>
+	<!--see_admin: /admin/Nami renvoie donc à /Accounts/show/pseudo/Nami-->
+		<route name="see_admin">
+			<find>
+				<controller>admin</controller>
+			</find>
+			<replace>
+				<controller>Account</controller>
+				<action>show</action>
+				<pseudo>{action}</pseudo>
+			</replace>
+		</route>
+	</routes>
+</rules>

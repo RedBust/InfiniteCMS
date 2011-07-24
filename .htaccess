@@ -1,0 +1,43 @@
+Options +FollowSymlinks -indexes
+
+<IfModule expires_module>
+	# Optimisation
+	ExpiresActive On
+	ExpiresDefault "access"
+
+	ExpiresByType text/javascript "access plus 1 year"
+	ExpiresByType application/javascript "access plus 1 year"
+	ExpiresByType application/x-javascript "access plus 1 year"
+	ExpiresByType text/css "access plus 1 year"
+	ExpiresByType image/gif "access plus 1 year"
+	ExpiresByType image/jpg "access plus 1 year"
+	ExpiresByType image/jpeg "access plus 1 year"
+	ExpiresByType image/png "access plus 1 year"
+	ExpiresByType image/bmp "access plus 1 year"
+</IfModule>
+
+	# Better URLs
+	RewriteEngine on
+
+	# we check if the .html version is here (caching)
+	RewriteRule ^$ index.html [QSA]
+	RewriteRule ^([^.]+)$ $1.html [QSA]
+	RewriteCond %{REQUEST_FILENAME} !-f
+	RewriteCond %{REQUEST_FILENAME} !-d
+
+	# no, so we redirect to our front web controller
+	RewriteRule ^(.*)$ index.php?rewrite=1 [QSA,L]
+
+#	RewriteCond %{REQUEST_FILENAME} !-d
+#	RewriteRule ^([a-zA-Z_]+)/([a-zA-Z_]+)/([0-9]+)(?:/|\.html)?$ ./?controller=$1&action=$2&id=$3 [L]
+#	RewriteCond %{REQUEST_FILENAME} !-d
+#	RewriteRule ^([a-zA-Z_]+)/([a-zA-Z_]+)/([0-9]+)/([a-zA-Z_]+)(?:/|\.html)?$ ./?controller=$1&action=$2&id=$3&mode=$4 [L]
+#	RewriteCond %{REQUEST_FILENAME} !-d
+	# highly-simplified regexp from the 1st version (this regexp was splitted into 6 regexp :$)
+#	RewriteRule ^/?([a-zA-Z_]+)(?:/([a-zA-Z_]+))?(?:/([a-zA-Z_]+))?(?:/([a-zA-Z_]+))?(?:/([a-zA-Z_]+))?(?:/([0-9a-zA-Z_]+))?(/|\.(?!js$|css$|png$|jpg$|gif$)[a-zA-Z]{2,5})?$ index.php?controller=$1&action=$2&$3=$4&$5=$6&ext=$7 [L]
+
+#<Directory tpl/>
+#	Deny from all
+#</Directory>
+
+AddType text/xml .atom

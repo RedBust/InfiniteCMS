@@ -1,0 +1,940 @@
+Area:
+  connection: static
+  tableName: area_data
+  columns:
+    id:
+      type: integer(4)
+      fixed: false
+      unsigned: false
+      primary: false
+      notnull: true
+      autoincrement: false
+    name:
+      type: string(100)
+      fixed: false
+      unsigned: false
+      primary: false
+      notnull: true
+      autoincrement: false
+    superarea:
+      type: integer(4)
+      fixed: false
+      unsigned: false
+      primary: false
+      notnull: true
+      autoincrement: false
+Crafts:
+  connection: static
+  tableName: crafts
+  columns:
+    id:
+      type: integer(4)
+      fixed: false
+      unsigned: false
+      primary: true
+      autoincrement: false
+    craft:
+      type: string()
+      fixed: false
+      unsigned: false
+      primary: false
+      notnull: true
+      autoincrement: false
+Drops:
+  connection: static
+  tableName: drops
+  columns:
+    id:
+      type: integer(8)
+      autoincrement: true
+      primary: true
+    mob:
+      type: integer(4)
+      fixed: false
+      unsigned: false
+      primary: false
+      notnull: true
+      autoincrement: false
+    item:
+      type: integer(4)
+      fixed: false
+      unsigned: false
+      primary: false
+      notnull: true
+      autoincrement: false
+    seuil:
+      type: integer(4)
+      fixed: false
+      unsigned: false
+      primary: false
+      default: '100'
+      notnull: true
+      autoincrement: false
+    max:
+      type: integer(4)
+      fixed: false
+      unsigned: false
+      primary: false
+      notnull: true
+      autoincrement: false
+    taux:
+      type: decimal(10)
+      fixed: false
+      unsigned: false
+      primary: false
+      notnull: true
+      autoincrement: false
+EndfightAction:
+  connection: static
+  tableName: endfight_action
+  columns:
+    id:
+      type: integer(8)
+      autoincrement: true
+      primary: true
+    map:
+      type: integer(4)
+      fixed: false
+      unsigned: false
+      primary: false
+      notnull: true
+      autoincrement: false
+    fighttype:
+      type: integer(4)
+      fixed: false
+      unsigned: false
+      primary: false
+      notnull: true
+      autoincrement: false
+    action:
+      type: integer(4)
+      fixed: false
+      unsigned: false
+      primary: false
+      notnull: true
+      autoincrement: false
+    args:
+      type: string(30)
+      fixed: false
+      unsigned: false
+      primary: false
+      notnull: true
+      autoincrement: false
+Experience:
+  connection: static
+  tableName: experience
+  columns:
+    id:
+      type: integer(8)
+      autoincrement: true
+      primary: true
+    lvl:
+      type: integer(4)
+      fixed: false
+      unsigned: false
+      primary: false
+      notnull: true
+      autoincrement: false
+    perso:
+      type: integer(8)
+      fixed: false
+      unsigned: false
+      primary: false
+      notnull: true
+      autoincrement: false
+    metier:
+      type: integer(8)
+      fixed: false
+      unsigned: false
+      primary: false
+      notnull: true
+      autoincrement: false
+    dinde:
+      type: integer(8)
+      fixed: false
+      unsigned: false
+      primary: false
+      notnull: true
+      autoincrement: false
+    pvp:
+      type: integer(4)
+      fixed: false
+      unsigned: false
+      primary: false
+      notnull: true
+      autoincrement: false
+InteractiveObjectsData:
+  connection: static
+  tableName: interactive_objects_data
+  columns:
+    id:
+      type: integer(4)
+      fixed: false
+      unsigned: false
+      primary: true
+      autoincrement: false
+    respawn:
+      type: integer(4)
+      fixed: false
+      unsigned: false
+      primary: false
+      default: '10000'
+      notnull: true
+      autoincrement: false
+    duration:
+      type: integer(4)
+      fixed: false
+      unsigned: false
+      primary: false
+      default: '1500'
+      notnull: true
+      autoincrement: false
+    unknow:
+      type: integer(4)
+      fixed: false
+      unsigned: false
+      primary: false
+      default: '4'
+      notnull: true
+      autoincrement: false
+    walkable:
+      type: integer(4)
+      fixed: false
+      unsigned: false
+      primary: false
+      default: '1'
+      notnull: true
+      autoincrement: false
+    'name io':
+      type: string()
+      fixed: false
+      unsigned: false
+      primary: false
+      notnull: true
+      autoincrement: false
+ItemTemplate:
+  connection: static
+  tableName: item_template
+  columns:
+    id:
+      type: integer(4)
+      fixed: false
+      unsigned: false
+      primary: false
+      default: '-1'
+      notnull: true
+      autoincrement: false
+    type:
+      type: integer(4)
+      fixed: false
+      unsigned: false
+      primary: false
+      default: '-1'
+      notnull: true
+      autoincrement: false
+    name:
+      type: string(50)
+      fixed: false
+      unsigned: false
+      primary: false
+      default: ''
+      notnull: true
+      autoincrement: false
+    level:
+      type: integer(4)
+      fixed: false
+      unsigned: false
+      primary: false
+      default: '1'
+      notnull: true
+      autoincrement: false
+    statstemplate:
+      type: string(300)
+      fixed: false
+      unsigned: false
+      primary: false
+      default: ''
+      notnull: true
+      autoincrement: false
+    pod:
+      type: integer(4)
+      fixed: false
+      unsigned: false
+      primary: false
+      default: '0'
+      notnull: true
+      autoincrement: false
+    panoplie:
+      type: integer(4)
+      fixed: false
+      unsigned: false
+      primary: false
+      default: '-1'
+      notnull: true
+      autoincrement: false
+    prix:
+      type: integer(4)
+      fixed: false
+      unsigned: false
+      primary: false
+      default: '0'
+      notnull: true
+      autoincrement: false
+    condition:
+      type: string(100)
+      fixed: false
+      unsigned: false
+      primary: false
+      default: ''
+      notnull: true
+      autoincrement: false
+    armesinfos:
+      type: string(100)
+      fixed: false
+      unsigned: false
+      primary: false
+      default: ''
+      notnull: true
+      autoincrement: false
+Itemsets:
+  connection: static
+  tableName: itemsets
+  columns:
+    id:
+      type: integer(4)
+      fixed: false
+      unsigned: false
+      primary: true
+      autoincrement: false
+    name:
+      type: string(150)
+      fixed: false
+      unsigned: false
+      primary: false
+      notnull: true
+      autoincrement: false
+    items:
+      type: string()
+      fixed: false
+      unsigned: false
+      primary: false
+      notnull: true
+      autoincrement: false
+    bonus:
+      type: string()
+      fixed: false
+      unsigned: false
+      primary: false
+      notnull: true
+      autoincrement: false
+JobsData:
+  connection: static
+  tableName: jobs_data
+  columns:
+    id:
+      type: integer(1)
+      fixed: false
+      unsigned: false
+      primary: true
+      autoincrement: false
+    tools:
+      type: string(300)
+      fixed: false
+      unsigned: false
+      primary: false
+      notnull: true
+      autoincrement: false
+    crafts:
+      type: string()
+      fixed: false
+      unsigned: false
+      primary: false
+      notnull: true
+      autoincrement: false
+Maps:
+  connection: static
+  tableName: maps
+  columns:
+    id:
+      type: integer(4)
+      fixed: false
+      unsigned: false
+      primary: true
+      autoincrement: false
+    date:
+      type: string(50)
+      fixed: false
+      unsigned: false
+      primary: false
+      notnull: true
+      autoincrement: false
+    width:
+      type: integer(4)
+      fixed: false
+      unsigned: false
+      primary: false
+      default: '-1'
+      notnull: true
+      autoincrement: false
+    heigth:
+      type: integer(4)
+      fixed: false
+      unsigned: false
+      primary: false
+      default: '-1'
+      notnull: true
+      autoincrement: false
+    places:
+      type: string(300)
+      fixed: false
+      unsigned: false
+      primary: false
+      default: '|'
+      notnull: true
+      autoincrement: false
+    key:
+      type: string()
+      fixed: false
+      unsigned: false
+      primary: false
+      notnull: true
+      autoincrement: false
+    mapdata:
+      type: string()
+      fixed: false
+      unsigned: false
+      primary: false
+      notnull: true
+      autoincrement: false
+    monsters:
+      type: string()
+      fixed: false
+      unsigned: false
+      primary: false
+      notnull: true
+      autoincrement: false
+    capabilities:
+      type: integer(4)
+      fixed: false
+      unsigned: false
+      primary: false
+      default: '0'
+      notnull: true
+      autoincrement: false
+    mappos:
+      type: string(15)
+      fixed: false
+      unsigned: false
+      primary: false
+      default: '0,0,0'
+      notnull: true
+      autoincrement: false
+    numgroup:
+      type: integer(4)
+      fixed: false
+      unsigned: false
+      primary: false
+      default: '5'
+      notnull: true
+      autoincrement: false
+Monsters:
+  connection: static
+  tableName: monsters
+  columns:
+    id:
+      type: integer(4)
+      fixed: false
+      unsigned: false
+      primary: true
+      autoincrement: false
+    name:
+      type: string(100)
+      fixed: false
+      unsigned: false
+      primary: false
+      notnull: true
+      autoincrement: false
+    gfxid:
+      type: integer(4)
+      fixed: false
+      unsigned: false
+      primary: false
+      notnull: true
+      autoincrement: false
+    align:
+      type: integer(4)
+      fixed: false
+      unsigned: false
+      primary: false
+      notnull: true
+      autoincrement: false
+    grades:
+      type: string()
+      fixed: false
+      unsigned: false
+      primary: false
+      notnull: true
+      autoincrement: false
+    colors:
+      type: string(30)
+      fixed: false
+      unsigned: false
+      primary: false
+      default: '-1,-1,-1'
+      notnull: true
+      autoincrement: false
+    stats:
+      type: string()
+      fixed: false
+      unsigned: false
+      primary: false
+      notnull: true
+      autoincrement: false
+    spells:
+      type: string()
+      fixed: false
+      unsigned: false
+      primary: false
+      notnull: true
+      autoincrement: false
+    pdvs:
+      type: string(200)
+      fixed: false
+      unsigned: false
+      primary: false
+      default: 1|1|1|1|1|1|1|1|1|1
+      notnull: true
+      autoincrement: false
+    points:
+      type: string(200)
+      fixed: false
+      unsigned: false
+      primary: false
+      default: 1;1|1;1|1;1|1;1|1;1|1;1|1;1|1;1|1;1|1;1
+      notnull: true
+      autoincrement: false
+    inits:
+      type: string(200)
+      fixed: false
+      unsigned: false
+      primary: false
+      default: 1|1|1|1|1|1|1|1|1|1
+      notnull: true
+      autoincrement: false
+    minkamas:
+      type: integer(4)
+      fixed: false
+      unsigned: false
+      primary: false
+      default: '0'
+      notnull: true
+      autoincrement: false
+    maxkamas:
+      type: integer(4)
+      fixed: false
+      unsigned: false
+      primary: false
+      default: '0'
+      notnull: true
+      autoincrement: false
+    exps:
+      type: string(200)
+      fixed: false
+      unsigned: false
+      primary: false
+      default: 1|1|1|1|1|1|1|1|1|1
+      notnull: true
+      autoincrement: false
+    ai_type:
+      type: integer(4)
+      fixed: false
+      unsigned: false
+      primary: false
+      default: '1'
+      notnull: true
+      autoincrement: false
+NpcQuestions:
+  connection: static
+  tableName: npc_questions
+  columns:
+    id:
+      type: integer(4)
+      fixed: false
+      unsigned: false
+      primary: false
+      notnull: true
+      autoincrement: false
+    responses:
+      type: string(100)
+      fixed: false
+      unsigned: false
+      primary: false
+      notnull: true
+      autoincrement: false
+    params:
+      type: string(100)
+      fixed: false
+      unsigned: false
+      primary: false
+      notnull: true
+      autoincrement: false
+NpcReponsesActions:
+  connection: static
+  tableName: npc_reponses_actions
+  columns:
+    id:
+      type: integer(4)
+      fixed: false
+      unsigned: false
+      primary: false
+      notnull: true
+      autoincrement: false
+    type:
+      type: integer(4)
+      fixed: false
+      unsigned: false
+      primary: false
+      notnull: true
+      autoincrement: false
+    args:
+      type: string()
+      fixed: false
+      unsigned: false
+      primary: false
+      notnull: true
+      autoincrement: false
+NpcTemplate:
+  connection: static
+  tableName: npc_template
+  columns:
+    id:
+      type: integer(4)
+      fixed: false
+      unsigned: false
+      primary: true
+      autoincrement: false
+    bonusvalue:
+      type: integer(4)
+      fixed: false
+      unsigned: false
+      primary: false
+      notnull: true
+      autoincrement: false
+    gfxid:
+      type: integer(4)
+      fixed: false
+      unsigned: false
+      primary: false
+      notnull: true
+      autoincrement: false
+    scalex:
+      type: integer(4)
+      fixed: false
+      unsigned: false
+      primary: false
+      notnull: true
+      autoincrement: false
+    scaley:
+      type: integer(4)
+      fixed: false
+      unsigned: false
+      primary: false
+      notnull: true
+      autoincrement: false
+    sex:
+      type: integer(4)
+      fixed: false
+      unsigned: false
+      primary: false
+      notnull: true
+      autoincrement: false
+    color1:
+      type: integer(4)
+      fixed: false
+      unsigned: false
+      primary: false
+      notnull: true
+      autoincrement: false
+    color2:
+      type: integer(4)
+      fixed: false
+      unsigned: false
+      primary: false
+      notnull: true
+      autoincrement: false
+    color3:
+      type: integer(4)
+      fixed: false
+      unsigned: false
+      primary: false
+      notnull: true
+      autoincrement: false
+    accessories:
+      type: string(30)
+      fixed: false
+      unsigned: false
+      primary: false
+      default: '0,0,0,0'
+      notnull: true
+      autoincrement: false
+    extraclip:
+      type: integer(4)
+      fixed: false
+      unsigned: false
+      primary: false
+      default: '-1'
+      notnull: true
+      autoincrement: false
+    customartwork:
+      type: integer(4)
+      fixed: false
+      unsigned: false
+      primary: false
+      default: '0'
+      notnull: true
+      autoincrement: false
+    initquestion:
+      type: integer(4)
+      fixed: false
+      unsigned: false
+      primary: false
+      default: '-1'
+      notnull: true
+      autoincrement: false
+    ventes:
+      type: string()
+      fixed: false
+      unsigned: false
+      primary: false
+      notnull: true
+      autoincrement: false
+Npcs:
+  connection: static
+  tableName: npcs
+  columns:
+    id:
+      type: integer(8)
+      autoincrement: true
+      primary: true
+    mapid:
+      type: integer(4)
+      fixed: false
+      unsigned: false
+      primary: false
+      notnull: true
+      autoincrement: false
+    npcid:
+      type: integer(4)
+      fixed: false
+      unsigned: false
+      primary: false
+      notnull: true
+      autoincrement: false
+    cellid:
+      type: integer(4)
+      fixed: false
+      unsigned: false
+      primary: false
+      notnull: true
+      autoincrement: false
+    orientation:
+      type: integer(4)
+      fixed: false
+      unsigned: false
+      primary: false
+      notnull: true
+      autoincrement: false
+ScriptedCells:
+  connection: static
+  tableName: scripted_cells
+  columns:
+    id:
+      type: integer(8)
+      autoincrement: true
+      primary: true
+    mapid:
+      type: integer(4)
+      fixed: false
+      unsigned: false
+      primary: false
+      notnull: true
+      autoincrement: false
+    cellid:
+      type: integer(4)
+      fixed: false
+      unsigned: false
+      primary: false
+      notnull: true
+      autoincrement: false
+    actionid:
+      type: integer(4)
+      fixed: false
+      unsigned: false
+      primary: false
+      notnull: true
+      autoincrement: false
+    eventid:
+      type: integer(4)
+      fixed: false
+      unsigned: false
+      primary: false
+      notnull: true
+      autoincrement: false
+    actionsargs:
+      type: string()
+      fixed: false
+      unsigned: false
+      primary: false
+      notnull: true
+      autoincrement: false
+    conditions:
+      type: string()
+      fixed: false
+      unsigned: false
+      primary: false
+      notnull: true
+      autoincrement: false
+Sorts:
+  connection: static
+  tableName: sorts
+  columns:
+    id:
+      type: integer(4)
+      fixed: false
+      unsigned: false
+      primary: true
+      autoincrement: false
+    nom:
+      type: string(100)
+      fixed: false
+      unsigned: false
+      primary: false
+      notnull: true
+      autoincrement: false
+    sprite:
+      type: integer(4)
+      fixed: false
+      unsigned: false
+      primary: false
+      default: '-1'
+      notnull: true
+      autoincrement: false
+    spriteinfos:
+      type: string(20)
+      fixed: false
+      unsigned: false
+      primary: false
+      default: '0,0,0'
+      notnull: true
+      autoincrement: false
+    lvl1:
+      type: string()
+      fixed: false
+      unsigned: false
+      primary: false
+      notnull: true
+      autoincrement: false
+    lvl2:
+      type: string()
+      fixed: false
+      unsigned: false
+      primary: false
+      notnull: true
+      autoincrement: false
+    lvl3:
+      type: string()
+      fixed: false
+      unsigned: false
+      primary: false
+      notnull: true
+      autoincrement: false
+    lvl4:
+      type: string()
+      fixed: false
+      unsigned: false
+      primary: false
+      notnull: true
+      autoincrement: false
+    lvl5:
+      type: string()
+      fixed: false
+      unsigned: false
+      primary: false
+      notnull: true
+      autoincrement: false
+    lvl6:
+      type: string()
+      fixed: false
+      unsigned: false
+      primary: false
+      notnull: true
+      autoincrement: false
+    effecttarget:
+      type: string(300)
+      fixed: false
+      unsigned: false
+      primary: false
+      notnull: true
+      autoincrement: false
+SubareaData:
+  connection: static
+  tableName: subarea_data
+  columns:
+    id:
+      type: integer(4)
+      fixed: false
+      unsigned: false
+      primary: false
+      notnull: true
+      autoincrement: false
+    area:
+      type: integer(4)
+      fixed: false
+      unsigned: false
+      primary: false
+      notnull: true
+      autoincrement: false
+    alignement:
+      type: integer(4)
+      fixed: false
+      unsigned: false
+      primary: false
+      default: '-1'
+      notnull: true
+      autoincrement: false
+    name:
+      type: string(200)
+      fixed: false
+      unsigned: false
+      primary: false
+      notnull: true
+      autoincrement: false
+UseItemActions:
+  connection: static
+  tableName: use_item_actions
+  columns:
+    id:
+      type: integer(8)
+      autoincrement: true
+      primary: true
+    template:
+      type: integer(4)
+      fixed: false
+      unsigned: false
+      primary: false
+      notnull: true
+      autoincrement: false
+    type:
+      type: integer(4)
+      fixed: false
+      unsigned: false
+      primary: false
+      notnull: true
+      autoincrement: false
+    args:
+      type: string(100)
+      fixed: false
+      unsigned: false
+      primary: false
+      notnull: true
+      autoincrement: false
