@@ -40,11 +40,12 @@ if ($guild->Members->count())
 		$html .= $gm;
 
 	echo tag('b', lang('guild.mean_level')), $guild->getMeanLevel(), tag('br'),
-	tag('table', $guild->Members->count() > 20 ? array('style' => 'width: 100%;', 'border' => '1') : array(),
+	tag('table', array('border' => '1', 'style' => 'width: 100%;'),
 		tag('thead', tag('tr', tag('th', tag('b', lang('guild.rank'))) .
 			CharacterTable::getInstance()->getTableHeaderDatas(true) .
 			tag('th', tag('b', lang('guild.xp_given'))) .
-			tag('th', tag('b', lang('guild.xp_per'))))) .
-		tag('tbody', array('style' => array('height' => '550px', 'overflow' => 'auto')), $html));
+			tag('th', array('style' => array('width' => '5%')), tag('b', lang('guild.xp_per'))) .
+			tag('th', array('class' => 'showMe', 'style' => array('width' => '5%')), tag('b', lang('guild.rights'))))) .
+		tag('tbody', array('style' => array('overflow' => 'auto')), $html));
 		
 }

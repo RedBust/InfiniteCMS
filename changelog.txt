@@ -1,9 +1,7 @@
 ﻿(AJaX = pas de rechargement de la page)
 @todo
 ban ips
-guildmember.rights
 contact form
-remove APPEND_FORM_TAG ? to put it by default ...
 link to account's profile from character's profile
 1.3(?):
  Added a complete event system. You can add events via datetimepicker, choose a name.

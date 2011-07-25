@@ -24,6 +24,10 @@ $days = $table->sort($events);
 
 $firstDay = $date->format('N') - 1; //we don't compense the exact number, only [1st of the month]-1
 
+if (level(LEVEL_ADMIN))
+{
+	echo make_link('@event.update', lang('event.new')) . tag('br') . tag('br');
+}
 
 $months = array();
 foreach (range(1, 12) as $i)

@@ -26,4 +26,8 @@ class Event extends BaseEvent
 		}
 		return $this->elapsed;
 	}
+	public function refreshElapsed()
+	{
+		$this->elapsed = null;
+	}
 }

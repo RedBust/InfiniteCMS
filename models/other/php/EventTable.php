@@ -36,8 +36,9 @@ class EventTable extends RecordTable
 		global $account;
 		$this->_eventBoxes = array();
 
-		echo tag('div', array('style' => array('display' => 'none'), 'id' => 'eventParticipants', 'title' => lang('participants')), ''),
-		 tag('div', array('id' => 'selectChar', 'style' => array('display' => 'none'), 'title' => pluralize(ucfirst(lang('character')), count($account->Characters))), $account->getCharactersList(true));
+		echo tag('div', array('style' => array('display' => 'none'), 'id' => 'eventParticipants', 'title' => lang('participants')), '');
+		if ($account)
+			echo tag('div', array('id' => 'selectChar', 'style' => array('display' => 'none'), 'title' => pluralize(ucfirst(lang('character')), count($account->Characters))), $account->getCharactersList(true));
 		jQ('
 var eventParticipants = $("#eventParticipants").dialog(dialogOpt),
 	events = [],
