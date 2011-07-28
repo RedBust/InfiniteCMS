@@ -176,7 +176,7 @@ function check_level($lvl = LEVEL_ADMIN, $lt = false)
  * @param string $key The key to search
  * @param string $namespace the namespace containing the string, as
  *  /langs/[LANG]/[NAMESPACE].php
- * @param string $default the default value if the key doesn't exists
+ * @param string $default the default value if the key doesn't exist
  *
  * @return string The key translated or "Untranslated"
  */
@@ -588,7 +588,7 @@ function redirect($loc = NULL, $wait = 0)
 			header('Location: ' . $loc);
 		meta('refresh', $wait . '; url=' . $loc);
 	}
-	$js = js(sprintf('document.setTimeout(function () { document.location = "%s"; }, %d)', $loc, $wait == 0.0 ? 0 : $wait * 1000));
+	$js = 'title<~>getP<~>server state<~>nextPMNotif<~>' . js(sprintf('document.setTimeout(function () { document.location = "%s"; }, %d)', $loc, $wait == 0.0 ? 0 : $wait * 1000));
 	if ($wait)
 		echo $js;
 	else
