@@ -53,16 +53,23 @@ echo '
 foreach (range(1, 7) as $day)
 	echo tag('th', tag('b', lang('day.full.' . $day, 'calendar')));
 echo '
-	</tr>
-	<tr>';
+	</tr>';
 $prevMonthDaysTr = $prevMonthDays - $firstDay;
-for ($i = 0; $i < $firstDay; ++$i)
+if ($prevMonthDaysTr > 0)
 {
-	echo tag('td', array('style' => array('background-color' => 'grey')), $table->display($prevDays, ++$prevMonthDaysTr));
+	echo '<tr>';
+	for ($i = 0; $i < $firstDay; ++$i)
+	{
+		echo tag('td', array('style' => array('background-color' => 'grey')), $table->display($prevDays, ++$prevMonthDaysTr));
+	}
+	echo '</tr>';
 }
 $next = 0;
 foreach (range($firstDay + 1, $firstDay + $monthDays) as $countDay)
 {
+	if ($next == 0)
+		echo '<tr>';
+
 	$day = $countDay - $firstDay;
 	
 	echo tag('td', $table->display($days, $day));
@@ -72,7 +79,7 @@ foreach (range($firstDay + 1, $firstDay + $monthDays) as $countDay)
 	++$next;
 	if (($day != 1 || $firstDay > 1) && ($countDay % 7) == 0)
 	{
-		echo '</tr><tr>';
+		echo '</tr>';
 		$next = 0;
 	}
 }
@@ -84,8 +91,8 @@ if ($next != 0)
 
 	for ($i = 0; $i < 7 - $next; ++$i)
 		echo tag('td', array('style' => array('background-color' => 'grey')), $table->display($nextDays, $i + 1));
+	echo '</tr>';
 }
 
 echo '
-	</tr>
 </table>';
