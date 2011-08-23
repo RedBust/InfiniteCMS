@@ -1,1 +1,0 @@
-<div id="profil-2" style="display: none;"><b>Pseudo: </b>Anthony<br /><span class="f_level" data-id="2"><b><i><u>Administrateur</u></i></b></span><br /><br /><b>Dernière connexion: </b>Le 2011-07-06 21:35:34<br /><a class="link" href="/Infinite/Account/show/2">Plus ...</a></div> 
