@@ -40,7 +40,7 @@ foreach ($answers as $answer)
 	else
 		$msg = News::format($msg);
 	echo tag('tr', array('style' => array('width' => '20%;')),
-	 tag('td', tag('b', $answer->Author->Account->getProfilLink()) . tag('br') . sprintf(lang('_the_at'), $created[0], $created[1])) .
+	 tag('td', tag('b', make_link($answer->Author->Account)) . tag('br') . sprintf(lang('_the_at'), $created[0], $created[1])) .
 	 tag('td', array('style' => array('width' => '80%')), $msg));
 }
 $rcv = $thread->Receivers[$account->guid];

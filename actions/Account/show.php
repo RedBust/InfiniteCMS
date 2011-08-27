@@ -15,6 +15,7 @@ if (!( $acc = AccountTable::getInstance()->createQuery('a')
 		->fetchOne() ))
 { //@todo better error handling with $fromInclude ?
 	echo lang('acc.does_not_exists');
+	exit('lol');
 	return;
 }
 /* @var $acc Account */
@@ -47,23 +48,23 @@ if ($connected)
 $isAdmin = level(LEVEL_ADMIN);
 if (!$acc->relatedExists('User'))
 	$acc->User = UserTable::getInstance()->fromGuid($acc->guid);
-$info = tag('b', lang('pseudo') . ': ') . $acc->getPseudo() . $nl .
+$info = tag('b', lang('pseudo') . ': ') . $acc->getName() . $nl .
 		$acc->getLevel() . $nl .
 		( $isAdmin ? ($acc ? $acc->User->getPoints() : 0) . $nl : '' ) . //points if admin?
 		( $acc->banned ? sprintf(lang('acc.is_banned'), $acc->pseudo) . $nl : '' ) . //banned?
-		( $isFriend && $isFriendR ? sprintf(lang('acc.in_ur_friends_&'), $acc->getPseudo()) : //parse
-				( $isFriend ? sprintf(lang('acc.in_ur_friends'), $acc->getPseudo()) : ( $isFriendR ? //friend
-								sprintf(lang('acc.in_ur_friends_!'), $acc->getPseudo()) : '' ) ) ) . $nl . //(or not)
+		( $isFriend && $isFriendR ? sprintf(lang('acc.in_ur_friends_&'), $acc->getName()) : //parse
+				( $isFriend ? sprintf(lang('acc.in_ur_friends'), $acc->getName()) : ( $isFriendR ? //friend
+								sprintf(lang('acc.in_ur_friends_!'), $acc->getName()) : '' ) ) ) . $nl . //(or not)
 		( empty($lastCnx) ? '' : tag('b', lang('acc.last_cnx') . ': ') . $lastCnx ) . //lastConnection
 		( $isAdmin ? $nl . make_link(array(//edit link
-					'controller' => 'Account',
-					'action' => 'edit', //site_extra
-					'id' => $acc->guid,
-				), sprintf(lang('acc.edit'), $acc->pseudo), array(), array('class' => 'link')) . '&nbsp;&bull;&nbsp;' . make_link(array(
-					'controller' => 'Account', //edit link 2
-					'action' => 'index', //other
-					'id' => $acc->guid,
-				), sprintf(lang('acc.edit_infos'), $acc->pseudo), array(), array('class' => 'link')) : '' );
+				'controller' => 'User',
+				'action' => 'update',
+				'id' => $acc->guid,
+			), sprintf(lang('acc.edit'), $acc->pseudo), array(), array('class' => 'link')) . '&nbsp;&bull;&nbsp;' . make_link(array(
+				'controller' => 'Account',
+				'action' => 'update',
+				'id' => $acc->guid,
+			), sprintf(lang('acc.edit_infos'), $acc->pseudo), array(), array('class' => 'link')) : '' );
 
 unset($accountId);
 if ($fromInclude)
@@ -82,7 +83,7 @@ else
 		/* @var $f Account */
 		if ($f->guid != $acc->guid)
 		{ //not himself his friend (yeah, sometimes it happens ... sing with me ... "I'm a poor lonesone dofus player" ...)
-			$friends .= tag('li', '&bull;&nbsp;' . $f->getProfilLink());
+			$friends .= tag('li', '&bull;&nbsp;' . make_link($f));
 		}
 	}
 

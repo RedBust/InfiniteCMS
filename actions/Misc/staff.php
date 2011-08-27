@@ -11,7 +11,7 @@ if (count($config['staff']))
 		/* v2: { 'guid@5': ['Fondateur', 'Dev. client'], 'pseudo@Nami': ['Flemmard', 'Glandeur'] }
 		  $id = explode( '@', $id );
 		  if( ( strlen( $id ) - strlen( trim( $id, '\\' ) ) ) % 2 ) //not escaped
-		  { //no need to re-explode: there is any columns with \\
+		  { //no need to re-explode: there are no columns with \\
 		  $staffProfils[$id[0]][] = $id[1];
 		  $staff[$id] = $id[1];
 		  }
@@ -31,12 +31,12 @@ if (count($config['staff']))
 	foreach ($config['staff'] as $name => $rang)
 	{
 		if (isset($staffProfil[$name]))
-			$name = $staffProfil[$name]->getProfilLink();
+			$name = make_link($staffProfil[$name]);
 		/* v2
 		  foreach( $staffProfils as $key => $foo )
 		  if( isset( $staffProfils[$key][$name] ) )
 		  {
-		  $name = $staffProfils[$key][$name]->getProfilLink();
+		  $name = make_link($staffProfils[$key][$name]);
 		  break;
 		  }
 		 */

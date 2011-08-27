@@ -8,7 +8,7 @@
 class Member extends Multiton
 {
 	const CHAMP_LEVEL = 'level',
-	CHAMP_PSEUDO = 'pseudo',
+	CHAMP_PSEUDO = 'account',
 	CHAMP_PASS = 'pass';
 
 	public function lang()
@@ -24,25 +24,9 @@ class Member extends Multiton
 		return!empty($_POST[$this->CHAMP_PSEUDO]) ? $_POST[$this->CHAMP_PSEUDO] : $d;
 	}
 
-	public function level()
-	{
-		global $account;
-		if (!empty($account) && $account instanceof Account)
-			return $account->level;
-		return LEVEL_GUEST;
-	}
-
 	public function init()
 	{
 		$this->lang = $this->lang();
-	}
-
-	/**
-	 * @return boolean
-	 */
-	public function isSending()
-	{
-		return $this->pseudo() === NULL && $this->level() === NULL;
 	}
 
 	/**
@@ -61,7 +45,6 @@ class Member extends Multiton
 	}
 
 	/**
-	 * log
 	 * logs the user
 	 *
 	 * @return User
@@ -73,21 +56,27 @@ class Member extends Multiton
 		else if ($guid === NULL)
 			$guid = $_SESSION['guid'];
 
-		return UserTable::fromGuid($guid);
+		return UserTable::getInstance()->fromGuid($guid);
 	}
+
 	/*
-	 * Retourne du texte représentatif du rang
+	 * returns string representation of the level
 	 *
 	 * @param integer $lvl Niveau du membre
 	 */
-
-	public static function formateLevel($lvl)
+	public static function formateLevel($lvl, $vip)
 	{
 		$lvl = intval($lvl);
 		$lvls = self::getFormattedLevels();
+		return $lvls[self::adjustLevel($lvl, $vip)];
+	}
+	public static function adjustLevel($lvl, $vip)
+	{
 		if ($lvl > LEVEL_ADMIN)
-			$lvl = LEVEL_ADMIN;
-		return $lvls[$lvl];
+			return LEVEL_ADMIN;
+		if ($lvl == LEVEL_LOGGED && $vip)
+			return LEVEL_VIP;
+		return $lvl;
 	}
 
 	public static function getLevels()
@@ -95,6 +84,7 @@ class Member extends Multiton
 		return array(
 			LEVEL_GUEST => lang('rank.guest'),
 			LEVEL_LOGGED => lang('rank.player'),
+			LEVEL_VIP => lang('rank.vip'),
 			LEVEL_TEST => lang('rank.test'),
 			LEVEL_MODO => lang('rank.mod'),
 			LEVEL_MJ => lang('rank.gm'),
@@ -107,6 +97,7 @@ class Member extends Multiton
 		return array(
 			LEVEL_GUEST => lang('rank.guest'),
 			LEVEL_LOGGED => '<i>' . lang('rank.player') . '</i>',
+			LEVEL_VIP => '<b>' . lang('rank.vip') . '</b>',
 			LEVEL_TEST => '<u>' . lang('rank.test') . '</u>',
 			LEVEL_MODO => '<b><i>' . lang('rank.mod') . '</i></b>',
 			LEVEL_MJ => '<b><u>' . lang('rank.gm') . '</u></b>',

@@ -105,6 +105,12 @@ return array(
 	//Points given for one pass
 	//Points donnés pour un pass
 	'POINTS_CREDIT' => 100,
+	//Points given for a vote from a VIP
+	//Points donnés pour un vote PAR UN VIP
+	'POINTS_VOTE_VIP' => 4,
+	//Points given for one pass from a VIP
+	//Points donnés pour un pass PAR UN VIP
+	'POINTS_CREDIT_VIP' => 140,
 
 	//Used for "server online?"
 	//Utilisé pour "serveur en ligne ?"

@@ -26,19 +26,19 @@ else
 	foreach ($threads as $thread)
 	{
 		$receivers = array();
-		foreach ($thread['Receivers'] as $i => $receiver)
+		foreach ($thread->Receivers as $i => $receiver)
 		{
-			if ($receiver['user_guid'] != $account->guid)
-				$receivers[] = $receiver['Account']->getProfilLink();
+			if ($receiver->user_guid != $account->guid)
+				$receivers[] = make_link($receiver->Account);
 		}
-		$fAnswer = $thread['Answers'][0]; //fAnswer
-		$new = $unreads->contains($thread['id']) ? tag('b', tag('u', '!')) . '&nbsp;' : '';
-		$_url = $url + array('id' => $thread['id']);
-		if ($thread['Receivers'][$account->guid]['next_page'] != 0)
-			$_url += array('page' => $thread['Receivers'][$account->guid]['next_page']);
+		$fAnswer = $thread->Answers->getFirst(); //fAnswer
+		$new = $unreads->contains($thread->id) ? tag('b', tag('u', '!')) . '&nbsp;' : '';
+		$_url = $url + array('id' => $thread->id);
+		if ($thread->Receivers[$account->guid]->next_page != 0)
+			$_url += array('page' => $thread->Receivers[$account->guid]->next_page);
 
-		echo tag('li', sprintf(lang('pm.info'), $new . make_link($_url, html($thread['title'])), '<i>' . implode('</i>, <i>', $receivers) . '</i>') .
-		 sprintf(lang('pm.last_answer_by_on'), $fAnswer['Author']['Account']->getProfilLink(), $fAnswer['created_at']));
+		echo tag('li', sprintf(lang('pm.info'), $new . make_link($_url, html($thread->title)), '<i>' . implode('</i>, <i>', $receivers) . '</i>') .
+		 sprintf(lang('pm.last_answer_by_on'), make_link($fAnswer->Author->Account), $fAnswer->created_at));
 	}
 echo '</ul>';
 }

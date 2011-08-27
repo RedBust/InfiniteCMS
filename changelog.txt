@@ -1,16 +1,47 @@
 ﻿(AJaX = pas de rechargement de la page)
 @todo
 ban ips
-guildmember.rights
 contact form
 remove APPEND_FORM_TAG ? to put it by default ...
 link to account's profile from character's profile
 1.3(?):
+ There's now a "VIP" rank, which provides 
+  - special items in shop
+  - special prices for items
+  - different number of points gained with vote/code
+ There's CURRENTLY now way (other than DB edit) to be VIP. It'll be fixed
+ Changed the way account's characters are handled :
+  Now, you have a "main char" when you first log-in (with Characters.count > 0) which will perform all the actions
+  You can change him via a link (if Characters.count > 1). It's not re-active (event participation's character won't be replaced)
+ Changed the way make_link and replace_url behave. replace_url($url) : ($recordName is make_link param #2)
+  - a string :
+   - if routes[$url]
+    - routes to the URL replacement
+   - else
+    - routes to $url
+  - an array
+   - routes to key/value pairs
+  - a Doctrine_Record object :
+    - if !$url.exists? :
+     - routes to [$url.class.to_s]/update
+    - else :
+     - if $url.respond_to?(:getLink) && $recordName !== false
+      - return $url.getLink($recordName)
+     - else
+      - unless $recordName.is_a String
+       - $recordName = $url.getName()
+      - routes to [$url.class.to_s]/show/[$url.getId()]
+   - anything else : returns it.
+ fixed redirect()
+ Refactored controllers : there's now a controller named User, handling updating / login / delog / credit / vote / ladder_vote. There's also a new controller named Comment/, handling censor update create
+ Refactored actions : Account/index is now Account/update, Account/new is now Account/create and Account/edit is now User/update. News/comment has been splitted (see above)
+ Refactored some vars to use english name, refactored some comments, and so on.
  Added a complete event system. You can add events via datetimepicker, choose a name.
   Then, navigate between months / years with a calendar (from monday to saturday, empty cases (if the month starts at wednesday, i.e.) are filled with prev month's events).
   JS OFF : There's a like "register" / "unregister" (or no link if event.elapsed) beside the event's name (2 buds + a sign "+" / a sign "-")
   JS ON : There's a link "participate" (image of 2 buds), beside the event's name (unless event.elapsed && no participants). 
    From here, there's a list of participants. Your character (if registered) will be in red.
+  You can also add reward, and enter the winner's same if event.elapsed?
  Added a complete PM system.
   You can add many receivers (but only the ones who have you got you as a friend). Using jQuery.tokenInput facebook style to autocomplete.
   You can't add / remove a receiver during the conversation (even it would take only 3/4 lines, I don't want)
@@ -54,7 +85,8 @@ link to account's profile from character's profile
  Added the comment author
  Renamed so DB aliases.
  Refactored SQL code, to use Doctrine's generation.
- Updated to jQuery 1.5 and jQuery UI to 1.9
+ Updated to jQuery 1.6.2
+ Updated to jQuery UI to 1.9
  Fixed way the router handles /Controller/action/NOT NUMBER/xxx (no more XXX = mode !)
  Removed the level in Account/ladder_vote (use modal view instead)
  Added the ability to disable the GuestBook with config.RATES_BY_PAGE to -1
@@ -67,8 +99,7 @@ link to account's profile from character's profile
  Fixed Shop/delete effect
  Moved Account/join regexp's to an strtr control. Also changed configuration with launcher links
  Added date + date_range in input's types
- Added pagination on Shop/search
- Removed ALL $nl
+ Removed $nl
  Added format to guild's xp
  Added a fallback in IG::getStat in case there is no value for this stat
  Added an error if action starts with _
@@ -83,11 +114,11 @@ link to account's profile from character's profile
  Refactored the way Emblem tag is generated (for multiple "calls" to the same emblem)
  Added a visitCart mode for Characters : Character/show/[id].png or Character/show/[column]/[value].png
   ie : Character/show/name/Vende.png
- Showing : Character name. Account pseudo. Breed + gender + level. Guild infos (name + lvl).
-  Alignment infos (name + rank + honor + dishonor if >0). Kamas + statsPoints + spellsPoints.
-  Stats : int, wisdom, str, agi, luck, vita. AP + MP. Add if >0 : CC, +dmg, %dmg
- Added a stats page, with 2 pie charts (genders + breeds) and a lot of informations (counters, averages, ...)
- Integrated AJaX system with history.pushState, if disponible
+  showing : Character name. Account pseudo. Breed + gender + level. Guild infos (name + lvl).
+   Alignment infos (name + rank + honor + dishonor if >0). Kamas + statsPoints + spellsPoints.
+   Stats : int, wisdom, str, agi, luck, vita. AP + MP. Add if >0 : CC, +dmg, %dmg
+ Added a stats page, with 3 pie charts (genders + breeds + aligns) and a lot of informations (counters, averages, ...)
+ Integrated AJaX system with history.pushState, if avalaible
 1.2.2:
  Many others bugs fixed (I'm thinking about validating inputs one-by-one ...)
  Removed the possibility to put the same title in comment by setting "-1" (how ugly !)

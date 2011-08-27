@@ -87,8 +87,7 @@ class User
 		$unreads = $this->getUnreadPM();
 		if ($unreads->count())
 		{
-			foreach ($unreads as $unread)
-				break; //:eq(0) won't work ...
+			$unread = $unreads[0];
 			$pm_url = to_url(array('controller' => 'PrivateMessage', 'action' => 'show', 'id' => $unread['id'], 'page' => $unread['Receivers'][$this->guid]['next_page']));
 			return sprintf(lang('pm.arrived' . ($unreads->count() > 1 ? 's' : '')), $pm_url, $unreads->count()) . tag('br');
 		}

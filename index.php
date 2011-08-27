@@ -20,7 +20,7 @@
  *
  * Nami-D0C
  */
-//$mem is used for my debug (shows where is memory leaks)
+//$mem is used for my debug (shows where are memory leaks)
 $mem = '<br />' . memory_get_usage() . ': Avant tout<br />';
 define('ROOT', './');
 define('EXT', strrchr(__FILE__, '.'));
@@ -31,6 +31,7 @@ ini_set('include_path', implode(PATH_SEPARATOR, array(
 )));
 $mem .= memory_get_usage() . ': Avant fonctions.php<br />';
 //load API + bootstrap
+
 try
 {
 	require 'lib/bootstrap' . EXT;
@@ -41,7 +42,7 @@ try
 	else
 		exit('Problems during the init. Please contact the server admin.');
 }
-global $config, $account, $compte, $router, $member;
+
 $mem .= memory_get_usage() . ': Apres fonctions.php<br />';
 
 $infos = $router->getInfos();
@@ -50,8 +51,8 @@ $infos = $router->getInfos();
 $title = lang($infos['controller'] . ' - ' . $infos['action'], 'title', true);
 $connected = $member->isConnected();
 $isSpecialExt = $router->getExt() !== EXT && $router->getExt() !== NULL;
-$headers = !$isSpecialExt && $router->requestVar('header', 1) == 1;
 $output = (bool) $router->requestVar('output', 1);
+$headers = $output ? ( !$isSpecialExt && $router->requestVar('header', 1) == 1 ) : false;
 meta('Content-Type', 'text/html; charset=UTF-8'); //@todo move this
 $mem .= memory_get_usage() . ': Avant controller+action<br />';
 
@@ -74,10 +75,10 @@ try
 		}
 		else
 		{ //normally load the page
-			jQ(false, 'cache');
+			jQ(false, 'cache'); //enter cache mode
 			require_once $router->getPath();
-			jQ(false, 'main');
-			jQ(jQ(NULL, 'cache'));
+			jQ(false, 'main'); //go back to main mode
+			jQ(jQ(NULL, 'cache')); //add remaining cache JS into main
 		}
 	}
 

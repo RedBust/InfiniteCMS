@@ -34,12 +34,23 @@ Comment:
       class: User
       local: author_id
       foreign: id
+
 ShopItem:
   connection: other
   columns:
     name: varchar(255)
     cost: integer(9)
+    cost_vip: integer(9)
     description: text
+    is_vip:
+      type: boolean
+      default: 0
+    is_lottery:
+      type: boolean
+      default: 0
+    is_hidden:
+      type: boolean
+      default: 0
   relations:
     Effects:
       class: ShopItemEffect
@@ -74,6 +85,7 @@ User:
       default: 0
     lastIP: integer(9)
     culture: varchar(255)
+    main_char: integer(9)
   relations:
     Comments:
       class: Comment
@@ -101,7 +113,7 @@ User:
 #    description: text
 #    author: text
 #    state:
-#Envoy� - en cours - r�solu
+#Envoyé - en cours - résolu
 #      type: enum
 #      length: 3
 #      values: [0, 1, 2]
@@ -273,6 +285,7 @@ PrivateMessageThreadReceiver:
 Event:
   connection: other
   columns:
+    guild_id: int(9)
     name: varchar(255) #i.e. "goodbye server /rofl"
     period: datetime
   relations:
@@ -282,6 +295,9 @@ Event:
       type: many
       local: event_id
       foreign: character_id
+    Guild:
+      local: guild_id
+      foreign: id
 EventParticipant:
   connection: other
   columns:
@@ -404,13 +420,12 @@ Account:
       primary: false
       notnull: true
       autoincrement: false
-    stable:
-      type: string()
-      fixed: false
-      unsigned: false
-      primary: false
-      notnull: true
-      autoincrement: false
+    logged:
+      type: boolean
+      default: '0'
+    vip:
+      type: boolean
+      default: '0'
   relations:
     User:
       local: guid

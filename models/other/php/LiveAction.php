@@ -10,16 +10,4 @@
  */
 class LiveAction extends BaseLiveAction
 {
-	public static function giveItem($perso, $objet)
-	{
-		global $types, $config;
-		if (!isset($types[$objet['type']]))
-			return;
-
-		$item = new self;
-		$item->Character = $perso;
-		$item->action = $objet['type'];
-		$item->nombre = $objet['value'];
-		$item->save();
-	}
 }

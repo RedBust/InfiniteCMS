@@ -22,20 +22,20 @@ if ($cache = Cache::start($router->getController() . '_show_' . $id .
 	}
 
 	jQ('
-	var acc = $( "#comments" );
-	acc.accordion(
-		{
-			collapsible: true,
-			fillSpace: true
-		} ).sortable(
-			{
-				axis: "y",
-				handle: "h3"
-		} );
-	binds.add(function ()
-		{
-			delete acc;
-		});');
+var acc = $("#comments");
+acc.accordion(
+{
+	collapsible: true,
+	fillSpace: true
+} ).sortable(
+	{
+		axis: "y",
+		handle: "h3"
+} );
+binds.add(function ()
+{
+	delete acc;
+});');
 	$com_actual = 0;
 	$coms = '';
 	foreach ($news->Comments as $com)
@@ -86,18 +86,17 @@ if ($cache = Cache::start($router->getController() . '_show_' . $id .
 					<!-- -->
 				</div>', make_link(array('controller' => $router->getController(), 'action' => 'index'), lang('back_to_index')),
 			$news->buildLinks(),
-			sprintf(lang('by'), $news->relatedExists('Author') && $news->Author->relatedExists('Account') ? $news->Author->Account->getProfilLink() : '?'), sprintf(lang('created'), $news['created_at']), $news['updated_at'] && $news['updated_at'] != $news['created_at'] ? sprintf(lang('last_update'), $news['updated_at']) : '',
+			sprintf(lang('by'), $news->relatedExists('Author') && $news->Author->relatedExists('Account') ? make_link($news->Author->Account) : '?'), sprintf(lang('created'), $news['created_at']), $news['updated_at'] && $news['updated_at'] != $news['created_at'] ? sprintf(lang('last_update'), $news['updated_at']) : '',
 			News::format($news['content']),
 			$config['MAX_COMMENTS'] == 0 ? '<!--' : '', //comments are disabled
 			( $canComment ? js_link('$( "#form_coms").slideToggle(); $("#comments").slideToggle();', $comsTitle) : ( count($news->Comments) ? $comsTitle : '' )),
 			( $canComment ? make_form(array(
-						array('title', ucfirst(lang('title')) . ':<br />', NULL, strip_tags($news->title)),
-						array('comment', ucfirst(lang('news.com.title')) . ':<br />', 'textarea', NULL, array('cols' => 20, 'rows' => 10)),
-					), to_url(array('action' => 'comment', 'mode' => 'add', 'id' => $news->id))) : ''), $coms);
+				array('title', ucfirst(lang('title')) . ':<br />', NULL, strip_tags($news->title)),
+				array('comment', ucfirst(lang('news.com.title')) . ':<br />', 'textarea', NULL, array('cols' => 20, 'rows' => 10)),
+			), to_url(array('controller' => 'Comment', 'action' => 'create', 'id' => $news->id))) : ''), $coms);
 
 
-	#$cols = array('content'); //columns for edit in place in comments. Note: impossible with title. BELIEV ME FOOLS, I ALREADY TRIED ��
-	$col = 'content';
+	$cols = array('content'); //columns for edit in place in comments. Note: impossible with title. BELIEV ME FOOLS, I ALREADY TRIED §§
 	if (level(LEVEL_ADMIN))
 	{
 		$url = to_url(array(//URL for editInPlace of the title of the news
@@ -105,15 +104,16 @@ if ($cache = Cache::start($router->getController() . '_show_' . $id .
 					'action' => 'update',
 					'col' => 'title',
 					'output' => 0,
-					'id' => $news['id'],
+					'id' => $news->id->,
 		), false);
 		$url_com = array(
 			'_base' => array(//url for editInPlace of the content of a comment
-				'controller' => $router->getController(),
-				'action' => 'comment',
+				'controller' => 'Comment',
+				'action' => 'update',
 				'mode' => 'update',
+				'mod' => 1, //moderator action
 				'output' => 0,
-				'id' => '%%t.attr( "data-id" )%%',
+				'id' => '%%t.data("id")%%',
 			),
 		);
 		#foreach ($cols as $col)
@@ -124,33 +124,33 @@ if ($cache = Cache::start($router->getController() . '_show_' . $id .
 		#}
 		jQ('
 	$( "#newsTitle" ).editInPlace(
-		{
-			url: "' . $url . '",
-		} );');
+	{
+		url: "' . $url . '",
+	} );');
 	}
 	if ($config['MAX_COMMENTS'] != 0)
 	{
 		#foreach ($cols as $col)
 		#{
 			jQ('
-		$( ".comment-' . $col . '" ).each( function()
+$( ".comment-' . $col . '" ).each( function()
+	{
+		//t is used by $url_com[$col]
+		t = $( this );
+		' . ( level(LEVEL_ADMIN) ? '
+		t.editInPlace(
+		{
+			url: "' . $url_com[$col] . '",
+			field_type: "textarea"
+		} );' : '' ) . '
+		t.parent().resizable(
+		{
+			resize: function()
 			{
-				//t is used by $url_com[$col]
-				t = $( this );
-				' . ( level(LEVEL_ADMIN) ? '
-				t.editInPlace(
-					{
-						url: "' . $url_com[$col] . '",
-						field_type: "textarea"
-					} );' : '' ) . '
-				t.parent().resizable(
-					{
-						resize: function()
-						{
-							acc.accordion( "resize" );
-						},
-					} );
-			} );');
+				acc.accordion( "resize" );
+			},
+		} );
+	} );');
 		#}
 	}
 	$cache->save();

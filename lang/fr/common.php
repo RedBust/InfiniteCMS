@@ -24,7 +24,8 @@ return array(
 	'desc' => 'Description',
 	'point' => 'point',
 	'votes' => 'Votes',
-	'cost' => 'Co&ucirc;t',
+	'cost' => 'Prix',
+	'cost_vip' => 'Prix VIP',
 	'type' => 'Type',
 	'unknow' => 'Inconnu',
 	'any_characters' => 'aucun personnage',
@@ -76,7 +77,8 @@ return array(
 	'error.404' => 'Page introuvable',
 	'rank.guest' => 'Invité',
 	'rank.player' => 'Joueur',
-	'rank.newser' => 'Newseur',
+	'rank.VIP' => 'VIP',
+	'rank.newser' => 'Newseur', //?
 	'rank.test' => 'En test',
 	'rank.mod' => 'Modérateur',
 	'rank.gm' => 'Ma&icirc;tre du Jeu',
@@ -143,14 +145,18 @@ return array(
 	'shop.item.no_by_criteria' => 'Aucun objet ne correspond à vos critères de recherche',
 	'shop.need_filter' => 'Vous devez au moins activer un filtre',
 	'shop.check_to_filter' => 'Pour activer un filtre, cochez la case au début de la ligne',
-	'shop.cost' => 'Co&ucirc;t (Code:%d,Vote:%d)',
+	'shop.cost' => 'Prix (code:%d,vote:%d;VIP code:%d,vote:%d)',
+	'shop.cost_simple' => 'Prix (code:%d,vote:%d)',
 	'shop.buy' => make_img('bouton/btn_buy', EXT_PNG),
 	'shop.any_objects' => 'Aucun objet !',
-	'shop.!character_on_acc' => 'Le personnage n\'existe pas ou n\'est pas sur votre compte !',
 	'shop.must_be_logged' => 'Vous devez &ecirc;tre connecté pour avoir accès à la boutique',
 	'shop.!buy_but_credit' => 'Vous n\'avez pas assez de points pour acheter <b>%s</b> !<br />Mais vous pouvez <i>%s</i> ou <i>%s</i> ...%s', // First %s = item to buy, 2 = credit, 3 = vote, 4 = return_back
 	'shop.bought' => 'Vous avez bien acheté <b>%s</b> !<br />Vous recevrez votre cadeau en jeu d\'ici maximum cinq minutes%s', // first %s = item, second = go back
-	'shop.choose_charac' => 'Choississez un personnage',
+	'shop.lottery_bought' => 'Vous avez bien acheté <b>%s</b> en Loterie, vous avez reçu <b>%s</b> !<br />Vous recevrez votre cadeau en jeu d\'ici maximum cinq minutes%s', // first %s = item, second = effect (coz lottery), third = go back
+	'shop.fill_before_add' => 'Vous devez remplir tous les effets avant d\'en ajouter',
+	'shop.is_vip' => 'VIP',
+	'shop.is_lottery' => 'Loterie',
+	'shop.is_hidden' => 'Caché',
 	'character.does_not_exists' => 'Le personnage n\'existe pas',
 	'character.on_acc' => '<b>%s</b> est sur votre compte', //%s = character name
 	'character.on_acc_of' => '<b>%s</b> est sur le compte de %s', //first %s = character name, second = account pseudo
@@ -169,9 +175,16 @@ return array(
 	'character.spell_pos' => 'Position du sort',
 	'character.leader_of' => 'Meneur de la guilde "%s"',
 	'character.member_of' => 'Membre de la guilde "%s"',
+	'character._rank_of' => '<b>%s</b> chez %s',
 	'character.guild_infos' => '<b>%s</b> appartient à la guilde %s, niveau %d.', //%1: character name | %2: guild emblem + guild name, %d: guild level
 	'character.give' => 'Faire un don',
 	'character.given' => 'Vous avez donné une action de type <b>%s</b> avec la valeur <b>%s</b> à <b>%s</b>', //1 => effect name. 2 = effect value. 3 = character name
+	'character.!on_acc' => 'Le personnage n\'existe pas ou n\'est pas sur votre compte !',
+	'character.main' => 'Personnage principal',
+	'character.main.new' => 'Il semble que ce soit votre première visite sur le site avec un personnage.<br />
+Votre personnage principal a été changé (vous pouvez le voir dans le menu, en dessous des informations sur votre compte).<br />
+Votre personnage principal est le personnage qui recevra vos commandes boutique, qui sera celui inscrit aux évènements et, s\'il mène une guilde, il pourra organiser des évènements pour celui-ci. En outre, dans les messages privés, ce sera le personnage montré.<br /><b>Note :</b> vous pouvez le changer à tout moment via l\'icone à côté de son nom. La modification n\'est pas rétro-active, c\'est-à-dire que si vous vous êtes inscrit avec un autre personnage à un évènement (par exemple), celui-ci ne prendra pas sa place.',
+	'character.main.lempty' => 'Vous n\'avez pas de personnage.', //lempty = list empty
 
 	'acc.register.accept_tos' => 'J\'accepte les ' . make_link('@tos', 'Conditions Générales d\'utilisations'), //ugly ? no, it's ONLY a link.
 	'acc.register.password' => 'Mot de passe',
@@ -179,6 +192,7 @@ return array(
 	'acc.register.question' => 'Question secrète',
 	'acc.register.answer' => 'Réponse secrète',
 	'acc.register.banned' => 'Bannis',
+	'acc.register.unsafe_dup' => 'Vous ne pouvez pas utiliser votre mot de passe, votre pseudo ou votre nom de compte dans votre mot de passe, votre pseudo ou votre nom de compte, ni dans vos questions / réponses secrètes.',
 	'acc.is_banned' => '<b>%s</b> est bannis',
 	'acc.register.infos' => 'Données du compte',
 	'acc.register.prefs' => 'Préférences',
@@ -358,7 +372,7 @@ Vous pouvez vous inscrire %register%.{/register}{log}-->{/log}', //{log} = if lo
 	'guild.rank.19' => 'Eleveur',
 	'guild.rank.18' => 'Marchand',
 	'guild.rank.17' => 'Apprenti',
-	'guild.rank.0' => 'à l\'essai',
+	'guild.rank.0' => '&Agrave; l\'essai',
 	'guild.rank.16' => 'Bourreau',
 	'guild.rank.15' => 'Déserteur',
 	'guild.rank.14' => 'Boulet',
@@ -396,6 +410,7 @@ Vous pouvez vous inscrire %register%.{/register}{log}-->{/log}', //{log} = if lo
 	'align.lvl.9' => 'Commandeur',
 	'align.lvl.10' => 'Heros',
 
+	'stats.all' => 'Toutes les statistiques',
 
 	'please_enable_js' => 'Veuillez activer le JavaScript',
 

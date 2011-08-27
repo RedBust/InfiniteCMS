@@ -94,39 +94,50 @@ if($c = Cache::start("Account_show_profil_' . $this->guid . '_" . ($connected ? 
 		}
 	}
 
-	public function getProfilLink($text = NULL)
+	public function getLink($text = NULL)
 	{
 		$this->sendProfil();
-		return js_link('showProfil(' . $this->guid . ');', $text === NULL ? $this->getPseudo() : $text, to_url(array(
-					'controller' => 'Account',
-					'action' => 'show',
-					'id' => $this->guid
-				)));
+		return js_link('showProfil(' . $this->guid . ');', $text === NULL ? $this->getName() : $text, to_url(array(
+			'controller' => 'Account',
+			'action' => 'show',
+			'id' => $this->guid
+		)));
 	}
 
-	public function getPseudo()
+	public function getName()
 	{
 		return $this->banned ? tag('strike', $this->pseudo) : $this->pseudo;
 	}
 
+	/**
+	 * @return float number representation of the level
+	 */
+	public function getLvl()
+	{
+		return Member::adjustLevel($this->level, $this->vip);
+	}
+	/**
+	 * @return string string representation of the level (html mix)
+	 */
+	public function getFormattedLevel()
+	{
+		return Member::formateLevel($this->level, $this->vip);
+	}
+	/**
+	 * @return string html representation of the level (Edit In Place mix)
+	 */
 	public function getLevel($format = true)
 	{
 		return tag('span', array(
 			'class' => 'f_level',
 			'data-id' => $this->guid,
-				), $format ? $this->getFormattedLevel() : $this->getSimpleLevel());
+		), $format ? $this->getFormattedLevel() : $this->getLvl());
 	}
-
-	public function getFormattedLevel()
+	public function isVIP()
 	{
-		return Member::formateLevel($this->level);
-	}
-
-	public function getSimpleLevel()
-	{
-		$lvls = Member::getLevels();
-		$lvl = $this->level > LEVEL_ADMIN ? $this->level : LEVEL_ADMIN;
-		return $lvls[$lvl];
+		if (level(LEVEL_TEST)) //in-test mod (reminder)
+			return true;
+		return $this->vip;
 	}
 
 	public function canParticipate($event)
@@ -161,7 +172,6 @@ if($c = Cache::start("Account_show_profil_' . $this->guid . '_" . ($connected ? 
 	}
 
 	/**
-	 * getFriends
 	 * return friends
 	 *
 	 * @return Collection list of friends
@@ -175,14 +185,13 @@ if($c = Cache::start("Account_show_profil_' . $this->guid . '_" . ($connected ? 
 		{ //init
 			$this->amis = Query::create()
 					->from(__CLASS__)
-					->whereIn('guid', explode(',', $this->friends))
+						->whereIn('guid', explode(',', $this->friends))
 					->execute();
 		}
 		return $this->amis;
 	}
 
 	/**
-	 * hasFriend
 	 * determines if this Account has this friend
 	 *
 	 * @param Account $acc The account that may be the friend
@@ -201,8 +210,7 @@ if($c = Cache::start("Account_show_profil_' . $this->guid . '_" . ($connected ? 
 	}
 
 	/**
-	 * preInsert
-	 * Execute action before insert
+	 * executes action before insert
 	 *
 	 * @package Doctrine
 	 * @subpackage hooks
@@ -236,8 +244,7 @@ if($c = Cache::start("Account_show_profil_' . $this->guid . '_" . ($connected ? 
 	}
 
 	/**
-	 * maj
-	 * Update the account
+	 * updates the account
 	 *
 	 * @global Accounts $account
 	 *
@@ -250,6 +257,7 @@ if($c = Cache::start("Account_show_profil_' . $this->guid . '_" . ($connected ? 
 	{
 		global $account, $member, $config;
 		$errors = array();
+
 		if (empty($columns) || $columns === true)
 		{
 			//no, no, it's not getTable()->getColumnNames
@@ -275,13 +283,22 @@ if($c = Cache::start("Account_show_profil_' . $this->guid . '_" . ($connected ? 
 			{
 				if ($t === 'level')
 				{
-					if ($values[$t] === LEVEL_BANNED)
-					{ //just put "banned", don't modify the level. But ... "LEVEL_BANNED" is not showed in rank list !
+					if ($values[$t] == LEVEL_BANNED)
+					{ //just put "banned", don't modify the level. But ... "LEVEL_BANNED" is not in the ranks list !
 						$this->banned = 1;
 						continue;
 					}
-					if ($values[$t] === LEVEL_GUEST)
-						$values[$t] = LEVEL_LOGGED;
+					if ($values[$t] == LEVEL_VIP)
+					{
+						$this->vip = 1;
+						continue; //reset level to LOGGED? 
+					}
+					if ($values[$t] == LEVEL_GUEST)
+						$values[$t] = LEVEL_LOGGED; //would delete the account ... and it'd be stupid.
+					if ($values[$t] == LEVEL_LOGGED && $this->vip)
+					{
+						$this->vip = 0; //no continue.
+					}
 					if ($values[$t] > LEVEL_ADMIN)
 						$values[$t] = LEVEL_ADMIN;
 				}
@@ -293,8 +310,8 @@ if($c = Cache::start("Account_show_profil_' . $this->guid . '_" . ($connected ? 
 		{
 			$errors['email'] = lang('acc.register.error.mail');
 		}
-		if (!$this->exists()
-				&& (!isset($values['tos']) || ( $values['tos'] !== 'on' && $values['tos'] !== '' ) ))
+		if (( !isset($values['tos']) || ( $values['tos'] !== 'on' && $values['tos'] !== '' ) )
+		 && !$this->exists())
 		{
 			$errors['tos'] = sprintf(lang('acc.register.error.tos'), make_link('@tos', lang('cgu')));
 		}
@@ -329,11 +346,55 @@ if($c = Cache::start("Account_show_profil_' . $this->guid . '_" . ($connected ? 
 				$errors['_'] = lang('acc.register.error.already_created_acc');
 			}
 		}
+		if (strpos($this->pseudo, $this->account) !== false
+		 || strpos($this->account, $this->pseudo) !== false
+		 || strpos($this->pass, $this->account) !== false
+		 || strpos($this->account, $this->pass) !== false
+		 || strpos($this->pass, $this->pseudo) !== false
+		 || strpos($this->pseudo, $this->pass) !== false
+		 || strpos($this->question, $this->pseudo) !== false
+		 || strpos($this->question, $this->account) !== false
+		 || strpos($this->question, $this->pass) !== false
+		 || strpos($this->reponse, $this->pseudo) !== false
+		 || strpos($this->reponse, $this->account) !== false
+		 || strpos($this->reponse, $this->pass) !== false)
+		{ //:'). In fact : if [pseudo, account, pass].any in [pseudo, account, pass, question, reponse] then fail
+			$errors['unsafe_dup'] = lang('acc.register.unsafe_dup'); //duplication
+		}
 		if ($errors === array())
 		{
 			$this->save();
 		}
 
 		return $errors;
+	}
+
+	public function getId()
+	{
+		return $this->guid;
+	}
+	public function getMainChar()
+	{
+		if (!$this->Characters->count())
+			return null;
+		if (!$this->relatedExists('User'))
+			$this->User = UserTable::getInstance()->fromGuid($this);
+		if ($this->User->main_char != 0 && $this->Characters->contains($this->User->main_char))
+			return $this->Characters[$this->User->main_char];
+
+		jQ('$("#firstMainChar").dialog(dialogOptO);');
+
+
+		$main_char = $this->Characters->getFirst();
+		if ($this->Characters->count() != 1)
+		{
+			foreach ($this->Characters as $character)
+			{
+				if ($main_char instanceof Character && $character->xp > $main_char->xp)
+					$main_char = $character;
+			}
+		}
+		$this->User->main_char = $main_char->guid;
+		return $main_char;
 	}
 }

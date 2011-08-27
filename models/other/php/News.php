@@ -10,8 +10,6 @@
  */
 class News extends BaseNews
 {
-	protected static $_panelsInit = false;
-
 	/**
 	 * format
 	 * format a news after TinyMCE editing
@@ -76,42 +74,6 @@ class News extends BaseNews
 		return $errors;
 	}
 
-	protected static function _initPanels()
-	{
-		if (!self::$_panelsInit)
-		{
-			echo tag('div', array(
-				'title' => lang('Index - update', 'title'),
-				'id' => 'news_edit',
-				'style' => 'display: none;'
-			), '');
-			jQ('
-var newsPanel = $( "#news_edit" ), f = true;
-newsPanel.dialog( $.extend( dialogOpt, {"modal": false } ) );
-function newsEditPanel(id)
-{
-	var cont = $( "#form_content_ifr" ).find( "html > body" ).html();
-	if( cont === "" || cont === null )
-	{
-		updateContent( locations[$( ".edit_link_" + id ).attr( "id" )] );
-		return;
-	}
-	newsPanel.find( "div" ).hide();
-	newsPanel.find( "#news_panel-" + id ).show();
-	newsPanel.dialog( "open" );
-	
-	if( f )
-	{
-		tinymce_include();
-		f = false;
-	}
-}
-bind( function () { newsPanel.dialog( "close" ); delete newPanel; delete f; } );');
-			define('FROM_INCLUDE', true);
-			self::$_panelsInit = true;
-		}
-	}
-
 	public function buildLinks()
 	{
 		global $router, $config;
@@ -124,7 +86,7 @@ bind( function () { newsPanel.dialog( "close" ); delete newPanel; delete f; } );
 		$auth = level(LEVEL_ADMIN);
 		if ($auth)
 		{
-			self::_initPanels();
+			$this->getTable()->initPanels();
 			$news = $this; //temp for _form
 			echo tag('div', array('id' => 'news_panel-' . $this['id'], 'class' => 'news-panel'), require $router->getPath($baseAction['controller'], '_form'));
 			jQ('newsPanel.append( $( "#news_panel-' . $this['id'] . '" ) )', 'cache');
@@ -137,8 +99,8 @@ bind( function () { newsPanel.dialog( "close" ); delete newPanel; delete f; } );
 			$edit_link = js_link('newsEditPanel( ' . $this['id'] . ' )', lang('act._edit'), to_url($params['update']), array('class' => 'edit_link_' . $this['id']));
 
 		return ( $router->getAction() == 'index' ? make_link($params['show'], $title) : $title ) .
-		( $auth ?
-				'  ' . $edit_link . ' ' .
-				make_link($params['delete'], lang('act.delete')) : '' );
+		 ( $auth ?
+		  '  ' . $edit_link . ' ' .
+		  make_link($params['delete'], lang('act.delete')) : '' );
 	}
 }

@@ -4,25 +4,24 @@ return array(
 	//Titres des pages
 	'News - index' => 'Index',
 	'News - show' => 'Vue d\'une news',
-	'News - new' => 'Création d\'une news',
+	'News - create' => 'Création d\'une news',					#fake
 	'News - update' => 'Édition d\'une news',
 	'News - delete' => 'Suppression d\'une news',
 	'News - comment' => 'Commenter',
 
 	'Account - join' => 'Nous rejoindre',
-	'Account - ladder_pvp' => 'Classement PvP',
-	'Account - ladder_vote' => 'Classement vote',
-	'Account - login' => 'Connexion',
-	'Account - delog' => 'Déconnexion',
-	'Account - credit' => 'Créditer son compte',
-	'Account - vote' => 'Vote',
-	'Account - new' => 'Inscription',
-	'Account - index' => 'Gestion de compte',
-	'Account - info' => 'Profil du compte',
+	'Account - create' => 'Inscription',
+	'Account - update' => 'Gestion de compte',
 	'Account - show' => 'Informations sur un compte',
-	'Account - edit' => 'Gestion des informations de compte',	#admin
 	'Account - list' => 'Liste des comptes',					#admin
 	'Account - mass_mail' => 'E-mail de masse',					#admin
+
+	'User - ladder_vote' => 'Classement vote',
+	'User - login' => 'Connexion',
+	'User - delog' => 'Déconnexion',
+	'User - credit' => 'Créditer son compte',
+	'User - vote' => 'Vote',
+	'User - update' => 'Gestion des informations de compte',	#admin
 
 	'Misc - staff' => 'L\'équipe',
 	'Misc - tos' => 'Conditions générales d\'utilisation',
@@ -33,10 +32,9 @@ return array(
 
 	'Shop - index' => 'Boutique',
 	'Shop - show' => 'Achat d\'un objet',
-	'Shop - new' => 'Création d\'un objet',
+	'Shop - create' => 'Création d\'un objet',					#fake
 	'Shop - update' => 'Édition d\'un objet',
 	'Shop - delete' => 'Suppression d\'un objet',
-	'Shop - search' => 'Recherche d\'objet',
 
 	'Character - ladder' => 'Classement PvM',
 	'Character - search' => 'Recherche de personnage',
@@ -51,7 +49,6 @@ return array(
 
 	'Poll - index' => 'Sondages',
 	'Poll - show' => 'Vue d\'un sondage',
-	'Poll - new' => 'Nouveau sondage',
 	'Poll - update' => 'Édition d\'un sondage',
 	'Poll - delete' => 'Suppression d\'un sondage',
 
@@ -64,5 +61,5 @@ return array(
 	'PrivateMessage - create' => 'Nouveau message privé',
 
 	'Event - index' => 'Évènements',
-	'Event - update' => '',
+	'Event - update' => 'Nouvel évènement',
 );

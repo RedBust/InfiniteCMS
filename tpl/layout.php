@@ -44,13 +44,25 @@
 			'style' => 'display: none;',
 			'title' => lang('loading'),
 			'align' => 'center'
-		), "\n\t\t\t" . tag('br') . tag('b', lang('loading') . ' ...') . "\n\t\t") .
-		 "\n\t\t" . tag('div', array(
+		), "\n\t\t\t" . tag('br') . tag('b', lang('loading') . ' ...') . "\n\t\t"),
+		 "\n\t\t", tag('div', array(
 			'id' => 'errorDiv',
 			'style' => 'display: none;',
 			'title' => lang('error'),
 			'align' => 'center', //@todo => marge
 		), "\n\t\t\t" . tag('br') . tag('b', array('id' => 'error'), '&nbsp;') . "\n\t\t");
+		if (level(LEVEL_LOGGED))
+		{
+			echo tag('div', array(
+				'id' => 'firstMainChar',
+				'style' => 'display: none;',
+				'title' => lang('character.main'),
+			), lang('character.main.new')), tag('div', array(
+				'id' => 'selectMainChar',
+				'style' => 'display: none;',
+				'title' => lang('character.main'),
+			), $account->getCharactersList(true));
+		}
 		?>
 
 		<div id="contenteur"><!-- Template and div id's from Woa, not me :p -->
@@ -58,7 +70,7 @@
 		echo tag('div', array('id' => 'header'),
 		 "\n\t\t\t\t" . tag('div', array('class' => 'play'),
 		  "\n\t\t\t\t\t" . make_link('@join', make_img('playr', EXT_PNG)) . "\n\t\t\t\t") .
-		 "\n\t\t\t") // not so clean :/
+		 "\n\t\t\t") //not so clean :/
 		?>
 
 			<div id="contenu">

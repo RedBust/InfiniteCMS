@@ -9,7 +9,11 @@ Doctrine_Manager::getInstance()->bindComponent('ShopItem', 'other');
  * 
  * @property varchar $name
  * @property integer $cost
+ * @property integer $cost_vip
  * @property text $description
+ * @property boolean $is_vip
+ * @property boolean $is_lottery
+ * @property boolean $is_hidden
  * @property Doctrine_Collection $Effects
  * 
  * @package    InfiniteCMS
@@ -30,8 +34,24 @@ abstract class BaseShopItem extends Record
              'type' => 'integer',
              'length' => '9',
              ));
+        $this->hasColumn('cost_vip', 'integer', 9, array(
+             'type' => 'integer',
+             'length' => '9',
+             ));
         $this->hasColumn('description', 'text', null, array(
              'type' => 'text',
+             ));
+        $this->hasColumn('is_vip', 'boolean', null, array(
+             'type' => 'boolean',
+             'default' => 0,
+             ));
+        $this->hasColumn('is_lottery', 'boolean', null, array(
+             'type' => 'boolean',
+             'default' => 0,
+             ));
+        $this->hasColumn('is_hidden', 'boolean', null, array(
+             'type' => 'boolean',
+             'default' => 0,
              ));
     }
 

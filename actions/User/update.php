@@ -1,5 +1,4 @@
 <?php
-//edit "User"
 if (!check_level(LEVEL_ADMIN))
 	return;
 
@@ -30,15 +29,8 @@ if ($sent)
 
 	foreach ((array) $cols as $i => $col)
 	{
-		if ($col == 'points')
-			$vals[$col] = intval($vals[$col]);
-#		if ($col == 'level' && !in_array(Member::getLevels()))
-#		{
-#			$errors[$col] = sprintf();
-#			continue;
-#		}
-		if (isset($vals[$col])) //ok I use isset() because of "0" value (level: Player, points: 0, ...)
-			$c->$col = $vals[$col];
+		if (!empty($vals[$col])) //ok I use isset() because of "0" value (level: Player, points: 0, ...)
+			$c->$col = intval($vals[$col]);
 		else
 			$errors[$col] = sprintf(lang('must_!empty'), $col);
 	}
@@ -48,13 +40,13 @@ if ($sent)
 }
 if (!$sent || $errors != array())
 {
-	partial('_form_user', 'c', PARTIAL_CONTROLLER);
+	partial('_form', 'c', PARTIAL_CONTROLLER);
 }
 elseif ($sent && $errors === array())
 {
 	echo lang('acc.edited');
 	redirect(array(
-		'controller' => $router->getController(),
+		'controller' => 'Account',
 		'action' => 'show',
 		'id' => $acc->guid,
 	));

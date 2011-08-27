@@ -17,12 +17,27 @@ class Character extends BaseCharacter
 	/** @var $spellRange char[][] */
 	protected $spellRange = NULL;
 
+	public function getMap()
+	{
+		return MapTable::getInstance()->find($this->map);
+	}
+
 	public function toString($includeName = true, $accordion = false)
 	{
-		return ( $includeName ? ($accordion ? '<h3>' : tag('b', lang('character_name') . ': ')) . $this->name . tag('br') . ($accordion ? '</h3>' : '') : '' ) .
+		return ( $includeName ? ($accordion ? '<h3>' : tag('b', lang('character_name') . ': ')) . $this->getName() . tag('br') . ($accordion ? '</h3>' : '') : '' ) .
 		($accordion ? '<div><p>' : '') . tag('b', lang('acc.ladder.class') . ': ') . $this->getBreed() . tag('br') .
 		tag('b', lang('acc.ladder.sex') . ': ') . $this->getGender() . tag('br') .
 		tag('b', lang('level') . ': ') . $this->level . tag('br');
+	}
+	public function getName()
+	{
+		if ($this->Account->getMainChar()->guid == $this->guid)
+			return tag('u', $this->name);
+		return $this->name;
+	}
+	public function getId()
+	{
+		return $this->guid;
 	}
 
 	public function __toString()
@@ -37,7 +52,7 @@ class Character extends BaseCharacter
 
 	public function getTableRowDatas($simple = false)
 	{
-		$datas = tag('td', $this->getInfoLink());
+		$datas = tag('td', $this->getLink());
 		if (!$simple)
 		{
 			$datas .= tag('td', $this->getBreed()) .
@@ -62,23 +77,23 @@ class Character extends BaseCharacter
 		Collection::charLoad($this);
 	}
 
-	public function getInfoURL()
+	public function getURL()
 	{
-		return to_url(array(
+		return array(
 			'controller' => 'Character',
 			'action' => 'show',
-			'id' => $this->guid));
+			'id' => $this->guid);
 	}
 
-	public function getInfoLink($text = NULL)
+	public function getLink($text = NULL)
 	{
 		$this->_init();
-		return js_link(sprintf('showChar( %d )', $this->guid), $text === NULL ? html($this->name) : $text, $this->getInfoURL());
+		return js_link(sprintf('showChar(%d)', $this->guid), $text === NULL ? html($this->name) : $text, $this->getURL());
 	}
 
 	public function getInfoBox()
 	{
-		return $this . tag('br') . make_link($this->getInfoURL(), lang('more') . ' ...', array(), array('id' => 'closeProfilBox'));
+		return $this . tag('br') . make_link($this->getURL(), lang('more') . ' ...', array(), array('id' => 'closeProfilBox'));
 	}
 
 	/**
@@ -96,7 +111,7 @@ class Character extends BaseCharacter
 		{
 			$this->items = Query::create()
 					->from('Item')
-					->whereIn('guid', explode('|', $this->objets))
+						->whereIn('guid', explode('|', $this->objets))
 					->execute();
 		}
 		return $this->items;
@@ -104,7 +119,7 @@ class Character extends BaseCharacter
 
 	public function give(ShopItemEffect $item)
 	{
-		LiveAction::giveItem($this, $item);
+		LiveActionTable::getInstance()->give($this, $item);
 	}
 
 	public function getSpells()

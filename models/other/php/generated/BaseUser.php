@@ -14,6 +14,7 @@ Doctrine_Manager::getInstance()->bindComponent('User', 'other');
  * @property integer $votes
  * @property integer $lastIP
  * @property varchar $culture
+ * @property integer $main_char
  * @property Doctrine_Collection $Comments
  * @property Review $Review
  * @property Doctrine_Collection $PollOptions
@@ -64,6 +65,10 @@ abstract class BaseUser extends Record
         $this->hasColumn('culture', 'varchar', 255, array(
              'type' => 'varchar',
              'length' => '255',
+             ));
+        $this->hasColumn('main_char', 'integer', 9, array(
+             'type' => 'integer',
+             'length' => '9',
              ));
     }
 

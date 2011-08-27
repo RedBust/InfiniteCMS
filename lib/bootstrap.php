@@ -1,5 +1,5 @@
 <?php
-global $config, $errors, $metas, $types, $account;
+global $config, $errors, $metas, $types, $account, $router, $member;
 
 /**
  * @file $Id: bootstrap.php 56 2011-01-16 19:39:32Z nami.d0c.0 $
@@ -81,6 +81,7 @@ define('STATE_RESOLVED', 2);
 define('LEVEL_BANNED', -2);
 define('LEVEL_GUEST', -1);
 define('LEVEL_LOGGED', 0);
+define('LEVEL_VIP', 0.5); //[...]
 define('LEVEL_TEST', 1);
 define('LEVEL_MODO', 2);
 define('LEVEL_MJ', 3);
@@ -100,18 +101,17 @@ $calendar_opts = '
 $routes = array(//action default : key
 	'root' => array('controller' => 'News', 'action' => 'index'),
 
-	'register' => array('controller' => 'Account', 'action' => 'new'),
-	'sign_in' => array('controller' => 'Account', 'action' => 'login'),
-	'sign_off' => array('controller' => 'Account', 'action' => 'delog'),
-	'account.edit' => array('controller' => 'Account', 'action' => 'index'),
-	'vote' => array('controller' => 'Account'),
-	'credit' => array('controller' => 'Account'),
-	'ladder_vote' => array('controller' => 'Account'),
+	'sign_off' => array('controller' => 'User', 'action' => 'delog'),
+	'sign_in' => array('controller' => 'User', 'action' => 'login'),
+	'vote' => array('controller' => 'User'),
+	'credit' => array('controller' => 'User'),
+	'ladder_vote' => array('controller' => 'User'),
 
 	'character.give' => array('controller' => 'Character', 'action' => 'give'),
 
 	'join' => array('controller' => 'Misc'),
 	'staff' => array('controller' => 'Misc'),
+	'stats' => array('controller' => 'Misc'),
 	'mass_mail' => array('controller' => 'Misc'),
 
 	'tos' => array('controller' => 'Misc'),
@@ -206,7 +206,7 @@ $manager->setAttribute(Doctrine_Core::ATTR_MODEL_LOADING,
 $manager->setAttribute(Doctrine_Core::ATTR_AUTO_FREE_QUERY_OBJECTS, true);
 set_include_path(implode(PATH_SEPARATOR, array(
 			ROOT, //see #0.3.2a
-			'lib/class/', //local libs > global libs
+			ROOT . 'lib/class/', //local libs > global libs
 #		get_include_path(),
 		)));
 if (DEBUG && !DEV)
@@ -261,7 +261,10 @@ if (!DEV)
 			if (!$account->relatedExists('User'))
 			{
 				$account->User = UserTable::getInstance()->fromGuid($account->guid);
+				//@todo main char
 			}
+			if ($account->getMainChar())
+				load_models('static');
 #			$_SESSION['account'] = serialize($account);
 #		}
 		if (DEBUG)

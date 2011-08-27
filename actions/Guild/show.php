@@ -8,8 +8,8 @@ foreach ($table->getColumnNames() as $col) //Guild/show/name/...
 		break;
 if (!$guild = $table->createQuery('g')
 				->where('g.' . $col . ' = ?', $c)
-				->leftJoin('g.Members gm')
-				->leftJoin('gm.Character p')
+					->leftJoin('g.Members gm')
+						->leftJoin('gm.Character p')
 				->orderBy('gm.rank ASC')
 				->fetchOne())
 {
@@ -40,11 +40,11 @@ if ($guild->Members->count())
 		$html .= $gm;
 
 	echo tag('b', lang('guild.mean_level')), $guild->getMeanLevel(), tag('br'),
-	tag('table', $guild->Members->count() > 20 ? array('style' => 'width: 100%;', 'border' => '1') : array(),
+	tag('table', array('style' => 'width: 100%;', 'border' => '1'),
 		tag('thead', tag('tr', tag('th', tag('b', lang('guild.rank'))) .
 			CharacterTable::getInstance()->getTableHeaderDatas(true) .
 			tag('th', tag('b', lang('guild.xp_given'))) .
 			tag('th', tag('b', lang('guild.xp_per'))))) .
-		tag('tbody', array('style' => array('height' => '550px', 'overflow' => 'auto')), $html));
+		tag('tbody', array('style' => $guild->Members->count() > 20 ? array('height' => '550px', 'overflow' => 'auto') : array()), $html));
 		
 }

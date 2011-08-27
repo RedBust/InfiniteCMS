@@ -4,7 +4,7 @@ if (!check_level(LEVEL_ADMIN))
 
 if (!($news = NewsTable::getInstance()->find($id = $router->requestVar('id', -1))))
 {
-	$title = lang($router->getController() . ' - new', 'title');
+	$title = lang($router->getController() . ' - create', 'title');
 	$news = new News;
 }
 /* @var $news News */

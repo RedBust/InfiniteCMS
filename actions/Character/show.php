@@ -15,7 +15,7 @@ $acc = $charac->Account;
 if ($acc == $account) //it's YOUR account
 	printf(lang('character.on_acc'), $charac->name);
 else
-	printf(lang('character.on_acc_of'), $charac->name, $acc->getProfilLink());
+	printf(lang('character.on_acc_of'), $charac->name, make_link($acc));
 
 $items = $charac->getItems(); //items info
 if (empty($items)) //no items (:°)
@@ -135,11 +135,10 @@ echo '
 if (!empty($charac->GuildMember))
 { //show the guild info
 	printf(lang('character.guild_infos'),
-			$charac->name, $charac->GuildMember->Guild->getLink(), $charac->GuildMember->Guild->lvl);
+			$charac->name, make_link($charac->GuildMember->Guild), $charac->GuildMember->Guild->lvl);
 }
-if (level(LEVEL_MJ))
+if (level(LEVEL_MJ) && $map = $charac->getMap())
 { //show the mapinfo
-	$map = MapTable::getInstance()->find($charac->map);
 	/* @var $map Map */
 	printf(lang('character.pos'), $charac->name, $charac->map, $map->getPosX(), $map->getPosY(), $charac->cell);
 }

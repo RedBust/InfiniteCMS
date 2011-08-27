@@ -11,8 +11,7 @@
 class ShopItem extends BaseShopItem
 {
 	/**
-	 * maj
-	 * Met à jour l'item
+	 * updates shop item
 	 *
 	 * @param arrray $values Les valeurs (_POST)
 	 * @access public
@@ -22,28 +21,35 @@ class ShopItem extends BaseShopItem
 	{
 		global $types;
 		$errors = array();
-		if( $columns === NULL )
-			$columns = array( 'name', 'cost', 'description' );
+		if( $columns === NULL ) //WHERE vip & hidden ? for VIP-destined draw.
+			$columns = array('description', 'name', 'cost', 'cost_vip', 'is_vip', 'is_lottery', 'is_hidden');
 		if( is_string( $columns ) )
 			$columns = explode( ';', $columns ); 
 
-		foreach( (array)$columns as $t )
+		foreach ((array)$columns as $t)
 		{
-			$t[0] = strtolower( $t[0] );
+			$t = lcfirst($t);
 			//check if the value is valid
-			if( !isset( $values[$t] ) || ( isset( $values[$t] ) && trim( $values[$t] ) === '' ) )
+			if (( !isset($values[$t]) || (isset($values[$t]) && trim($values[$t]) === '' ) )
+			 && substr($t, 0, 3) !== 'is_')
 			{
-				$errors[$t] = sprintf( lang( 'must_!empty' ), $t );
+				$errors[$t] = sprintf(lang('must_!empty'), $t);
 			}
 			else
 			{
-				if( in_array( $t, array( 'cost', 'value' ) ) && strval( intval( $values[$t] ) ) !== $values[$t] )
-					$errors[$t] = sprintf( lang( 'must_numeric' ), $t );
+				if (substr($t, 0, 3) == 'is_')
+				{
+					$values[$t] = isset($values[$t]) && ( $values[$t] == 'on' || $values[$t] == '1' );
+				}
+
+				if (in_array($t, $this->getTable()->getNumericCols()) && strval(intval($values[$t])) !== $values[$t])
+					$errors[$t] = sprintf(lang( 'must_numeric'), $t);
 				else
 					$this->$t = $values[$t];
 			}
 		}
-		if( !empty( $values['type'] ) && !empty( $values['value'] ) )
+		vdump($errors, $this->toArray(), $columns);
+		if (!empty( $values['type'] ) && !empty( $values['value'] ) )
 		{
 			$table = ShopItemEffectTable::getInstance();
 			/* @var $table ShopItemEffectTable */
@@ -89,5 +95,72 @@ class ShopItem extends BaseShopItem
 		}
 
 		return $errors;
+	}
+
+	public function __toString()
+	{
+		global $m, $account;
+
+		$id = array('data-id' => $objet['id']);
+
+		$effects = '';
+		if ($objet->Effects->count())
+			$effects = '
+		<ul>' . implode($this->Effects) . '
+		</ul>';
+
+		$html .= sprintf('
+		<td%s>
+			<b>%s:</b> %s.<br />
+			<b>%s:</b><br />%s<br />
+			%s <!-- cost(s) -->
+			%s <!-- Effects -->
+			%s
+			%s
+		</td>', ( $i === $count ? ' colspan="' . strval($config['ITEMS_BY_LINE'] - $m) . '"' : ''),
+		 lang('name'), tag('span', $id + array('class' => 'f_name'), $objet['name']),
+		 lang('desc'), News::format($objet['description']),
+		 $this->getCostInfo(),
+		 $effects,
+		 ( $account->getMainChar() === NULL || $account->User->points < $this->getCost() ? '' : $this->getPurchaseLink()),
+		 (!level(LEVEL_ADMIN) ? '' : tag('br') . $this->getUpdateLink() . '<br />' . $this->getDeleteLink()));
+	}
+
+
+	public function getCost()
+	{
+		if (level(LEVEL_VIP))
+			return $this->cost_vip;
+		return $this->cost;
+	}
+	public function getCostInfo()
+	{
+		$cost = '';
+		if (level(LEVEL_VIP))
+		{
+			$cost .= tag('b', lang('cost_vip')) . pluralize(lang('point'), $this->cost_vip, true, tag('span', $id + array('class' => 'f_cost_vip'), '%%content%%'));
+		}
+		if (!$this->is_vip)
+		{
+			if (level(LEVEL_ADMIN))
+				$cost .= tag('br');
+			if (!level(LEVEL_VIP) || level(LEVEL_ADMIN))
+			{
+				$cost .= tag('b', lang('cost')) . pluralize(lang('point'), $this->cost, true, tag('span', $id + array('class' => 'f_cost'), '%%content%%'));
+			}
+		}
+	}
+
+	public function getPurchaseLink()
+	{
+		return make_link(array('controller' => $router->getController(), 'action' => 'purchase', 'id' => $objet['id']), lang('act.choose'));
+	}
+	public function getUpdateLink()
+	{
+		return make_link(array('controller' => $router->getController(), 'action' => 'update', 'id' => $objet['id']), lang('act.edit'));
+	}
+	public function getDeleteLink()
+	{
+		return make_link(array('controller' => $router->getController(), 'action' => 'delete', 'id' => $objet['id']), lang('act.delete_item'));
 	}
 }

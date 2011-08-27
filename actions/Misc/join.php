@@ -7,5 +7,5 @@ echo tag('div', array('class' => 'post'), tag('div', array('class' => 'content')
 	'%launcher.32%' => $config['DOWNLOAD']['LAUNCHER.32'],
 	'%launcher.64%' => $config['DOWNLOAD']['LAUNCHER.64'],
 	'%config%' => $config['DOWNLOAD']['CONFIG'],
-	'%register%' => make_link('@register', lang('here')))
+	'%register%' => make_link(new Account, lang('here')))
 )));

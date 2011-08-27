@@ -1,4 +1,5 @@
 <?php
+define('SKIP_STATS', true);
 if ($cache = Cache::start($router->getController() . '_stats', 1))//'+6 hours'))
 {
 	$characters = Query::create()
