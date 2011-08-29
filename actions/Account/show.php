@@ -15,7 +15,6 @@ if (!( $acc = AccountTable::getInstance()->createQuery('a')
 		->fetchOne() ))
 { //@todo better error handling with $fromInclude ?
 	echo lang('acc.does_not_exists');
-	exit('lol');
 	return;
 }
 /* @var $acc Account */

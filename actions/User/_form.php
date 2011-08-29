@@ -6,4 +6,4 @@ echo make_form(array(
 		array('audiotel', $nl . $nl . lang('user.pass') . $nl, NULL, $c->audiotel),
 		array('votes', $nl . $nl . lang('user.vote') . $nl, NULL, $c->votes),
 	),
-), APPEND_FORM_TAG);
+));

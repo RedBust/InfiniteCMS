@@ -27,4 +27,4 @@ $fields = array(
 if (!$acc->exists())
 	array_unshift($fields, array('tos', lang('acc.register.accept_tos'), 'checkbox'));
 
-echo make_form($fields, APPEND_FORM_TAG);
+echo make_form($fields);

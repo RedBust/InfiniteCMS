@@ -17,10 +17,11 @@ $filter_names = $table->getFilters();
 foreach ($filter_names as $type)
 { //foreach columns
 	$is_check = substr($type, 0, 3) == 'is_'; //it's a check "is".
+	$value = $router->requestVar($type);
 	if (($router->requestVar('e_' . rtrim($type, '2')) !== NULL || $is_check)
 	 && !empty($value)) //e = enabled
 	{
-		$value = $type == 'name' ? $value : intval($value);
+		$value = $type == 'name' ? $value : ( $is_check ? strtolower($value) == 'on' : intval($value) );
 
 		$search_params['e_' . $type] = '1'; //used for ...
 		$search_params[$type] = $value; //... pagination
@@ -52,7 +53,7 @@ foreach ($filter_names as $type)
 		$itemsDql->addOrderBy($type . ' DESC');
 }
 foreach ($table->getProtectedFilters() as $filter)
-{ //protect remaining filters
+{ //protected remaining filters (can NOT be used)
 	$itemsDql->andWhere($filter . ' = 0');
 }
 
@@ -66,7 +67,7 @@ $layout->setSelectedTemplate('[<b>{%page}</b>]');
 if ($pager->haveToPaginate())
 	$layout->display();
 
-if ($items->count())
+if ($items->count() || count($search_params))
 {
 	$i = 0; //where are we in da items foreash ?
 	$items->shopDisplay();

@@ -32,6 +32,11 @@ ini_set('include_path', implode(PATH_SEPARATOR, array(
 $mem .= memory_get_usage() . ': Avant fonctions.php<br />';
 //load API + bootstrap
 
+//where should I put that kind of thing ?
+if (!function_exists('get_called_class'))
+	exit('Your PHP version seems too old. InfiniteCMS requires PHP5.3 at least.<br />
+Votre version de PHP est trop vieille. InfiniteCMS a besoin d\'au minimum PHP5.3 pour fonctionner.');
+
 try
 {
 	require 'lib/bootstrap' . EXT;
@@ -117,9 +122,9 @@ try
 					if (!empty($jQ))
 						echo js('
 					jQuery( function( $ )
-						{
-							' . $jQ . '
-						} );');
+					{
+						' . $jQ . '
+					} );');
 				}
 			}
 			else

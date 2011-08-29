@@ -37,18 +37,13 @@ if (!$admin)
 		return;
 	}
 }
+$shopItem->giveTo($p);
 if ($shopItem->is_lottery && $shopItem->Effects->count() > 1)
 {
-	$effect = $shopItem->Effects[rand(0, $shopItem->Effects->count())];
-	$char->give($effect);
-
 	printf(lang('shop.bought'),	$shopItem['name'], $effect, $return_back);
 }
 else
 {
-	foreach ($shopItem->Effects as $effect)
-		$char->give($effect);
-
 	printf(lang('shop.bought'), $shopItem['name'], $return_back);
 }
 

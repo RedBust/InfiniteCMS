@@ -39,6 +39,8 @@ class ShopItemEffect extends BaseShopItemEffect
 	}
 	public function __toString()
 	{
+		global $types;
+
 		if ($this->type === NULL || $this->type == -1 //should not happen but ...
 			|| (!$this->isItem() && $this->getValue() === 0 ))
 			continue; //null effect ?
@@ -66,7 +68,7 @@ class ShopItemEffect extends BaseShopItemEffect
 		}
 
 		if (!isset($types[$this->type]))
-			vdump($this->type);
+			vdump('unknow type : ' . $this->type);
 		$type = $types[$this->type];
 		if ($type[0] == $signe)
 			$type = substr($type, 1);
@@ -95,6 +97,7 @@ class ShopItemEffect extends BaseShopItemEffect
 
 	public function getDeleteLink()
 	{
-		return make_link(array('controller' => $router->getController(), 'action' => 'delete', 'mode' => 'ItemEffect', 'id' => $effect->id), lang('act.delete'));
+		global $router;
+		return make_link(array('controller' => $router->getController(), 'action' => 'delete', 'mode' => 'ItemEffect', 'id' => $this->id), lang('act.delete'));
 	}
 }

@@ -50,7 +50,7 @@ if ($persos->count())
 {
 	echo tag('h1', lang('character.search')), make_form(array(
 		array('character', lang('name'), NULL, $char),
-	), APPEND_FORM_TAG), str_repeat(tag('br'), 3);
+	)), str_repeat(tag('br'), 3);
 	$persos->ladderDisplay(($layout->getPager()->getPage() - 1) * $config['LADDER_LIMIT'], $char);
 	if ($layout->getPager()->haveToPaginate())
 		$layout->display();

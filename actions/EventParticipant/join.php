@@ -7,7 +7,11 @@ if (!$account->canParticipate($id = intval($router->requestVar('id', -1))))
 	return;
 }
 
-if (!$event = EventTable::getInstance()->find($id))
+if (( !$event = EventTable::getInstance()
+							->createQuery('e')
+								->leftJoin('e.Guild g')
+							->where('e.id = ?', $id)
+							->fetchOne() ))
 {
 	echo lang('event.does_not_exist');
 	return;	
@@ -17,13 +21,19 @@ if ($event->isElapsed())
 	echo lang('event.elapsed');
 	return;
 }
-
-if ($char = $character->getMainChar())
+if ($event->isFull())
 {
-	$event->link('Participants', array($char));
+	echo lang('event.full');
+	return;
+}
+
+$char = $account->getMainChar();
+if ($char && (!$event->relatedExists('Guild')
+  || ($event->relatedExists('Guild') && $char->relatedExists('GuildMember') && $char->GuildMember->relatedExists('Guild') && $event->Guild->id == $char->GuildMember->Guild->id)))
+{
+	$event->link('Participants', array($char->guid));
 	$event->save();
+	redirect($event->getUrl());
 }
 else
-{
-}
-redirect(array('controller' => 'Event', 'action' => 'index', 'year' => substr($event->period, 0, 4), 'month' => substr($event->period, 5, 2)));
+	define('HTTP_CODE', 404);

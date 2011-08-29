@@ -1,5 +1,11 @@
 <?php
+if (!$config['STATS'])
+{
+	define('HTTP_CODE', 404);
+	return;
+}
 define('SKIP_STATS', true);
+
 if ($cache = Cache::start($router->getController() . '_stats', 1))//'+6 hours'))
 {
 	$characters = Query::create()
@@ -65,17 +71,17 @@ if ($cache = Cache::start($router->getController() . '_stats', 1))//'+6 hours'))
 		$counts['avgCLevel'] = $counts['cLevel'] / $counts['characters'];
 		$counts['avgGLevel'] = $counts['gLevel'] / $counts['guilds'];
 		$counts['avgKamas'] = $counts['kamas'] / $counts['characters'];
-		echo tag('ul', tag('li', tag('b', lang('character.avg_level')) . ': ' . $counts['avgCLevel']) .
+		echo tag('ul', tag('li', tag('b', lang('character.avg_level')) . ': ' . number_format($counts['avgCLevel'], 0, '.', ' ')) .
 		 tag('li', tag('b', lang('character.avg_kamas')) . ': ' . number_format($counts['avgKamas'], 0, '.', ' ')) .
 		 tag('li', tag('b', pluralize(lang('character.guilded'), $counts['guilded'], false)) . ': ' . number_format($counts['guilded'], 0, '.', ' ')) .
-		 tag('li', tag('b', lang('guild.avg_level')) . ': ' . $counts['avgGLevel'])) .
+		 tag('li', tag('b', lang('guild.avg_level')) . ': ' . number_format($counts['avgGLevel'], 0, '.', ' '))) .
 			tag('div', array('id' => 'highGender'), '') . tag('div', array('id' => 'highBreed'), '');
 		if (count($counts['gender']) > 1)
 		{
 			$js_genders = array();
 			foreach ($counts['gender'] as $gender => $count)
 			{
-				$js_genders[] = '["' . lang('gender_.' . $gender) . '", ' . round(($count * 100) / $counts['characters'], 2) . ']';
+				$js_genders[] = '["' . lang('gender_.' . $gender) . ' ' . '' . '", ' . round(($count * 100) / $counts['characters'], 2) . ']';
 			}
 			$js_genders = implode(', ', $js_genders);
 			jQ("

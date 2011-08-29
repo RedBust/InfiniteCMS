@@ -10,6 +10,20 @@
  */
 class ShopItem extends BaseShopItem
 {
+	public function giveTo(Character $p)
+	{
+		if (!$this->Effects->count())
+			return;
+
+		if ($this->is_lottery)
+			$p->give($shopItem->Effects[rand(0, $shopItem->Effects->count())]);
+		else
+		{
+			foreach ($this->Effects as $effect)
+				$p->give($effect);
+		}
+	}
+
 	/**
 	 * updates shop item
 	 *
@@ -48,7 +62,6 @@ class ShopItem extends BaseShopItem
 					$this->$t = $values[$t];
 			}
 		}
-		vdump($errors, $this->toArray(), $columns);
 		if (!empty( $values['type'] ) && !empty( $values['value'] ) )
 		{
 			$table = ShopItemEffectTable::getInstance();
@@ -99,34 +112,59 @@ class ShopItem extends BaseShopItem
 
 	public function __toString()
 	{
-		global $m, $account;
+		global $account;
 
-		$id = array('data-id' => $objet['id']);
+		$id = $this->getDataId();
 
 		$effects = '';
-		if ($objet->Effects->count())
+		if ($this->Effects->count())
+		{
 			$effects = '
-		<ul>' . implode($this->Effects) . '
-		</ul>';
+			<ul>';
+			foreach ($this->Effects as $effect)
+				$effects .= $effect;
+			$effects .= '
+			</ul>';
+		}
+		$desc = trim(News::format($this->description));
 
-		$html .= sprintf('
-		<td%s>
+		return sprintf('
 			<b>%s:</b> %s.<br />
-			<b>%s:</b><br />%s<br />
-			%s <!-- cost(s) -->
-			%s <!-- Effects -->
+			%s<b>%s:</b><br />%s<br /><!-- desc -->
+			%s<br /><!-- cost(s) -->
+			%s<!-- type(s) -->
+			%s<!-- Effects -->
 			%s
-			%s
-		</td>', ( $i === $count ? ' colspan="' . strval($config['ITEMS_BY_LINE'] - $m) . '"' : ''),
-		 lang('name'), tag('span', $id + array('class' => 'f_name'), $objet['name']),
-		 lang('desc'), News::format($objet['description']),
+			%s',
+		 lang('name'), tag('span', $id + array('class' => 'f_name'), $this->name),
+		 empty($desc) ? '<!--' : '', lang('desc'), $desc,
 		 $this->getCostInfo(),
+		 $this->getTypesInfo(),
 		 $effects,
 		 ( $account->getMainChar() === NULL || $account->User->points < $this->getCost() ? '' : $this->getPurchaseLink()),
-		 (!level(LEVEL_ADMIN) ? '' : tag('br') . $this->getUpdateLink() . '<br />' . $this->getDeleteLink()));
+		 ( !level(LEVEL_ADMIN) ? '' : tag('br') . $this->getUpdateLink() . '<br />' . $this->getDeleteLink() ));
 	}
 
+	public function getDataId()
+	{
+		return array('data-id' => $this->id);
+	}
+	public function getTypesInfo()
+	{
+		global $router;
+		if ($router->getController() != 'Shop')
+			return ''; //this is a hack, I know ._.
 
+		$types = array();
+		if ($this->is_vip)
+			$types[] = lang('shop.is_vip');
+		if ($this->is_lottery)
+			$types[] = lang('shop.is_lottery');
+		if ($this->is_hidden)
+			$types[] = lang('shop.is_hidden');
+
+		return implode(' &bull; ', $types);
+	}
 	public function getCost()
 	{
 		if (level(LEVEL_VIP))
@@ -136,9 +174,11 @@ class ShopItem extends BaseShopItem
 	public function getCostInfo()
 	{
 		$cost = '';
+		$id = $this->getDataId();
+
 		if (level(LEVEL_VIP))
 		{
-			$cost .= tag('b', lang('cost_vip')) . pluralize(lang('point'), $this->cost_vip, true, tag('span', $id + array('class' => 'f_cost_vip'), '%%content%%'));
+			$cost .= tag('b', lang('cost_vip') . ' : ') . pluralize(lang('point'), $this->cost_vip, true, tag('span', $id + array('class' => 'f_cost_vip'), '%%content%%'));
 		}
 		if (!$this->is_vip)
 		{
@@ -146,21 +186,22 @@ class ShopItem extends BaseShopItem
 				$cost .= tag('br');
 			if (!level(LEVEL_VIP) || level(LEVEL_ADMIN))
 			{
-				$cost .= tag('b', lang('cost')) . pluralize(lang('point'), $this->cost, true, tag('span', $id + array('class' => 'f_cost'), '%%content%%'));
+				$cost .= tag('b', lang('cost') . ' : ') . pluralize(lang('point'), $this->cost, true, tag('span', $id + array('class' => 'f_cost'), '%%content%%'));
 			}
 		}
+		return $cost;
 	}
 
 	public function getPurchaseLink()
 	{
-		return make_link(array('controller' => $router->getController(), 'action' => 'purchase', 'id' => $objet['id']), lang('act.choose'));
+		return make_link(array('controller' => 'Shop', 'action' => 'purchase', 'id' => $this->id), lang('act.choose'));
 	}
 	public function getUpdateLink()
 	{
-		return make_link(array('controller' => $router->getController(), 'action' => 'update', 'id' => $objet['id']), lang('act.edit'));
+		return make_link(array('controller' => 'Shop', 'action' => 'update', 'id' => $this->id), lang('act.edit'));
 	}
 	public function getDeleteLink()
 	{
-		return make_link(array('controller' => $router->getController(), 'action' => 'delete', 'id' => $objet['id']), lang('act.delete_item'));
+		return make_link(array('controller' => 'Shop', 'action' => 'delete', 'id' => $this->id), lang('act.delete_item'));
 	}
 }

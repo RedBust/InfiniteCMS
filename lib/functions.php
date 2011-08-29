@@ -681,6 +681,8 @@ function make_img($url, $ext = EXT_JPG, $title = NULL, $alt = NULL, $add = array
 		$add = $alt;
 		$alt = '';
 	}
+	if (is_string($title) && empty($alt))
+		$alt = $title;
 	return tag('img', $add + array('src' => url_for_image($url, $ext), 'title' => $title, 'alt' => $alt));
 }
 
@@ -1226,7 +1228,7 @@ function input($name, $label, $type = NULL, $value = '', $add = array())
 	{
 		$opts_label = array_merge($opts_label, $add);
 	}
-	return (empty($label) ? '' : tag('label', $opts_label, $label)) . $type;
+	return tag('span', array('id' => 'form_couple_' . $name), (empty($label) ? '' : tag('label', $opts_label, $label)) . $type);
 }
 
 /**
@@ -1344,35 +1346,33 @@ function render_errors($for = NULL)
  * @subpackage HTML
  *
  * @param array $columns The columns
- * @param boolean $tag Add the "form" tag ?
  *
  * @return string the form rendered
  */
-function make_form($columns, $tag = NULL, $loc = '#', $opts = array())
+function make_form($columns, $loc = '#', $opts = array())
 {
 	global $router;
-	if (is_string($tag))
-		$loc = $tag;
-	if ($tag === NULL)
-	{ //@ignore
-		echo 'not set the append_form_tag? constant in ';
-		debug_print_backtrace();
-		$tag = APPEND_FORM_TAG;
-	}
-	if (!is_bool($tag) && $loc == '#')
-	{ //loc may be a string, an array, ...
-		$loc = $tag;
-		$tag = APPEND_FORM_TAG;
-	}
-	else if (is_array($loc))
-	{
-		$opts = $loc;
-		$loc = '#';
-	}
 	if (!isset($opts['method']))
 		$opts['method'] = 'POST';
 	if (!isset($opts['sep_inputs']))
 		$opts['sep_inputs'] = tag('br');
+	if (!isset($opts['append_form_tag']))
+		$opts['append_form_tag'] = true;
+	if (!isset($opts['submit_text']))
+		$opts['submit_text'] = lang('send');
+	if (!isset($opts['submit_hideThis']))
+		$opts['submit_hideThis'] = false;
+	if (!isset($opts['submit_add']))
+		$opts['submit_add'] = array();
+	if (isset($opts['submit_add']['class']) && is_array($opts['submit_add']['class']))
+		$opts['submit_add']['class'] = implode(' ', $opts['submit_add']['class']);
+	else
+		$opts['submit_add']['class'] = '';
+
+	if ($opts['submit_hideThis'])
+	{
+		$opts['submit_add']['class'] .= ' hideThis';
+	}
 
 	$firstCol = '';
 
@@ -1430,12 +1430,14 @@ function make_form($columns, $tag = NULL, $loc = '#', $opts = array())
 		if (( $id = $router->requestVar('id', NULL) ) !== NULL)
 			$params += array('id' => $id);
 		$loc = to_url($params);
-		jQ(sprintf('$( "#form_%s" ).focus();', $firstCol));
+		jQ(sprintf('$( "#form_%s" ).focus();', $firstCol)); //why only focus if #? dunno
 	}
 	else
 		$loc = replace_url($loc);
-	$str .= input('send', lang('send'), 'submit') . input('sent', NULL, 'hidden', 1);
-	return $tag ? tag('form', array('method' => $opts['method'], 'action' => $loc, 'id' => 'form'), $str) : $str;
+
+	if ($opts['submit_text'] !== NULL)
+		$str .= input('send', $opts['submit_text'], 'submit', NULL, $opts['submit_add']);
+	return $opts['append_form_tag'] ? tag('form', array('method' => $opts['method'], 'action' => $loc, 'id' => 'form'), $str) : $str;
 }
 
 /**

@@ -14,6 +14,14 @@ class Event extends BaseEvent
 {
 	protected $elapsed = null;
 
+	public function canJoin()
+	{
+		return !$this->isFull() && !$this->isElapsed();
+	}
+	public function isFull()
+	{
+		return $this->capacity == -1 ? false : $this->Participants->count() == $this->capacity;
+	}
 	public function isElapsed()
 	{
 		if (null === $this->elapsed)
@@ -30,9 +38,18 @@ class Event extends BaseEvent
 	{
 		return substr($this->period, 8, 2);
 	}
-	public function getHourMinutes()
+	public function getHour()
 	{
-		return substr($this->period, 11, 5);
+		return substr($this->period, 11, 2);
+	}
+	public function getMinute()
+	{
+		return substr($this->period, 14, 2);
+	}
+
+	public function getURL()
+	{
+		return array('controller' => 'Event', 'action' => 'index', 'year' => substr($this->period, 0, 4), 'month' => substr($this->period, 5, 2));
 	}
 
 	public function getGuildLink()
@@ -46,17 +63,39 @@ class Event extends BaseEvent
 	{
 		global $account;
 
-		$canParticipate = level(LEVEL_LOGGED) ? $account->canParticipate($this->id) : false;
+		$canParticipate = level(LEVEL_LOGGED) && $this->canJoin() ? $account->canParticipate($this->id) : false;
 		$participate_url = to_url(array('controller' => 'EventParticipant', 'action' => $canParticipate ? 'join' : 'part', 'id' => $this->id));
 
 		if ($this->Participants->count())
 		{
 			$participants = array();
+			$winnerId = $this->relatedExists('Winner') && $this->isElapsed() ? $this->Winner->guid : -1;
+			if ($winnerId === -1 && $this->isElapsed())
+			{
+				$winner = make_form(array(array('char', lang('winner'))), array('controller' => 'Event', 'action' => 'win', 'id' => $this->id), array('submit_hideThis' => true));
+				if ($this->Participants->count() > 0)
+					jQ('
+var form_char = $("#form_char").autocomplete(
+{
+	source: ' . json_encode($this->Participants->getKeyArray('name')) . ',
+	select: function (event, ui)
+	{
+		form_char.val(ui.item.value);
+		this.form.submit();
+	}
+});');
+			}
+			else
+				$winner = '';
+
 			foreach ($this->Participants as $character)
 			{
-				$participants[] = tag('span', array('class' => $character->isMine() ? 'myChar' : 'aChar'), make_link($character));
+				$participants[] = tag('span', array('class' => $character->isMine() ? 'myChar' : 'aChar'),
+				 ($winnerId == $character->guid ? make_img('icons/medal_gold_1', EXT_PNG, lang('winner')) : '') . make_link($character));
 			}
-			$participants = implode(', ', $participants);
+			$participants = tag('h3', lang('participant' . ( count($participants) > 1 ? 's' : '' )) .
+			 ( $this->capacity == -1 ? '' : '(' . count($participants) . '/' . $this->capacity . ')' ) .
+			 ' : ') . $winner . implode(', ', $participants);
 		}
 		else
 			$participants = $this->isElapsed() ? '' : lang('participants.any');
@@ -73,13 +112,19 @@ class Event extends BaseEvent
 			else
 				$participate_link = '';
 		}
-		echo tag('div', array('id' => 'event-' . $this->id, 'class' => 'showThis'), $participate_link . $participants);
+
+		if ($this->relatedExists('Reward'))
+			$reward = tag('br') . tag('fieldset', tag('legend', tag('b', lang('reward'))) . $this->Reward) . tag('br');
+		else
+			$reward = '';
+
+		echo tag('div', array('id' => 'event-' . $this->id, 'class' => 'showThis'), $participate_link . $reward . $participants);
 		jQ('registerEvent(' . $this->id . ')');
 
-		return tag('b', str_replace(':', 'h', $this->getHourMinutes()) . ($this->getGuildLink()) . ': ') . $this->name .
+		return tag('b', $this->getHour() . 'h' . $this->getMinute() . $this->getGuildLink() . ': ') . $this->name .
 		 ($this->isElapsed() && !$this->Participants->count() ? '' : js_link('showEvent(' . $this->id . ')', make_img('icons/group', EXT_PNG, lang('participants')), '#', array('class' => 'showThis'))) .
-		 (level(LEVEL_LOGGED) && !$this->isElapsed() && $account->getMainChar() ? make_link($participate_url, 
-		   make_img('icons/group_' . ($canParticipate ? 'add' : 'delete'), EXT_PNG, lang('participant.join')),
+		 (level(LEVEL_LOGGED) && $account->getMainChar() && $this->canJoin() ? make_link($participate_url, 
+		   make_img('icons/group_' . ($canParticipate ? 'add' : 'delete'), EXT_PNG, lang('event.join')),
 		   null, array('class' => 'hideThis')) : '');
 	}
 }

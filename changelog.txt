@@ -2,14 +2,26 @@
 @todo
 ban ips
 contact form
-remove APPEND_FORM_TAG ? to put it by default ...
 link to account's profile from character's profile
+consider Event as VIP-only if Reward.is_vip ???
 1.3(?):
+ Fixed Shop#delete redirects to a bad URL
+ Added ability to select a reward (ShopItem) and to select a winner in an Event (with jQ.UI.AutoComplete).
+  The prize will be given via LiveAction. The ShopItem should'nt be VIP (or should it make the Event for VIP only ?)
+ Refactored tons of models code (splitted lots of big code)
+ There's now "type" in Shop Items :
+   THIS WILL BE ADDED SOON !/!\
+  - Lottery
+   It only gives ONE of the effects (an "WARNING : LOTTERY" will be added)
+  - VIP
+   Only for VIP
+  - Hidden
+   Used if you just want this ShopItem to be a reward, or something like that.
  There's now a "VIP" rank, which provides 
   - special items in shop
   - special prices for items
   - different number of points gained with vote/code
- There's CURRENTLY now way (other than DB edit) to be VIP. It'll be fixed
+  There's CURRENTLY no way (other than DB edit) to be VIP. It'll be fixed (soon).
  Changed the way account's characters are handled :
   Now, you have a "main char" when you first log-in (with Characters.count > 0) which will perform all the actions
   You can change him via a link (if Characters.count > 1). It's not re-active (event participation's character won't be replaced)

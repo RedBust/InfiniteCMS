@@ -179,7 +179,8 @@ return array(
 	'character.guild_infos' => '<b>%s</b> appartient à la guilde %s, niveau %d.', //%1: character name | %2: guild emblem + guild name, %d: guild level
 	'character.give' => 'Faire un don',
 	'character.given' => 'Vous avez donné une action de type <b>%s</b> avec la valeur <b>%s</b> à <b>%s</b>', //1 => effect name. 2 = effect value. 3 = character name
-	'character.!on_acc' => 'Le personnage n\'existe pas ou n\'est pas sur votre compte !',
+	'character.!on_acc' => 'Le personnage n\'existe pas ou n\'est pas sur votre compte.',
+	'character.!on_event' => 'Le personnage n\'existe pas ou ne participe pas à cet évènement.',
 	'character.main' => 'Personnage principal',
 	'character.main.new' => 'Il semble que ce soit votre première visite sur le site avec un personnage.<br />
 Votre personnage principal a été changé (vous pouvez le voir dans le menu, en dessous des informations sur votre compte).<br />
@@ -431,6 +432,7 @@ Vous pouvez vous inscrire %register%.{/register}{log}-->{/log}', //{log} = if lo
 	'pm.arriveds' => '<a href="%s" class="pm-count">%s</a> Nouveaux messages privés.',
 
 	'participants' => 'Participants',
+	'participant' => 'Participant',
 	'participants.any' => 'Aucun participant.',
 	'event.join_first' => 'Soyez le premier à participer',
 	'event.join' => 'Participer',
@@ -439,4 +441,9 @@ Vous pouvez vous inscrire %register%.{/register}{log}-->{/log}', //{log} = if lo
 	'event.not_participating' => 'Vous ne participez pas à cet évènement.',
 	'event.invalid' => 'Cet évènement n\'existe pas.',
 	'event.elapsed' => 'Cet évènement est passé.',
+	'event.!elapsed' => 'Cet évènement n\'est pas encore passé.',
+	'event.full' => 'Cet évènement ne peut accueillir plus de participants.',
+	'event.already_won' => 'Cet évènement a déjà un vainqueur.',
+	'reward' => 'Récompense',
+	'winner' => 'Vainqueur',
 );

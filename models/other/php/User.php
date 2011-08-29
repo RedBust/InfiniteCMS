@@ -14,9 +14,6 @@ class User
 	protected $pmUnreads = null;
 
 	/**
-	 * preInsert
-	 * Before insert action
-	 *
 	 * @package Doctrine
 	 *
 	 * @global array $config
@@ -34,14 +31,12 @@ class User
 	}
 
 	/**
-	 * getPoints
-	 *
 	 * @return string Litteral representation of points
 	 */
 	public function getPoints()
 	{
 		return pluralize(ucfirst(lang('point')), $this->points) . ': ' .
-		tag('span', array('class' => 'f_points', 'data-id' => $this->guid), $this->points);
+		 tag('span', array('class' => 'f_points', 'data-id' => $this->guid), $this->points);
 	}
 
 	public function canVote(Poll $poll)
@@ -74,11 +69,11 @@ class User
 		if (null === $this->pmUnreads)
 		{
 			$this->pmUnreads = Query::create()
-						->from('PrivateMessageThread pmt INDEXBY pmt.id')
-							->leftJoin('pmt.Receivers pmr INDEXBY pmr.user_guid')
-						->where('pmt.id IN (SELECT pmtr.thread_id FROM PrivateMessageThreadReceiver pmtr WHERE pmtr.user_guid = ? AND pmtr.next_page != 0)',
-							 $this->guid)
-						->execute();
+									->from('PrivateMessageThread pmt INDEXBY pmt.id')
+										->leftJoin('pmt.Receivers pmr INDEXBY pmr.user_guid')
+									->where('pmt.id IN (SELECT pmtr.thread_id FROM PrivateMessageThreadReceiver pmtr WHERE pmtr.user_guid = ? AND pmtr.next_page != 0)',
+										 $this->guid)
+									->execute();
 		}
 		return $this->pmUnreads;
 	}
@@ -87,7 +82,7 @@ class User
 		$unreads = $this->getUnreadPM();
 		if ($unreads->count())
 		{
-			$unread = $unreads[0];
+			$unread = $unreads->getFirst();
 			$pm_url = to_url(array('controller' => 'PrivateMessage', 'action' => 'show', 'id' => $unread['id'], 'page' => $unread['Receivers'][$this->guid]['next_page']));
 			return sprintf(lang('pm.arrived' . ($unreads->count() > 1 ? 's' : '')), $pm_url, $unreads->count()) . tag('br');
 		}

@@ -158,7 +158,7 @@ if($c = Cache::start("Account_show_profil_' . $this->guid . '_" . ($connected ? 
 
 	public function getCharactersList($accordion = false)
 	{
-		if ($this->relatedExists('Characters') && $this->Characters->count())
+		if ($this->Characters->count())
 		{
 			$persos = '';
 			foreach ($this->Characters as $character)

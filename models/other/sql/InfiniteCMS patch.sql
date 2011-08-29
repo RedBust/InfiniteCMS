@@ -2,7 +2,7 @@ CREATE TABLE `user` (`id` BIGINT AUTO_INCREMENT, `guid` BIGINT, `lastvote` BIGIN
 CREATE TABLE `news` (`id` BIGINT AUTO_INCREMENT, `author_id` BIGINT, `title` VARCHAR(255), `content` text, `created_at` DATETIME NOT NULL, `updated_at` DATETIME NOT NULL, INDEX `author_id_idx` (`author_id`), PRIMARY KEY(`id`)) ENGINE = INNODB;
 CREATE TABLE `comment` (`id` BIGINT AUTO_INCREMENT, `news_id` BIGINT, `author_id` BIGINT, `title` VARCHAR(255), `content` text, `created_at` DATETIME NOT NULL, INDEX `news_id_idx` (`news_id`), INDEX `author_id_idx` (`author_id`), PRIMARY KEY(`id`)) ENGINE = INNODB;
 CREATE TABLE `review` (`id` BIGINT AUTO_INCREMENT, `author_id` BIGINT, `comment` text, `created_at` DATETIME NOT NULL, INDEX `author_id_idx` (`author_id`), PRIMARY KEY(`id`)) ENGINE = INNODB;
-CREATE TABLE `event` (`id` BIGINT AUTO_INCREMENT, `guild_id` BIGINT, `name` VARCHAR(255), `period` datetime, INDEX `guild_id_idx` (`guild_id`), PRIMARY KEY(`id`)) ENGINE = INNODB;
+CREATE TABLE `event` (`id` BIGINT AUTO_INCREMENT, `guild_id` BIGINT, `winner_id` BIGINT, `reward_id` BIGINT, `name` VARCHAR(255), `period` datetime, `capacity` BIGINT DEFAULT -1, INDEX `guild_id_idx` (`guild_id`), INDEX `winner_id_idx` (`winner_id`), INDEX `reward_id_idx` (`reward_id`), PRIMARY KEY(`id`)) ENGINE = INNODB;
 CREATE TABLE `event_participant` (`id` BIGINT AUTO_INCREMENT, `event_id` INT, `character_id` INT, INDEX `character_id_idx` (`character_id`), INDEX `event_id_idx` (`event_id`), PRIMARY KEY(`id`)) ENGINE = INNODB;
 CREATE TABLE `poll` (`id` BIGINT AUTO_INCREMENT, `name` VARCHAR(255), `date_start` DATE, `date_end` DATE, PRIMARY KEY(`id`)) ENGINE = INNODB;
 CREATE TABLE `poll_option` (`id` BIGINT AUTO_INCREMENT, `poll_id` BIGINT, `name` VARCHAR(255), INDEX `poll_id_idx` (`poll_id`), PRIMARY KEY(`id`)) ENGINE = INNODB;
@@ -16,7 +16,7 @@ CREATE TABLE `ticket` (`id` BIGINT AUTO_INCREMENT, `category_id` BIGINT, `state`
 CREATE TABLE `ticket_answer` (`id` BIGINT AUTO_INCREMENT, `ticket_id` BIGINT, `author_id` BIGINT, `content` text, `created_at` DATETIME NOT NULL, `updated_at` DATETIME NOT NULL, INDEX `ticket_id_idx` (`ticket_id`), INDEX `author_id_idx` (`author_id`), PRIMARY KEY(`id`)) ENGINE = INNODB;
 CREATE TABLE `ticket_category` (`id` BIGINT AUTO_INCREMENT, `name` VARCHAR(255), `icon` VARCHAR(40), `description` text, `root_id` BIGINT, `lft` INT, `rgt` INT, `level` SMALLINT, PRIMARY KEY(`id`)) ENGINE = INNODB;
 
---These are integrity checks.
+#These are integrity checks.
 DELIMITER //
 CREATE TRIGGER clean_delchar AFTER DELETE ON `personnages`
 FOR EACH ROW

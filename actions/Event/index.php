@@ -37,7 +37,7 @@ foreach (range(1, 12) as $i)
 echo make_form(array(
 	array('month', NULL, 'select', $months, $month),
 	array('year', NULL, 'select', array_combine(range($minYear, $maxYear), range($minYear, $maxYear)), $year),
-), APPEND_FORM_TAG, '#', array('sep_inputs' => ' ', 'method' => 'GET'));
+), '#', array('sep_inputs' => ' ', 'method' => 'GET'));
 jQ('
 $("#form_send").hide();
 $("#form_month").change(function (val)

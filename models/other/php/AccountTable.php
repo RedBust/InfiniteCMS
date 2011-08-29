@@ -11,7 +11,7 @@
 class AccountTable extends RecordTable
 {
 	public function findReverseFriends($guid = null)
-	{
+	{ //todo move this to Account class ...
 		if (null === $guid)
 		{
 			global $account;

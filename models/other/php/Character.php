@@ -209,6 +209,8 @@ class Character extends BaseCharacter
 		if (!level(LEVEL_LOGGED))
 			return false;
 
+		if ($accountID instanceof Account)
+			$accountID = $accountID->guid;
 		if (!$accountID)
 		{
 			global $account;

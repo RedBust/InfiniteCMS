@@ -286,8 +286,13 @@ Event:
   connection: other
   columns:
     guild_id: int(9)
+    winner_id: int(9)
+    reward_id: int(9)
     name: varchar(255) #i.e. "goodbye server /rofl"
     period: datetime
+    capacity:
+      type: int(9)
+      default: -1
   relations:
     Participants:
       class: Character
@@ -297,6 +302,14 @@ Event:
       foreign: character_id
     Guild:
       local: guild_id
+      foreign: id
+    Winner:
+      class: Character
+      local: winner_id
+      foreign: guid
+    Reward:
+      class: ShopItem
+      local: reward_id
       foreign: id
 EventParticipant:
   connection: other

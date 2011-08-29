@@ -15,6 +15,7 @@ Doctrine_Manager::getInstance()->bindComponent('ShopItem', 'other');
  * @property boolean $is_lottery
  * @property boolean $is_hidden
  * @property Doctrine_Collection $Effects
+ * @property Doctrine_Collection $Event
  * 
  * @package    InfiniteCMS
  * @subpackage Models
@@ -61,5 +62,9 @@ abstract class BaseShopItem extends Record
         $this->hasMany('ShopItemEffect as Effects', array(
              'local' => 'id',
              'foreign' => 'item_id'));
+
+        $this->hasMany('Event', array(
+             'local' => 'id',
+             'foreign' => 'reward_id'));
     }
 }

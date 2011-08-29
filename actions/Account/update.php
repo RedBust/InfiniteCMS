@@ -3,9 +3,8 @@ if (!level(LEVEL_LOGGED))
 	redirect(array('controller' => $router->getController(), 'action' => 'create'));
 
 if (level(LEVEL_ADMIN) && !empty($_SESSION['referer']) && $_SESSION['referer'] === 'list')
-{ //From the list of accounts ? if yes, delete the "sent" key: we just valid the search-account form
+{
 	unset($_SESSION['referer']);
-	unset($_POST['sent']);
 	define('FROM_SEARCH', true);
 }
 else

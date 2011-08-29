@@ -16,7 +16,7 @@ class LiveActionTable extends RecordTable
 		if (!isset($types[$objet['type']]))
 			return;
 
-		$item = new self;
+		$item = new LiveAction;
 		$item->Character = $char;
 		$item->action = $objet['type'];
 		$item->nombre = $objet['value'];

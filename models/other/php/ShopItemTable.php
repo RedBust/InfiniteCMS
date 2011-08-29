@@ -43,9 +43,9 @@ class ShopItemTable extends RecordTable
 
 		$options = tag_open('div', array('id' => 'options')) . '>';
 		$options .= input('is_lottery', lang('shop.is_lottery'), 'checkbox', $search_val['is_lottery']);
-		if (in_array('is_vip', $this->getFilterNames()))
+		if (in_array('is_vip', $this->getFilters()))
 			$options .= input('is_vip', lang('shop.is_vip'), 'checkbox', $search_val['is_vip']);
-		if (in_array('is_hidden', $this->getFilterNames()))
+		if (in_array('is_hidden', $this->getFilters()))
 			$options .= input('is_hidden', lang('shop.is_hidden'), 'checkbox', $search_val['is_hidden']);
 		$options .= '</div>';
 		jQ('$("#options").buttonset();');
@@ -61,6 +61,6 @@ class ShopItemTable extends RecordTable
 				 NULL, intval($search_val['cost']), array(), false),
 				array('cost2', '&nbsp;' . lang('and') . '&nbsp;', NULL, intval($search_val['cost2'])),
 				$options
-			), APPEND_FORM_TAG);
+			));
 	}
 }

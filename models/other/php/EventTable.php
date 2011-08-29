@@ -23,8 +23,8 @@ class EventTable extends RecordTable
 	public function findByYearAndMonthAndMGuildId($year, $month, $guild)
 	{
 		return $this->createQuery('e')
-					->where('YEAR(e.period) = ? AND MONTH(e.period) = ? AND (guild_id = ? OR guild_id = 0)', array($year, $month, $guild))
-						->leftJoin('e.Participants p')
+					->where('YEAR(e.period) = ? AND MONTH(e.period) = ? AND (guild_id = ? OR guild_id = 0 OR guild_id IS NULL)', array($year, $month, $guild))
+						->leftJoin('e.Participants p INDEXBY guid')
 						->leftJoin('e.Guild g')
 					->execute();
 	}
@@ -41,7 +41,7 @@ class EventTable extends RecordTable
 		echo tag('div', array('style' => array('display' => 'none'), 'id' => 'eventParticipants', 'title' => lang('participants')), '');
 		jQ('
 var eventParticipants = $("#eventParticipants").dialog(dialogOpt),
-	events = [],
+	events = [];
 
 function showEvent(id)
 {

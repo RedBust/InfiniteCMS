@@ -132,7 +132,7 @@ WEBO;
 			make_form(array(
 				array('code', lang('acc.credit.code') . tag('br'), NULL,
 					NULL, $inputAttr),
-			 ), APPEND_FORM_TAG);
+			 ));
 			break;
 		case 'star':
 			echo tag('div', array('id' => 'starpass_' . $config['PASS']['idd']), '') .

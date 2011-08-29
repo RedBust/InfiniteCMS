@@ -104,7 +104,7 @@ binds.add(function ()
 					'action' => 'update',
 					'col' => 'title',
 					'output' => 0,
-					'id' => $news->id->,
+					'id' => $news->id,
 		), false);
 		$url_com = array(
 			'_base' => array(//url for editInPlace of the content of a comment

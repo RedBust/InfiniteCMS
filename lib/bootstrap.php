@@ -12,11 +12,6 @@ define('DS', '/');
 
 
 //I created this constants because I hate "ghost parameters"
-//@see make_form
-/* * Append the <form> & </form> */
-define('APPEND_FORM_TAG', true);
-/* * Don't append the <form> & </form> */
-define('NOT_APPEND_FORM_TAG', false);
 
 /* * Reverse level */
 define('REQUIRE_NOT', true);
@@ -194,6 +189,7 @@ $doctrine = array(
 	'other' => Doctrine_Manager::connection($login . $config['DB_OTHER'], 'other'),
 	'static' => Doctrine_Manager::connection($login . $config['DB_STATIC'], 'static'),
 );
+unset($login, $config['DB_HOST'], $config['DB_USER'], $config['DB_PSWD']);
 if (DEBUG && !DEV)
 	$mem .= memory_get_usage() . ': connections loaded - ' . __FILE__ . ':' . __LINE__ . '<br />';
 $manager = Doctrine_Manager::getInstance();
@@ -203,15 +199,15 @@ $manager->setAttribute(Doctrine_Core::ATTR_COLLECTION_CLASS, 'Collection');
 $manager->setAttribute(Doctrine_Core::ATTR_AUTOLOAD_TABLE_CLASSES, true);
 $manager->setAttribute(Doctrine_Core::ATTR_MODEL_LOADING,
 		Doctrine_Core::MODEL_LOADING_CONSERVATIVE);
+$manager->setAttribute(Doctrine_Core::ATTR_QUOTE_IDENTIFIER, true);
 $manager->setAttribute(Doctrine_Core::ATTR_AUTO_FREE_QUERY_OBJECTS, true);
 set_include_path(implode(PATH_SEPARATOR, array(
-			ROOT, //see #0.3.2a
-			ROOT . 'lib/class/', //local libs > global libs
+	ROOT, //see #0.3.2a
+	ROOT . 'lib/class/', //local libs > global libs
 #		get_include_path(),
-		)));
+)));
 if (DEBUG && !DEV)
 	$mem .= memory_get_usage() . ': Attributes loaded ... - ' . __FILE__ . ':' . __LINE__ . '<br />';
-unset($login);
 
 if (!DEV)
 {
@@ -244,29 +240,25 @@ if (!DEV)
 
 	if (!empty($_SESSION['guid']))
 	{ //retrieve account
-			$accountQ = Query::create()
-							->from('Account a')
-								->leftJoin('a.Characters c INDEXBY c.guid')
-									->leftJoin('c.Events e INDEXBY e.id')
-								->leftJoin('a.User u')
-									->leftJoin('u.PollOptions po')
-										->leftJoin('po.Poll p')
-									->leftJoin('u.Review r')
-							->where('guid = ?', $_SESSION['guid']);
-			$account = $accountQ->fetchOne();
-			$accountQ->free();
-			if (!$account)
-				unset($_SESSION['guid']);
-			/* @var $account Account */
-			if (!$account->relatedExists('User'))
-			{
-				$account->User = UserTable::getInstance()->fromGuid($account->guid);
-				//@todo main char
-			}
-			if ($account->getMainChar())
-				load_models('static');
-#			$_SESSION['account'] = serialize($account);
-#		}
+		$account = Query::create()
+						->from('Account a')
+							->leftJoin('a.Characters c INDEXBY guid')
+								->leftJoin('c.Events e INDEXBY e.id')
+							->leftJoin('a.User u')
+								->leftJoin('u.PollOptions po')
+									->leftJoin('po.Poll p')
+								->leftJoin('u.Review r')
+						->where('guid = ?', $_SESSION['guid'])
+						->fetchOne();
+		if (!$account)
+			unset($_SESSION['guid']);
+		/* @var $account Account */
+		if (!$account->relatedExists('User'))
+		{
+			$account->User = UserTable::getInstance()->fromGuid($account->guid);
+		}
+		if ($account->getMainChar())
+			load_models('static');
 		if (DEBUG)
 			$mem .= memory_get_usage() . ': Acc loaded ... - ' . __FILE__ . ':' . __LINE__ . '<br />';
 	}

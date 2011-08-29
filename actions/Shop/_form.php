@@ -8,7 +8,7 @@ $loc = FROM_INCLUDE ? to_url(array(
 			'controller' => 'Shop',
 			'action' => 'update',
 			'id' => $item['id'],
-		)) : APPEND_FORM_TAG;
+		)) : '#';
 $fields = array(
 	array('name', lang('name') . '<br />', NULL, $item->name),
 	array('cost', $preNl . sprintf(lang('shop.cost'), $config['POINTS_CREDIT'], $config['POINTS_VOTE'], $config['POINTS_CREDIT_VIP'], $config['POINTS_VOTE_VIP']) . '<br />', NULL, $item->cost),
@@ -45,14 +45,15 @@ $ef[] = array('value[' . $id . ']', '&nbsp;&bull;&nbsp;' . $lang_val . ' :');
 $fields[lang('effects')] = $ef;
 jQ(sprintf('
 $("#options").buttonset();
-var input_cost = $("#form_cost"),
-	cost = input_cost.parent();
+var cost_couple = $("#form_couple_cost"),
+	cost_on = false;
 $("#form_is_vip").change(function ()
-{
-	if ($(this).val() == "on")
-		cost.hide();
+{ //cost_on = workaround
+	cost_on = !cost_on;
+	if (cost_on)
+		cost_couple.hide();
 	else
-		cost.show();
+		cost_couple.show();
 });
 
 var idEffect = %d,

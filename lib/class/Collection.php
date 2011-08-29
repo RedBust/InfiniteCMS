@@ -14,8 +14,7 @@ class Collection extends Doctrine_Collection
 	protected static $charsInit = NULL;
 
 	/**
-	 * addAll
-	 * add all values to this Collection
+	 * adds all values to this Collection
 	 *
 	 * @param $values Collection|array Values to add
 	 * @return void
@@ -25,6 +24,18 @@ class Collection extends Doctrine_Collection
 		foreach ($values as $id => $rec)
 		/** @var $rec Record */
 			$this->add($rec);
+	}
+	/**
+	 * creates an array of each $record[$key]
+	 *
+	 * @return array [records[0].key, records[1].key, ...]
+	 */
+	public function getKeyArray($key)
+	{
+		$records = array();
+		foreach ($this as $record)
+			$records[] = $record[$key];
+		return $records;
 	}
 
 	/**
@@ -119,7 +130,7 @@ class Collection extends Doctrine_Collection
 					$itemsID[] = $ef->value;
 		}
 		$items = Query::create()
-				->from('ItemTemplate it INDEXBY id') //@todo INDEXBY?
+				->from('ItemTemplate it INDEXBY id')
 					->whereIn('id', $itemsID)
 				->execute();
 
@@ -141,7 +152,7 @@ class Collection extends Doctrine_Collection
 				'controller' => 'Shop',
 				'action' => 'update',
 				'output' => 0,
-				'id' => '%%t.data( "id" )%%',
+				'id' => '%%t.data("id")%%',
 				'col' => '',
 			);
 			jQ('
@@ -168,7 +179,7 @@ $(".f_' . $t . '").each( function ()
 				$html .= '
 		</tr>
 		<tr>';
-			$html .= $item;
+			$html .= tag('td', $i === $count ? array('colspan' => strval($config['ITEMS_BY_LINE'] - $m)) : array(), $item);
 		}
 		$html .= '
 			</tr>

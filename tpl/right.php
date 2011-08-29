@@ -50,7 +50,7 @@
 					<?php endif ?>
 					<div id="servInfo">
 					</div>
-					<?php if ($config['SHOW_CREATED_STATS'] && !defined('SKIP_STATS')
+					<?php if ($config['STATS'] && !defined('SKIP_STATS')
 					 || (defined('SKIP_STATS') && !SKIP_STATS)): ?>
 					<br /><br />
 					<div class="module4">

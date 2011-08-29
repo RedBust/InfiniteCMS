@@ -7,7 +7,7 @@ if (empty($_POST))
 	echo tag('h1', lang('admin.characters.search')) .
 	make_form(array(
 		array('name', lang('name') . lang('joker') . tag('br')),
-	), APPEND_FORM_TAG);
+	));
 }
 else
 {

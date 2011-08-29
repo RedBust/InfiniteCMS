@@ -141,6 +141,10 @@ return array(
 	//Registration enabled ?
 	//Inscription activée ?
 	'ENABLE_REG' => true,
+	//Allow multi-account ?
+	//Autoriser le multi-compte ?
+	'ALLOW_MULTI' => true,
+
 	//Number of bugs by pages on the BugTracker
 	//Nombre de bugs à montrer par page sur le bugTracker
 #	'BUGS_BY_PAGE' => 30, //commented: not finished functionnality | commenté: fonctionnalité non terminée
@@ -173,15 +177,12 @@ return array(
 	//Show admins on ladder ?
 	//Afficher les admins sur le ladder ?
 	'LADDER_ADMIN' => false,
-	//Allow multi-account ?
-	//Autoriser le multi-compte ?
-	'ALLOW_MULTI' => true,
-	//SHOW_CREATED_STATS: Show (or not) "Accounts created" and "Characters created" section
-	// It costs 2 SQL Queries (And caching is really stupid: we want real stats ...)
-	//SHOW_CREATED_STATS: Montrer (ou pas) "Comptes crées" et "Personnages crées"
-	// Cela coûte 2 requêtes, et faire un système de cache serait stupide: nous voulons
-	//  les données réelles.
-	'SHOW_CREATED_STATS' => true,
+
+	//STATS: Show (or not) "Accounts created", "Characters created" and "accounts logged on"
+	// It costs 3 SQL Queries (1h cache). It enables also the Misc/stats page (showing all stats, 6h cache)
+	//STATS: Montrer (ou pas) "Comptes crées", "Personnages crées" et "connectés"
+	// Cela coûte 3 requêtes, il y a un cache d'une heure. Cela active aussi la page Misc/stats (toutes les stats, cache de 6h)
+	'STATS' => true,
 
 # STAFF
 #Your staff

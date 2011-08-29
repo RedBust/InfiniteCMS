@@ -37,6 +37,7 @@ var href,
 	pm_inbox = $('#pm_inbox')
 
 	inbox_html = '&nbsp;<?php echo make_link('@pm', make_img('icons/email', EXT_PNG, lang('PrivateMessage - index', 'title'))) ?>';
+
 function updateContent(URL)
 {
 	if( in_ajax )
@@ -113,7 +114,7 @@ function followLink(event)
 		url = href;
 	if (isLocalURI(href))
 	{
-		updateContent( href );
+		updateContent(href);
 		if (typeof event != "string")
 			event.preventDefault();
 		return false;
@@ -324,7 +325,8 @@ var dialogOpt =
 	modal: true,
 	resizable: true,
 	width: 600
-};var dialogOptO = //O = open
+};
+var dialogOptO = //O = open
 {
 	autoOpen: true,
 	draggable: true,
@@ -449,7 +451,7 @@ function bind(fn, pos)
 var binds =
 {
 	base_ajax_binds:
-		{
+	{
 		'before': [],
 		'after': [ resetMarks ]
 	},
