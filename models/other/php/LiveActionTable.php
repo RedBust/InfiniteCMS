@@ -10,4 +10,16 @@
  */
 class LiveActionTable extends RecordTable
 {
+	public function give($char, $objet)
+	{
+		global $types, $config;
+		if (!isset($types[$objet['type']]))
+			return;
+
+		$item = new LiveAction;
+		$item->Character = $char;
+		$item->action = $objet['type'];
+		$item->nombre = $objet['value'];
+		$item->save();
+	}
 }

@@ -19,9 +19,12 @@ class Guild extends BaseGuild
 		return round($this->totalCharsLevels / $this->Members->count(), 0);
 	}
 
-	public function getLink()
+	public function getLink($text = NULL)
 	{
-		return make_link(array('controller' => 'Guild', 'action' => 'show', 'id' => $this->id), $this->getName());
+		if ($text === NULL)
+			$text = $this->getName();
+
+		return make_link(array('controller' => 'Guild', 'action' => 'show', 'id' => $this->id), $text, array('title' => $this->name));
 	}
 
 	public function getName()
@@ -31,6 +34,9 @@ class Guild extends BaseGuild
 
 	public function getEmblem()
 	{
+		if (empty($this->emblem))
+			return '';
+
 		$emblem = explode(',', strtoupper($this->emblem));
 		$this->getTable()->initEmblems();
 		$emblemCode = '';

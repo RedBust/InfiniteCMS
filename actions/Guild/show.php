@@ -8,8 +8,8 @@ foreach ($table->getColumnNames() as $col) //Guild/show/name/...
 		break;
 if (!$guild = $table->createQuery('g')
 				->where('g.' . $col . ' = ?', $c)
-				->leftJoin('g.Members gm')
-				->leftJoin('gm.Character p')
+					->leftJoin('g.Members gm')
+						->leftJoin('gm.Character p')
 				->orderBy('gm.rank ASC')
 				->fetchOne())
 {
@@ -46,6 +46,5 @@ if ($guild->Members->count())
 			tag('th', tag('b', lang('guild.xp_given'))) .
 			tag('th', array('style' => array('width' => '5%')), tag('b', lang('guild.xp_per'))) .
 			tag('th', array('class' => 'showMe', 'style' => array('width' => '5%')), tag('b', lang('guild.rights'))))) .
-		tag('tbody', array('style' => array('overflow' => 'auto')), $html));
-		
+		tag('tbody', array('style' => array('overflow' => 'auto')), $html));		
 }

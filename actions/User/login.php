@@ -7,11 +7,16 @@ if (level(LEVEL_LOGGED))
 	echo lang('acc.already_connected') . $link_back;
 	return;
 }
-$pseudo = $router->requestVar('pseudo');
-$pass = $router->requestVar('pass');
+$pseudo = $router->requestVar(Member::CHAMP_PSEUDO);
+$pass = $router->requestVar(Member::CHAMP_PASS);
 if (empty($pseudo) || empty($pass))
 	return; // no error :p
-if (!($account = AccountTable::getInstance()->findOneByAccountAndPass($pseudo, $pass)))
+if (!( $account = AccountTable::getInstance()
+							->createQuery('a')
+								->leftJoin('a.Characters c INDEXBY guid')
+								->leftJoin('a.User u')
+							->where('account = ? AND pass = ?', array($pseudo, $pass))
+							->fetchOne() ))
 {
 	if ($check)
 		exit('bad');

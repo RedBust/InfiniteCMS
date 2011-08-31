@@ -1,12 +1,10 @@
 <?php
-//edit "Account"
-if (!check_level(LEVEL_LOGGED))
-	return;
+if (!level(LEVEL_LOGGED))
+	redirect(array('controller' => $router->getController(), 'action' => 'create'));
 
 if (level(LEVEL_ADMIN) && !empty($_SESSION['referer']) && $_SESSION['referer'] === 'list')
-{ //From the list of accounts ? if yes, delete the "sent" key: we just valid the search-account form
+{
 	unset($_SESSION['referer']);
-	unset($_POST['sent']);
 	define('FROM_SEARCH', true);
 }
 else
@@ -38,7 +36,8 @@ if ($sent)
 		$col = true; //update all
 	else
 		$vals = array($col => $_POST['update_value']); //only a col
-	$erreurs = $acc->update_attributes($vals, $col);
+	$errors = $acc->update_attributes($vals, $col);
+
 	if (!empty($col) && !is_array($col) && $col !== true)
 	{
 		$val = nl2br($acc[$col]);
@@ -47,12 +46,12 @@ if ($sent)
 		exit($val);
 	}
 }
-if (!$sent || $erreurs != array())
+if (!$sent || $errors != array())
 {
 	partial('_form', 'acc', PARTIAL_CONTROLLER);
 }
-elseif ($sent && $erreurs === array())
+elseif ($sent && $errors === array())
 {
 	echo lang('acc.edited');
-	redirect('@root');
+	redirect(array('router' => $router->getController(), 'action' => 'show', 'id' => $acc->guid));
 }

@@ -10,4 +10,41 @@
  */
 class NewsTable extends RecordTable
 {
+	protected $panelsInit = false;
+
+	public function initPanels()
+	{
+		if ($this->panelsInit)
+			return;
+		$this->panelsInit = true;
+
+		echo tag('div', array(
+			'title' => lang('News - update', 'title'),
+			'id' => 'news_edit',
+			'style' => 'display: none;'
+		), '');
+		jQ('
+var newsPanel = $( "#news_edit" ), f = true;
+newsPanel.dialog( $.extend( dialogOpt, {"modal": false } ) );
+function newsEditPanel(id)
+{
+	var cont = $( "#form_content_ifr" ).find( "html > body" ).html();
+	if( cont === "" || cont === null )
+	{
+		updateContent( locations[$( ".edit_link_" + id ).attr( "id" )] );
+		return;
+	}
+	newsPanel.find( "div" ).hide();
+	newsPanel.find( "#news_panel-" + id ).show();
+	newsPanel.dialog( "open" );
+	
+	if( f )
+	{
+		tinymce_include();
+		f = false;
+	}
+}
+bind( function () { newsPanel.dialog( "close" ); delete newPanel; delete f; } );');
+		define('FROM_INCLUDE', true);
+	}
 }

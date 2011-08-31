@@ -13,6 +13,7 @@ Doctrine_Manager::getInstance()->bindComponent('Guild', 'other');
  * @property integer $lvl
  * @property integer $xp
  * @property Doctrine_Collection $Members
+ * @property Doctrine_Collection $Event
  * 
  * @package    InfiniteCMS
  * @subpackage Models
@@ -79,5 +80,9 @@ abstract class BaseGuild extends Record
         $this->hasMany('GuildMember as Members', array(
              'local' => 'id',
              'foreign' => 'guild'));
+
+        $this->hasMany('Event', array(
+             'local' => 'id',
+             'foreign' => 'guild_id'));
     }
 }

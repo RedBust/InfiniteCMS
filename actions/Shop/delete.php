@@ -26,4 +26,4 @@ $item->delete();
 echo lang('shop.item.deleted');
 
 if ($mode == 'ItemEffect')
-	redirect(array('controller' => $router->getController(), 'action' => 'edit', 'id' => $itemID)); //redirect to the "edit" page
+	redirect(array('controller' => $router->getController(), 'action' => 'update', 'id' => $itemID)); //redirect to the "edit" page

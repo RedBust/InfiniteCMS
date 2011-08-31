@@ -19,11 +19,13 @@ class EventTable extends RecordTable
         return Doctrine_Core::getTable('Event');
     }
 
-	public function findByYearAndMonth($year, $month)
+	//AndM = And Maybe (yeah, I know, the door is fully opened ._.)
+	public function findByYearAndMonthAndMGuildId($year, $month, $guild)
 	{
 		return $this->createQuery('e')
-					->where('YEAR(e.period) = ? AND MONTH(e.period) = ?', array($year, $month))
-						->leftJoin('e.Participants p')
+					->where('YEAR(e.period) = ? AND MONTH(e.period) = ? AND (guild_id = ? OR guild_id = 0 OR guild_id IS NULL)', array($year, $month, $guild))
+						->leftJoin('e.Participants p INDEXBY guid')
+						->leftJoin('e.Guild g')
 					->execute();
 	}
 
@@ -37,17 +39,13 @@ class EventTable extends RecordTable
 		$this->_eventBoxes = array();
 
 		echo tag('div', array('style' => array('display' => 'none'), 'id' => 'eventParticipants', 'title' => lang('participants')), '');
-		if ($account)
-			echo tag('div', array('id' => 'selectChar', 'style' => array('display' => 'none'), 'title' => pluralize(ucfirst(lang('character')), count($account->Characters))), $account->getCharactersList(true));
+
 		jQ('
 var eventParticipants = $("#eventParticipants").dialog(dialogOpt),
-	events = [],
-	event_selected = null,
+	events = [];
 
-	selectChar = $("#selectChar").dialog(dialogOpt).accordion({clearStyle: true, collapsible: true, active: false});
 function showEvent(id)
 {
-	event_selected = id;
 	eventParticipants.dialog("open").find(".event").hide();
 	eventParticipants.find("#event-" + id).show();
 }
@@ -55,26 +53,11 @@ function registerEvent(id)
 {
 	events[id] = $("#event-" + id).addClass("event").appendTo(eventParticipants);
 }
-function choosePerso(perso)
-{
-	if (event_selected)
-		document.location = "' . to_url(array(
-			'controller' => 'EventParticipant',
-			'action' => 'join',
-			'id' => '%%event_selected%%',
-			'char' => ''
-		)) . '" + perso;
-	else
-		alert("You need to choose an event first.");
-}
 bind(function ()
 {
 	eventParticipants.dialog("close");
-	selectChar.dialog("close");
 	delete eventParticipants;
 	delete events;
-	delete selectChar;
-	delete chars;
 })');
 	}
 
@@ -86,46 +69,7 @@ bind(function ()
 		$days = array();
 		foreach ($events as $event)
 		{
-			$day = substr($event['period'], 8, 2);
-			if (!isset($days[$day]))
-				$days[$day] = array();
-
-			$canParticipate = level(LEVEL_LOGGED) ? $account->canParticipate($event['id']) : false;
-			$participate_url = to_url(array('controller' => 'EventParticipant', 'action' => $canParticipate ? 'join' : 'part', 'id' => $event['id']));
-			$days[$day][] = tag('b', str_replace(':', 'h', substr($event['period'], 11, 5)) . ': ') . $event['name'] .
-			 ($event->isElapsed() && !$event->Participants->count() ? '' : js_link('showEvent(' . $event['id'] . ')', make_img('icons/group', EXT_PNG, lang('participants')), '#', array('class' => 'showThis'))) .
-			 (level(LEVEL_LOGGED) && !$event->isElapsed() ? make_link($participate_url, 
-			   make_img('icons/group_' . ($canParticipate ? 'add' : 'delete'), EXT_PNG, lang('participant.join')),
-			   null, array('class' => 'hideThis')) : '');
-
-			
-			if ($event->Participants->count())
-			{
-				$participants = array();
-				foreach ($event->Participants as $character)
-				{
-						$participants[] = tag('span', array('class' => $character->isMine() ? 'myChar' : 'aChar'),
-						 $character->getInfoLink());
-				}
-				$participants = implode(', ', $participants);
-			}
-			else
-				$participants = $event->isElapsed() ? '' : lang('participants.any');
-
-			if ($event->isElapsed())
-				$participate_link = tag('i', lang('event.elapsed')) . tag('br');
-			else
-			{
-				if (level(LEVEL_LOGGED))
-				{
-					$participate_link = make_img('icons/group_' . ($canParticipate ? 'add' : 'delete'), EXT_PNG) .
-					 tag('b', call_user_func($canParticipate ? 'js_link' : 'make_link', $canParticipate ? 'selectChar.dialog("open")' : $participate_url, lang('event.' . ($canParticipate ? 'join' . ($event->Participants->count() ? '' : '_first') : 'part')), array(), array(), false)) . tag('br');
-				}
-				else
-					$participate_link = '';
-			}
-			echo tag('div', array('id' => 'event-' . $event['id'], 'class' => 'showThis'), $participate_link . $participants);
-			jQ('registerEvent(' . $event['id'] . ')');
+			$days[$event->getDay()][] = $event;
 		}
 		return $days;
 	}

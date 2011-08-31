@@ -35,7 +35,7 @@ if ($reviews->count())
 					'action' => 'delete',
 					'id' => $review['id'],
 			), lang('act.delete'), NULL, array(), false))  : '',
-		 sprintf(lang('by'), $review->relatedExists('Author') && $review->Author->relatedExists('Account') ? $review->Author->Account->getProfilLink() : '' ),
+		 sprintf(lang('by'), $review->relatedExists('Author') && $review->Author->relatedExists('Account') ? make_link($review->Author->Account) : '' ),
 		 sprintf(lang('created'), $review['created_at']),
 		 $review['comment']);
 	}

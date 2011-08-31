@@ -66,7 +66,7 @@ if (count($_POST) < 1 || $errors != array())
 		array('receivers', lang('pm.receivers') . tag('br')),
 		array('title', lang('title') . tag('br')),
 		array('message', lang('rate.msg') . tag('br'), 'textarea'),
-	), APPEND_FORM_TAG);
+	);
 	jQ('$("#form_receivers").tokenInput("' . getPath() . 'Account/reverseFriends.json", {theme: "facebook", preventDuplicates: true});');
 }
 elseif (count($_POST) && $errors == array())

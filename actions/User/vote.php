@@ -15,13 +15,12 @@ if (level(LEVEL_LOGGED))
 	else
 	{
 		$account->User->lastVote = time();
-		$account->User->points += $config['POINTS_VOTE'];
+		$account->User->points += $config['POINTS_VOTE' . (level(LEVEL_VIP) ? '_VIP' : '')];
 		$account->User->votes += 1;
-		$account->User->save();
-		echo sprintf(lang('acc.vote.won'), $config['POINTS_VOTE']);
+		echo sprintf(lang('acc.vote.won'), $config['POINTS_VOTE' . (level(LEVEL_VIP) ? '_VIP' : '')]);
 	}
 	echo '<br /><br />';
 }
 
 echo make_link($config['URL_VOTE'], make_img('http://www.rpg-paradize.com/vote', EXT_GIF));
-redirect($config['URL_VOTE'], 3);
+redirect($config['URL_VOTE']);

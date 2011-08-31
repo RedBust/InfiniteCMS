@@ -24,4 +24,4 @@ foreach ($account->Characters as $char)
 $event->unlink('Participants', array($char->guid));
 $event->save();
 
-redirect(array('controller' => 'Event', 'action' => 'index', 'year' => substr($event->period, 0, 4), 'month' => substr($event->period, 5, 2)));
+redirect($event->getURL());

@@ -9,7 +9,7 @@ $usersDql = Query::create()
 				->select('u.id, u.guid, u.votes, a.guid, a.pseudo, c.*')
 				->from('User u')
 					->innerJoin('u.Account a')
-						->leftJoin('a.Characters c')
+						->leftJoin('a.Characters c INDEXBY c.guid')
 				->orderBy('u.votes DESC');
 $pager = new Doctrine_Pager($usersDql, $router->requestVar('id', 1), 20); //$config['ARTICLES_BY_PAGE'] );
 $ladder = $pager->execute();
@@ -22,27 +22,18 @@ echo '
 				. tag('td', tag('b', lang('character')))));
 foreach ($ladder as $user)
 {
-	$p = null;
-	foreach ($user->Account->Characters as $char)
-	{ //find the highest perso lvl
-		/* @var $char Character */
-		if ($char['xp'] > ($p === NULL ? 0 : $p['xp']))
-		{
-			$p = $char;
-		}
-	}
 	/* @var $p Character */
-	if ($p === NULL)
-	{ //$p is the "strongest" character (of this account - In fact, the strongest chracter is Chuck-Norris, on MY account §)
-		$perso = tag('td', tag('i', lang('acc.ladder.no_character')));
+	if ($p = $user->Account->getMainChar())
+	{
+		$perso = tag('td', make_link($p));
 	}
 	else
 	{
-		$perso = tag('td', $p->getInfoLink());
+		$perso = tag('td', tag('i', lang('acc.ladder.no_character')));
 	}
 	$perso .= "\n";
 
-	echo tag('tr', tag('td', $user->Account->getProfilLink()) . tag('td', $user['votes']) . $perso);
+	echo tag('tr', tag('td', make_link($user->Account)) . tag('td', $user['votes']) . $perso);
 }
 echo '
 </table>';

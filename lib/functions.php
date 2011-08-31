@@ -129,15 +129,16 @@ spl_autoload_register('load');
  */
 function level($required = LEVEL_LOGGED, $reverse = false)
 {
-	global $member;
+	global $member, $account;
+
 	if ($required == LEVEL_GUEST)
 		return $reverse ? $member->isConnected() : !$member->isConnected(); //return true if !connected (without reverse)
 	if ($required == LEVEL_LOGGED)
 		return $reverse ? !$member->isConnected() : $member->isConnected(); //return true if connected (without reverse)
+	if ($required == LEVEL_VIP)
+		return $reverse ? !$account->isVIP() : $account->isVIP();
 
-	global $account;
-	//in case of banned, $lvl is LEVEL_BANNED
-	$lvl = $member->isConnected() ? ( $account->banned ? LEVEL_BANNED : $account->level ) : LEVEL_GUEST;
+	$lvl = $member->isConnected() ? $account->getLvl() : LEVEL_GUEST;
 	return ( $reverse ) ? $lvl < $required : $lvl >= $required;
 }
 
@@ -176,7 +177,7 @@ function check_level($lvl = LEVEL_ADMIN, $lt = false)
  * @param string $key The key to search
  * @param string $namespace the namespace containing the string, as
  *  /langs/[LANG]/[NAMESPACE].php
- * @param string $default the default value if the key doesn't exists
+ * @param string $default the default value if the key doesn't exist
  *
  * @return string The key translated or "Untranslated"
  */
@@ -490,9 +491,29 @@ function to_url($params, $strict = true, $rewrite = true)
  * @package Helper
  * @subpackage Route
  *
- * @example echo replace_url('@root');
+ * @example echo replace_url('@root')
+ * @example echo replace_url(array('controller' => 'Misc'))
+ * @example echo replace_url(new Account)
+ * @example echo replace_url(AccountTable::getInstance()->find(5))
  *
- * @param string $url URL to change
+ * @param mixed $url can be
+ *  - a string :
+ *   - if routes[$url]
+ *    - routes to the URL replacement
+ *   - else
+ *    - routes to $url
+ *  - an array : routes to key/value pairs
+ *  - a Doctrine_Record object :
+ *   - if !$url.exists? :
+ *    - routes to [$url.class.to_s]/update
+ *   - else :
+ *    - if $url.respond_to?(:getLink) && $recordName !== false
+ *     - return $url.getLink($recordName)
+ *    - else
+ *     - unless $recordName.is_a String
+ *      - $recordName = $url.getName()
+ *     - routes to [$url.class.to_s]/show/[$url.getId()]
+ *  - anything else : returns it.
  * @return string URL modified
  */
 function replace_url($url, $strict = true)
@@ -500,7 +521,24 @@ function replace_url($url, $strict = true)
 	global $routes;
 	if (!is_string($url))
 	{
-		if (is_array($url))
+		if ($url instanceof Doctrine_Record)
+		{
+			if ($url->exists())
+			{ //no way to edit_path, I know. fuck you :3
+				global $recordName;
+				if (method_exists($url, 'getLink') && $recordName !== false)
+					return $url->getLink($recordName);
+				else
+				{
+					if (!is_string($recordName))
+						$recordName = $url->getName();
+					return to_url(array('controller' => get_class($url), 'action' => 'show', 'id' => $url->getId()));
+				}
+			}
+			else
+				return to_url(array('controller' => get_class($url), 'action' => 'update')); //Account#update redirects to #create ;)
+		}
+		else if (is_array($url))
 			return to_url($url);
 		else
 			return $url;
@@ -582,17 +620,23 @@ function redirect($loc = NULL, $wait = 0)
 	$loc = replace_url($loc, false);
 	$wait = doubleval($wait);
 
-	if (!$router->isAjax())
+	if ($router->isAjax())
+	{
+		$js = 'title<~>getP<~>server state<~>nextPMNotif<~>' . js(sprintf('window.setTimeout(function () { followLink("%s"); }, %d)', $loc, $wait == 0.0 ? 0 : $wait * 1000));
+		if ($wait)
+			echo $js;
+		else
+		{
+			__shutdown();
+			exit($js);
+		}
+	}
+	else
 	{
 		if (!$wait)
 			header('Location: ' . $loc);
 		meta('refresh', $wait . '; url=' . $loc);
 	}
-	$js = js(sprintf('document.setTimeout(function () { document.location = "%s"; }, %d)', $loc, $wait == 0.0 ? 0 : $wait * 1000));
-	if ($wait)
-		echo $js;
-	else
-		exit($js);
 }
 
 /**
@@ -637,6 +681,8 @@ function make_img($url, $ext = EXT_JPG, $title = NULL, $alt = NULL, $add = array
 		$add = $alt;
 		$alt = '';
 	}
+	if (is_string($title) && empty($alt))
+		$alt = $title;
 	return tag('img', $add + array('src' => url_for_image($url, $ext), 'title' => $title, 'alt' => $alt));
 }
 
@@ -801,13 +847,36 @@ function js_link($js, $text, $link = '#', $add = array(), $event = NULL)
  *
  * @return string formatted link
  */
-function make_link($_url, $n, $opt = array(), $add = array(), $js = true)
+function make_link($_url, $n = NULL, $opt = array(), $add = array(), $js = true)
 {
 	global $config;
 	if ($config['LOAD_TYPE'] == LOAD_NONE)
 		$js = false; //force JS to be off
 
+	if ($_url instanceof Doctrine_Record && method_exists($_url, 'getLink') && $_url->exists() && $n !== false)
+		return $_url->getLink();
+
+	if ((is_array($_url) || $_url instanceof Doctrine_Record)
+	 && !empty($opt) && empty($add))
+	{
+		$add = $opt;
+		$opt = array();
+	}
+
+	if ($_url instanceof Doctrine_Record)
+	{
+		global $recordName;
+		$recordName = $n;
+		$url = replace_url($_url);
+		if (!empty($recordName))
+		{
+			$n = $recordName;
+			unset($recordName);
+		}
+	}
+	else
 	$url = replace_url($_url);
+
 	if (is_array($url) && ( $opt === array() || $opt === NULL ))
 	{
 		$opt = $url;
@@ -1050,9 +1119,9 @@ function input($name, $label, $type = NULL, $value = '', $add = array())
 	$value = str_replace('</', '&lt;/', $value); //On vire les caract�res sp�ciaux de $value
 	if ($type === 'textarea')
 	{
-		$type = tag('textarea', $add + array($add, 'name' => $name, 'id' => 'form_' . $name), $value);
+		$type = tag('textarea', $add + array($add, 'name' => $name, 'id' => 'form_' . $name), str_replace('</textarea>', '', $value));
 	}
-	elseif ($type === 'select')
+	else if ($type === 'select')
 	{
 		if (!is_array($add) && !isset($selected))//selected
 		{
@@ -1066,6 +1135,9 @@ function input($name, $label, $type = NULL, $value = '', $add = array())
 	}
 	else
 	{
+		if (is_string($value) && strpos($value, '<') !== false)
+			$value = str_replace('"', '', $value); 
+
 		$pre_html = $post_html = '';
 		global $calendar_opts;
 		switch ($type)
@@ -1163,25 +1235,27 @@ function input($name, $label, $type = NULL, $value = '', $add = array())
 						$value = false;
 					}
 				}
-			}
-			$params = array('type' => $type, 'name' => $name, 'value' => $value, 'id' => 'form_' . $name);
-			if ($type === 'checkbox')
-			{
+			break;
+			case 'Jcheckbox':
+				jQ('$("form_' . $name . '").buttonset();');
+				$type = 'checkbox';
+			//no break.
+			case 'checkbox':
 				if ((bool) $value)
 				{
 					$params = array_merge($params, array('checked' => 'checked'));
 				}
-				$value = 'on';
-			}
-			$type = $pre_html . tag('input', array_merge($params, $add)) . $post_html;
+				$value = $params['value'] = 'on';
+		}
+		$params = array('type' => $type, 'name' => $name, 'value' => $value, 'id' => 'form_' . $name);
+		$type = $pre_html . tag('input', array_merge($params, $add)) . $post_html;
 	}
-
 	$opts_label = array('for' => 'form_' . $name);
 	if ($act_label && is_array($add))
 	{
 		$opts_label = array_merge($opts_label, $add);
 	}
-	return (empty($label) ? '' : tag('label', $opts_label, $label)) . $type;
+	return tag('span', array('id' => 'form_couple_' . $name), (empty($label) ? '' : tag('label', $opts_label, $label)) . $type);
 }
 
 /**
@@ -1299,35 +1373,33 @@ function render_errors($for = NULL)
  * @subpackage HTML
  *
  * @param array $columns The columns
- * @param boolean $tag Add the "form" tag ?
  *
  * @return string the form rendered
  */
-function make_form($columns, $tag = NULL, $loc = '#', $opts = array())
+function make_form($columns, $loc = '#', $opts = array())
 {
 	global $router;
-	if (is_string($tag))
-		$loc = $tag;
-	if ($tag === NULL)
-	{ //@ignore
-		echo 'not set the append_form_tag? constant in ';
-		debug_print_backtrace();
-		$tag = APPEND_FORM_TAG;
-	}
-	if (!is_bool($tag) && $loc == '#')
-	{ //loc may be a string, an array, ...
-		$loc = $tag;
-		$tag = APPEND_FORM_TAG;
-	}
-	else if (is_array($loc))
-	{
-		$opts = $loc;
-		$loc = '#';
-	}
 	if (!isset($opts['method']))
 		$opts['method'] = 'POST';
 	if (!isset($opts['sep_inputs']))
 		$opts['sep_inputs'] = tag('br');
+	if (!isset($opts['append_form_tag']))
+		$opts['append_form_tag'] = true;
+	if (!isset($opts['submit_text']))
+		$opts['submit_text'] = lang('send');
+	if (!isset($opts['submit_hideThis']))
+		$opts['submit_hideThis'] = false;
+	if (!isset($opts['submit_add']))
+		$opts['submit_add'] = array();
+	if (isset($opts['submit_add']['class']) && is_array($opts['submit_add']['class']))
+		$opts['submit_add']['class'] = implode(' ', $opts['submit_add']['class']);
+	else
+		$opts['submit_add']['class'] = '';
+
+	if ($opts['submit_hideThis'])
+	{
+		$opts['submit_add']['class'] .= ' hideThis';
+	}
 
 	$firstCol = '';
 
@@ -1340,11 +1412,16 @@ function make_form($columns, $tag = NULL, $loc = '#', $opts = array())
 			continue;
 		if (is_numeric($i))
 		{
-			if (empty($firstCol))
-				$firstCol = $column[0];
-			$br = isset($column[5]) ? $column[5] : true;
-			$str .= input($column[0], $column[1], !empty($column[2]) ? $column[2] : NULL, isset($column[3]) ? $column[3] : '', !empty($column[4]) ? $column[4] : array())
-					. ( $br ? $opts['sep_inputs'] : '' );
+			if (is_array($column))
+			{
+				if (empty($firstCol))
+					$firstCol = $column[0];
+				$br = isset($column[5]) ? $column[5] : true;
+				$str .= input($column[0], $column[1], !empty($column[2]) ? $column[2] : NULL, isset($column[3]) ? $column[3] : '', !empty($column[4]) ? $column[4] : array())
+						. ( $br ? $opts['sep_inputs'] : '' );
+			}
+			else
+				$str .= $column;
 		}
 		else
 		{
@@ -1380,12 +1457,14 @@ function make_form($columns, $tag = NULL, $loc = '#', $opts = array())
 		if (( $id = $router->requestVar('id', NULL) ) !== NULL)
 			$params += array('id' => $id);
 		$loc = to_url($params);
-		jQ(sprintf('$( "#form_%s" ).focus();', $firstCol));
+		jQ(sprintf('$( "#form_%s" ).focus();', $firstCol)); //why only focus if #? dunno
 	}
 	else
 		$loc = replace_url($loc);
-	$str .= input('send', lang('send'), 'submit') . input('sent', NULL, 'hidden', 1);
-	return $tag ? tag('form', array('method' => $opts['method'], 'action' => $loc, 'id' => 'form'), $str) : $str;
+
+	if ($opts['submit_text'] !== NULL)
+		$str .= input('send', $opts['submit_text'], 'submit', NULL, $opts['submit_add']);
+	return $opts['append_form_tag'] ? tag('form', array('method' => $opts['method'], 'action' => $loc, 'id' => 'form'), $str) : $str;
 }
 
 /**

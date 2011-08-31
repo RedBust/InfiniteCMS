@@ -10,38 +10,57 @@
  */
 class ShopItemTable extends RecordTable
 {
-	const AUTOCOMPLETE_EXEC = true,
-		AUTOCOMPLETE_RETURN = false;
-
-	protected $_hasItemList = false;
-
-	public function getAutoComplete($val = 'form_value', $exec = NULL)
+	public function getNumericCols()
 	{
-		if( !$this->_hasItemList )
+		return array('cost', 'cost_vip', 'value');
+	}
+	public function getAllFilters()
+	{
+		return array('name', 'cost', 'cost2', 'is_lottery', 'is_vip', 'is_hidden');
+	}
+	public function getFilters()
+	{
+		$filters = array('name', 'cost', 'cost2', 'is_lottery');
+		if (level(LEVEL_VIP))
+			$filters[] = 'is_vip';
+		if (level(LEVEL_ADMIN))
+			$filters[] = 'is_hidden';
+		return $filters;
+	}
+	public function getProtectedFilters()
+	{
+		return array_diff($this->getAllFilters(), $this->getFilters());
+	}
+
+	public function getSearchBox()
+	{
+		global $router, $config;
+		$search_val = array();
+		foreach ($this->getFilters() as $filter)
 		{
-			$_items = lang( NULL, 'item' );
-			$count = count( $_items );
-			$items_txt = '';
-			foreach( $_items as $i => $name )
-			{
-				$items_txt .= "'" . str_replace( '\'', '\\\'', $name ) . "', ";
-			}
-			$items_txt = ( $count ? substr( $items_txt, 0, -2 ) : $items_txt );
-			jQ( 'var items = [' . $items_txt . '];' );
-			$this->_hasItemList = true;
+			$search_val[$filter] = $router->requestVar($filter) ?: '';
 		}
 
-		if( $val === NULL )
-			return;
-		$js = '
-var _value = $( \'#' . $val . '\' );
+		$options = tag_open('div', array('id' => 'options')) . '>';
+		$options .= input('is_lottery', lang('shop.is_lottery'), 'checkbox', $search_val['is_lottery']);
+		if (in_array('is_vip', $this->getFilters()))
+			$options .= input('is_vip', lang('shop.is_vip'), 'checkbox', $search_val['is_vip']);
+		if (in_array('is_hidden', $this->getFilters()))
+			$options .= input('is_hidden', lang('shop.is_hidden'), 'checkbox', $search_val['is_hidden']);
+		$options .= '</div>';
+		jQ('$("#options").buttonset();');
 
-_value.autocomplete(
-	{
-		source: items
-	} );';
-		if( $exec )
-			jQ( $js );
-		return $js;
+		return tag('b', lang('shop.check_to_filter'))
+		  . make_form(array(
+				array('e_name', NULL, 'checkbox', '1', array(), false),
+				array('name', '&nbsp;' . lang('shop.item.name') . '&nbsp;', NULL, $search_val['name']),
+				array('e_cost', NULL, 'checkbox', '1', array(), false),
+				array('cost', '&nbsp;'
+				 . sprintf(lang('shop.cost_simple'), $config['POINTS_CREDIT' . (level(LEVEL_VIP) ? '_VIP' : '')], $config['POINTS_VOTE' . (level(LEVEL_VIP) ? '_VIP' : '')]) . ', '
+				 . lang('between') . '&nbsp;',
+				 NULL, intval($search_val['cost']), array(), false),
+				array('cost2', '&nbsp;' . lang('and') . '&nbsp;', NULL, intval($search_val['cost2'])),
+				$options
+			));
 	}
 }

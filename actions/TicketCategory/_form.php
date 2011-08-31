@@ -5,7 +5,7 @@ echo make_form(array(
 	array('desc', lang('desc') . tag('br'), NULL, $category->description),
 	array('icon', lang('icon') . sprintf(lang('icon_tips'), $config['template']) . tag('br') .
 	 tag('b', lang('actual') . ':') . tag('img', array('id' => 'icon_preview', 'src' => $icon_path . $category->icon . '.png' )) . tag('br'), NULL, $category->icon),
-), APPEND_FORM_TAG);
+));
 jQ('var icon_preview = $("#icon_preview");
 $("#form_icon").change(function ()
 	{

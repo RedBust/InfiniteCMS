@@ -1,5 +1,5 @@
 <?php
-global $config, $errors, $metas, $types, $account, $guildRights;
+global $config, $errors, $metas, $types, $account, $router, $member, $guildRights;
 
 /**
  * @file $Id: bootstrap.php 56 2011-01-16 19:39:32Z nami.d0c.0 $
@@ -12,11 +12,6 @@ define('DS', '/');
 
 
 //I created this constants because I hate "ghost parameters"
-//@see make_form
-/* * Append the <form> & </form> */
-define('APPEND_FORM_TAG', true);
-/* * Don't append the <form> & </form> */
-define('NOT_APPEND_FORM_TAG', false);
 
 /* * Reverse level */
 define('REQUIRE_NOT', true);
@@ -81,6 +76,7 @@ define('STATE_RESOLVED', 2);
 define('LEVEL_BANNED', -2);
 define('LEVEL_GUEST', -1);
 define('LEVEL_LOGGED', 0);
+define('LEVEL_VIP', 0.5); //[...]
 define('LEVEL_TEST', 1);
 define('LEVEL_MODO', 2);
 define('LEVEL_MJ', 3);
@@ -100,18 +96,17 @@ $calendar_opts = '
 $routes = array(//action default : key
 	'root' => array('controller' => 'News', 'action' => 'index'),
 
-	'register' => array('controller' => 'Account', 'action' => 'new'),
-	'sign_in' => array('controller' => 'Account', 'action' => 'login'),
-	'sign_off' => array('controller' => 'Account', 'action' => 'delog'),
-	'account.edit' => array('controller' => 'Account', 'action' => 'index'),
-	'vote' => array('controller' => 'Account'),
-	'credit' => array('controller' => 'Account'),
-	'ladder_vote' => array('controller' => 'Account'),
+	'sign_off' => array('controller' => 'User', 'action' => 'delog'),
+	'sign_in' => array('controller' => 'User', 'action' => 'login'),
+	'vote' => array('controller' => 'User'),
+	'credit' => array('controller' => 'User'),
+	'ladder_vote' => array('controller' => 'User'),
 
 	'character.give' => array('controller' => 'Character', 'action' => 'give'),
 
 	'join' => array('controller' => 'Misc'),
 	'staff' => array('controller' => 'Misc'),
+	'stats' => array('controller' => 'Misc'),
 	'mass_mail' => array('controller' => 'Misc'),
 
 	'tos' => array('controller' => 'Misc'),
@@ -134,7 +129,6 @@ $routes = array(//action default : key
 	'pm.create' => array('controller' => 'PrivateMessage', 'action' => 'create'),
 
 	'events' => array('controller' => 'Event', 'action' => 'index'),
-	'event.update' => array('controller' => 'Event', 'action' => 'update'),
 );
 
 require 'lib/functions' . EXT;
@@ -196,6 +190,7 @@ $doctrine = array(
 	'other' => Doctrine_Manager::connection($login . $config['DB_OTHER'], 'other'),
 	'static' => Doctrine_Manager::connection($login . $config['DB_STATIC'], 'static'),
 );
+unset($login, $config['DB_HOST'], $config['DB_USER'], $config['DB_PSWD']);
 if (DEBUG && !DEV)
 	$mem .= memory_get_usage() . ': connections loaded - ' . __FILE__ . ':' . __LINE__ . '<br />';
 $manager = Doctrine_Manager::getInstance();
@@ -205,15 +200,15 @@ $manager->setAttribute(Doctrine_Core::ATTR_COLLECTION_CLASS, 'Collection');
 $manager->setAttribute(Doctrine_Core::ATTR_AUTOLOAD_TABLE_CLASSES, true);
 $manager->setAttribute(Doctrine_Core::ATTR_MODEL_LOADING,
 		Doctrine_Core::MODEL_LOADING_CONSERVATIVE);
+$manager->setAttribute(Doctrine_Core::ATTR_QUOTE_IDENTIFIER, true);
 $manager->setAttribute(Doctrine_Core::ATTR_AUTO_FREE_QUERY_OBJECTS, true);
 set_include_path(implode(PATH_SEPARATOR, array(
-			ROOT, //see #0.3.2a
-			'lib/class/', //local libs > global libs
+	ROOT, //see #0.3.2a
+	ROOT . 'lib/class/', //local libs > global libs
 #		get_include_path(),
-		)));
+)));
 if (DEBUG && !DEV)
 	$mem .= memory_get_usage() . ': Attributes loaded ... - ' . __FILE__ . ':' . __LINE__ . '<br />';
-unset($login);
 
 if (!DEV)
 {
@@ -246,26 +241,25 @@ if (!DEV)
 
 	if (!empty($_SESSION['guid']))
 	{ //retrieve account
-			$accountQ = Query::create()
-							->from('Account a')
-								->leftJoin('a.Characters c INDEXBY c.guid')
-									->leftJoin('c.Events e INDEXBY e.id')
-								->leftJoin('a.User u')
-									->leftJoin('u.PollOptions po')
-										->leftJoin('po.Poll p')
-									->leftJoin('u.Review r')
-							->where('guid = ?', $_SESSION['guid']);
-			$account = $accountQ->fetchOne();
-			$accountQ->free();
-			if (!$account)
-				unset($_SESSION['guid']);
-			/* @var $account Account */
-			if (!$account->relatedExists('User'))
-			{
-				$account->User = UserTable::getInstance()->fromGuid($account->guid);
-			}
-#			$_SESSION['account'] = serialize($account);
-#		}
+		$account = Query::create()
+						->from('Account a')
+							->leftJoin('a.Characters c INDEXBY guid')
+								->leftJoin('c.Events e INDEXBY e.id')
+							->leftJoin('a.User u')
+								->leftJoin('u.PollOptions po')
+									->leftJoin('po.Poll p')
+								->leftJoin('u.Review r')
+						->where('guid = ?', $_SESSION['guid'])
+						->fetchOne();
+		if (!$account)
+			unset($_SESSION['guid']);
+		/* @var $account Account */
+		if (!$account->relatedExists('User'))
+		{
+			$account->User = UserTable::getInstance()->fromGuid($account->guid);
+		}
+		if ($account->getMainChar())
+			load_models('static');
 		if (DEBUG)
 			$mem .= memory_get_usage() . ': Acc loaded ... - ' . __FILE__ . ':' . __LINE__ . '<br />';
 	}

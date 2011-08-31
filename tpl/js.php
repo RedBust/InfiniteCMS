@@ -8,6 +8,18 @@ var errorDiv = $( "#errorDiv" ),
 error = $( "#error" );
 errorDiv.dialog( dialogOpt );
 
+<?php if (level(LEVEL_LOGGED)): ?>
+function chooseMainChar(character)
+{
+	document.location = "<?php echo to_url(array(
+				'controller' => 'User',
+				'action' => 'main',
+				'id' => ''
+			)) ?>" + character;
+}
+var mainCharSelector = $("#selectMainChar").accordion({clearStyle: true, collapsible: true, active: false});
+<?php endif ?>
+
 function isLocalURI(href)
 {
 	return href.substr( 0, 1 ) == "?"
@@ -25,6 +37,7 @@ var href,
 	pm_inbox = $('#pm_inbox')
 
 	inbox_html = '&nbsp;<?php echo make_link('@pm', make_img('icons/email', EXT_PNG, lang('PrivateMessage - index', 'title'))) ?>';
+
 function updateContent(URL)
 {
 	if( in_ajax )
@@ -101,10 +114,14 @@ function followLink(event)
 		url = href;
 	if (isLocalURI(href))
 	{
-		updateContent( href );
+		updateContent(href);
 		if (typeof event != "string")
 			event.preventDefault();
 		return false;
+	}
+	else
+	{
+		document.location = href;
 	}
 };
 $('.link').live('click', followLink);
@@ -112,8 +129,8 @@ $('.link').live('click', followLink);
 var _inLoad = false;
 $(window).bind('popstate', function ()
 {
-	if (_inLoad && !'state' in window.history)
-	{ //firefox triggers 'load' on "back" button hit.
+	if (_inLoad)
+	{
 		_inLoad = false;
 		return;
 	}
@@ -166,18 +183,18 @@ $('#login_form').submit(function(event)
 		"ban": <?php echo javascript_val(lang('acc.banned')) ?>
 	},
 	t = $(this),
-	pseudo = encodeURIComponent( t.find( "#form_pseudo" ).val() ),
-	pass = encodeURIComponent( t.find( "#form_pass" ).val() );
+	pseudo = encodeURIComponent(field_pseudo.val()),
+	pass = encodeURIComponent(field_pass.val());
 	LoginForm_processing = true;
 	$.ajax(
 	{
 		mode: "POST",
 		url: <?php	echo '"' . to_url(array(
-			'controller' => 'Account',
+			'controller' => 'User',
 			'action' => 'login',
 			'check' => '1',
-			'pseudo' => '%%pseudo%%',
-			'pass' => '%%pass%%',
+			Member::CHAMP_PSEUDO => '%%pseudo%%',
+			Member::CHAMP_PASS => '%%pass%%',
 		), false) . '"' /* javascript_val escapes " :p */ ?>,
 		success: function (status)
 		{
@@ -189,7 +206,11 @@ $('#login_form').submit(function(event)
 			}
 			else
 			{
-				error.html( errorMessages[status] );
+				if (errorMessages[status])
+					error.html(errorMessages[status]);
+				else
+					error.html(status); //something is not going on perfectly ...
+
 				errorDiv.dialog( "open" );
 				event.preventDefault();
 				return false;
@@ -246,57 +267,49 @@ if (level(LEVEL_ADMIN))
 	var level_opts = ' . $level_opt . ';
 	$.each( level_opts, function (k, v)
 	{
-	level_opts[k] = v;
+		level_opts[k] = v;
 	} );');
 	
 	$spec = array('level' => '
 	field_type: "select",
-	select_text: t.html(),
+	select_text: $this.html(),
 	select_options: level_opts,');
-	$cols = array(
-		'points' => 'id',
-		'level' => 'guid',
-	);
 	$types = array('points', 'level');
 
-	$page = array('points' => 'edit', 'level' => 'index');
+	$controllers = array('points' => 'User', 'level' => 'Account');
 	foreach ($types as $type)
 		$js .= '
 	var data_id;
 	function apply_' . $type . '()
 	{
 		//cache is not usable =x
-		jQuery( ".f_' . $type . '" ).each( function()
+		jQuery(".f_' . $type . '").each(function()
 		{
-			t = jQuery( this );
-			if( !t.attr( "validated" ) )
+			$this = jQuery(this);
+			if(!$this.attr("validated"))
 			{
-				t.editInPlace(
+				$this.editInPlace(
 				{
 					url: "' . to_url(array(
-						'controller' => 'Account',
-						'action' => $page[$type],
+						'controller' => $controllers[$type],
+						'action' => 'update',
 						'header' => 0,
 						'col' => $type,
-						'id' => '%%t.attr( \'data-id\' )%%',
+						'id' => '%%$this.data(\'id\')%%',
 					), false) . '",
 					success: function (newValue)
 					{
-						data_id = jQuery( this ).attr( "data-id" );
-						$( ".f_' . $type . '" ).each( function()
+						$(".f_' . $type . '[data-id=" + $this.data("id") + "]").each(function()
 						{
-							t = jQuery( this );
-							if( t.attr( "data-id" ) == data_id )
-								t.html( newValue );
-						} );
-						return newValue;
+							$(this).html(newValue);
+						});
 					},
 					' . ( isset($spec[$type]) ? $spec[$type] : '' ) . '
-				} );
-			t.attr( "validated", true );
-		}
-	} );
-	setTimeout( apply_' . $type . ', 5000 );
+				});
+				$this.attr("validated", true);
+			}
+		});
+		setTimeout(apply_' . $type . ', 5000);
 	}
 	apply_' . $type . '();';
 	jQ($js);
@@ -308,6 +321,14 @@ echo javascript_tag('jQuery/core', 'jQuery/editInPlace-2.3', 'jQuery/dropShadow'
 var dialogOpt =
 {
 	autoOpen: false,
+	draggable: true,
+	modal: true,
+	resizable: true,
+	width: 600
+};
+var dialogOptO = //O = open
+{
+	autoOpen: true,
 	draggable: true,
 	modal: true,
 	resizable: true,
@@ -430,7 +451,7 @@ function bind(fn, pos)
 var binds =
 {
 	base_ajax_binds:
-		{
+	{
 		'before': [],
 		'after': [ resetMarks ]
 	},

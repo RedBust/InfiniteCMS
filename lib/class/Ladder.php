@@ -233,7 +233,7 @@ class Ladder
 						' . ++$i . '
 					</td>
 					' . $td . '
-						' . ( level(LEVEL_ADMIN) ? make_link(array('controller' => 'Account', 'action' => 'edit', 'id' => $perso['Account']['guid']), $p) : $p ) . '
+						' . ( level(LEVEL_ADMIN) ? make_link(array('controller' => 'Account', 'action' => 'update', 'id' => $perso['Account']['guid']), $p) : $p ) . '
 					</td>
 					' . $this->getResultFields($td, $perso) . '
 					' . $td . '

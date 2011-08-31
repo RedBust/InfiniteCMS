@@ -22,7 +22,8 @@ Doctrine_Manager::getInstance()->bindComponent('Account', 'other');
  * @property integer $bankkamas
  * @property string $bank
  * @property string $friends
- * @property string $stable
+ * @property boolean $logged
+ * @property boolean $vip
  * @property User $User
  * @property Doctrine_Collection $Characters
  * @property Doctrine_Collection $PrivateMessageThreadReceiver
@@ -177,14 +178,13 @@ abstract class BaseAccount extends Record
              'autoincrement' => false,
              'length' => '',
              ));
-        $this->hasColumn('stable', 'string', null, array(
-             'type' => 'string',
-             'fixed' => 0,
-             'unsigned' => false,
-             'primary' => false,
-             'notnull' => true,
-             'autoincrement' => false,
-             'length' => '',
+        $this->hasColumn('logged', 'boolean', null, array(
+             'type' => 'boolean',
+             'default' => '0',
+             ));
+        $this->hasColumn('vip', 'boolean', null, array(
+             'type' => 'boolean',
+             'default' => '0',
              ));
     }
 

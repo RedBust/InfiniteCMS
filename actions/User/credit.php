@@ -56,7 +56,7 @@ if ($isSubmitted)
 	if ($isValidCode)
 	{
 		//add points & count
-		$account->User['points'] += $config['POINTS_CREDIT'];
+		$account->User['points'] += $config['POINTS_CREDIT' . (level(LEVEL_VIP) ? '_VIP' : '')];
 		$account->User['audiotel'] = intval($account->User['audiotel']) + 1;
 		echo lang('acc.credit.credited');
 	}
@@ -132,7 +132,7 @@ WEBO;
 			make_form(array(
 				array('code', lang('acc.credit.code') . tag('br'), NULL,
 					NULL, $inputAttr),
-			 ), APPEND_FORM_TAG);
+			 ));
 			break;
 		case 'star':
 			echo tag('div', array('id' => 'starpass_' . $config['PASS']['idd']), '') .

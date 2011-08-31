@@ -1,5 +1,5 @@
 <?php
-$sent = isset($_POST['sent']);
+$sent = count($_POST);
 $acc = new Account;
 
 if (!check_level(LEVEL_GUEST)) //yeah, level guest is required. SO WAT ?

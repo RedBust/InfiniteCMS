@@ -14,6 +14,18 @@ class Event extends BaseEvent
 {
 	protected $elapsed = null;
 
+	public function canJoin()
+	{
+		return !$this->isFull() && !$this->isElapsed();
+	}
+	public function isFull()
+	{
+		return $this->capacity == -1 ? false : $this->Participants->count() == $this->capacity;
+	}
+	public function refreshElapsed()
+	{
+		$this->elapsed = null;
+	}
 	public function isElapsed()
 	{
 		if (null === $this->elapsed)
@@ -26,8 +38,97 @@ class Event extends BaseEvent
 		}
 		return $this->elapsed;
 	}
-	public function refreshElapsed()
+	public function getDay()
 	{
-		$this->elapsed = null;
+		return substr($this->period, 8, 2);
+	}
+	public function getHour()
+	{
+		return substr($this->period, 11, 2);
+	}
+	public function getMinute()
+	{
+		return substr($this->period, 14, 2);
+	}
+
+	public function getURL()
+	{
+		return array('controller' => 'Event', 'action' => 'index', 'year' => substr($this->period, 0, 4), 'month' => substr($this->period, 5, 2));
+	}
+
+	public function getGuildLink()
+	{
+		if (!$this->relatedExists('Guild'))
+			return '';
+		return make_link($this->Guild, '[G]');
+	}
+
+	public function __toString()
+	{
+		global $account;
+
+		$canParticipate = level(LEVEL_LOGGED) && $this->canJoin() ? $account->canParticipate($this->id) : false;
+		$participate_url = to_url(array('controller' => 'EventParticipant', 'action' => $canParticipate ? 'join' : 'part', 'id' => $this->id));
+
+		if ($this->Participants->count())
+		{
+			$participants = array();
+			$winnerId = $this->relatedExists('Winner') && $this->isElapsed() ? $this->Winner->guid : -1;
+			if ($winnerId === -1 && $this->isElapsed())
+			{
+				$winner = make_form(array(array('char', lang('winner'))), array('controller' => 'Event', 'action' => 'win', 'id' => $this->id), array('submit_hideThis' => true));
+				if ($this->Participants->count() > 0)
+					jQ('
+var form_char = $("#form_char").autocomplete(
+{
+	source: ' . json_encode($this->Participants->getKeyArray('name')) . ',
+	select: function (event, ui)
+	{
+		form_char.val(ui.item.value);
+		this.form.submit();
+	}
+});');
+			}
+			else
+				$winner = '';
+
+			foreach ($this->Participants as $character)
+			{
+				$participants[] = tag('span', array('class' => $character->isMine() ? 'myChar' : 'aChar'),
+				 ($winnerId == $character->guid ? make_img('icons/medal_gold_1', EXT_PNG, lang('winner')) : '') . make_link($character));
+			}
+			$participants = tag('h3', lang('participant' . ( count($participants) > 1 ? 's' : '' )) .
+			 ( $this->capacity == -1 ? '' : '(' . count($participants) . '/' . $this->capacity . ')' ) .
+			 ' : ') . $winner . implode(', ', $participants);
+		}
+		else
+			$participants = $this->isElapsed() ? '' : lang('participants.any');
+
+		if ($this->isElapsed())
+			$participate_link = tag('i', lang('event.elapsed')) . tag('br');
+		else
+		{
+			if (level(LEVEL_LOGGED))
+			{
+				$participate_link = make_img('icons/group_' . ($canParticipate ? 'add' : 'delete'), EXT_PNG) .
+				 tag('b', make_link($participate_url, lang('event.' . ($canParticipate ? 'join' . ($this->Participants->count() ? '' : '_first') : 'part')), array(), array(), false)) . tag('br');
+			}
+			else
+				$participate_link = '';
+		}
+
+		if ($this->relatedExists('Reward'))
+			$reward = tag('br') . tag('fieldset', tag('legend', tag('b', lang('reward'))) . $this->Reward) . tag('br');
+		else
+			$reward = '';
+
+		echo tag('div', array('id' => 'event-' . $this->id, 'class' => 'showThis'), $participate_link . $reward . $participants);
+		jQ('registerEvent(' . $this->id . ')');
+
+		return tag('b', $this->getHour() . 'h' . $this->getMinute() . $this->getGuildLink() . ': ') . $this->name .
+		 ($this->isElapsed() && !$this->Participants->count() ? '' : js_link('showEvent(' . $this->id . ')', make_img('icons/group', EXT_PNG, lang('participants')), '#', array('class' => 'showThis'))) .
+		 (level(LEVEL_LOGGED) && $account->getMainChar() && $this->canJoin() ? make_link($participate_url, 
+		   make_img('icons/group_' . ($canParticipate ? 'add' : 'delete'), EXT_PNG, lang('event.join')),
+		   null, array('class' => 'hideThis')) : '');
 	}
 }

@@ -14,8 +14,7 @@ class Collection extends Doctrine_Collection
 	protected static $charsInit = NULL;
 
 	/**
-	 * addAll
-	 * add all values to this Collection
+	 * adds all values to this Collection
 	 *
 	 * @param $values Collection|array Values to add
 	 * @return void
@@ -25,6 +24,18 @@ class Collection extends Doctrine_Collection
 		foreach ($values as $id => $rec)
 		/** @var $rec Record */
 			$this->add($rec);
+	}
+	/**
+	 * creates an array of each $record[$key]
+	 *
+	 * @return array [records[0].key, records[1].key, ...]
+	 */
+	public function getKeyArray($key)
+	{
+		$records = array();
+		foreach ($this as $record)
+			$records[] = $record[$key];
+		return $records;
 	}
 
 	/**
@@ -79,8 +90,8 @@ class Collection extends Doctrine_Collection
 		foreach ($this as $perso)
 		{
 			/* @var $perso Character */
-			if ($perso->relatedExists('GuildMember') && $perso['GuildMember']['rank'] !== NULL)
-				$g = $perso['GuildMember']['Guild']->getLink();
+			if ($perso->relatedExists('GuildMember') && $perso->GuildMember->rank !== NULL)
+				$g = make_link($perso->GuildMember->Guild);
 			else
 				$g = tag('i', lang('acc.no_guild'));
 			$align = array('align' => 'center');
@@ -89,11 +100,11 @@ class Collection extends Doctrine_Collection
 			else
 				$opt = array();
 			echo tag('tr', $opt, tag('td', $align, ++$startAt) .
-					tag('td', $align, $perso->getInfoLink()) .
+					tag('td', $align, make_link($perso)) .
 					tag('td', $align, $perso['level']) .
 					tag('td', $align, $g) .
 					tag('td', $align, make_img('classes/' . strtolower(substr($perso->getBreed(), 0, 3)) . '_' . $perso['sexe'], EXT_PNG)) .
-					( level(LEVEL_MJ) ? tag('td', $align, $perso['Account']->getProfilLink()) : ''));
+					( level(LEVEL_MJ) ? tag('td', $align, make_link($perso->Account)) : ''));
 		}
 		echo '
 		</table>';
@@ -102,12 +113,9 @@ class Collection extends Doctrine_Collection
 
 	public function shopDisplay()
 	{
-		global $account, $router;
-		if (!$account) // wtf :(
-			throw ExceptionManager::wrongContext('logged out');
+		global $config, $types, $account, $router;
 		$html = '';
 		$table = ShopItemTable::getInstance();
-		$persos = $account->getCharactersList();
 
 		if ($this->isEmpty())
 		{
@@ -122,66 +130,12 @@ class Collection extends Doctrine_Collection
 					$itemsID[] = $ef->value;
 		}
 		$items = Query::create()
-				->from('ItemTemplate it') //@todo INDEXBY?
-				->whereIn('id', $itemsID)
+				->from('ItemTemplate it INDEXBY id')
+					->whereIn('id', $itemsID)
 				->execute();
 
-		$html = tag('div', array(
-				'title' => lang('Shop - edit', 'title'),
-				'id' => 'shop_edit',
-				'style' => 'display: none;'
-			), '') . tag('div', array(
-				'style' => 'display: none;',
-				'id' => 'selectPerso',
-				'title' => lang('shop.choose_charac')
-			), tag('h1', pluralize(ucfirst(lang('character')), count($account->Characters))) .
-			( $persos === NULL ? tag('h2', tag('i', lang('any_characters'))) : tag('table', tag('tr', $persos))));
-		if ($persos !== NULL)
-			jQ('
-var shop = {},
-	shopPanel = $( "#shop_edit" );
-shopPanel.dialog( dialogOpt );
-function openEditPanel(id)
-{
-	shopPanel.html( shop[id] );
-	tinymce_include();
-	shopPanel.dialog( "open" );
-}
-var selectPerso = jQuery( "div#selectPerso" );
-var objet = undefined;
-selectPerso.dialog( dialogOpt );
-function openPerso(objetId)
-{
-	selectPerso.dialog( "open" );
-	objet = objetId;
-}
-function choosePerso(perso)
-{
-	if( objet === undefined )
-	{
-		alert( "' . lang('cannot_do_directly') . '" );
-		return false;
-	}
-	document.location = "' . to_url(array(
-						'controller' => $router->getController(),
-						'action' => 'show',
-						'perso' => '%%perso%%',
-						'id' => '%%objet%%'
-							), false) . '";
-}
-binds.add(function ()
-	{
-		delete choosePerso;
-		delete selectPerso;
-		delete objet;
-		delete shop;
-		delete shopPanel;
-	});');
-
-		global $config, $types, $account;
 		$count = $this->count();
 		$i = 0;
-		$stats = '';
 		$html .= '
 	<table border="1">
 		<tr>';
@@ -196,112 +150,48 @@ binds.add(function ()
 
 			$url = array(
 				'controller' => 'Shop',
-				'action' => 'edit',
+				'action' => 'update',
 				'output' => 0,
-				'header' => 0,
-				'id' => '%%t.attr( "data-id" )%%',
+				'id' => '%%t.data("id")%%',
 				'col' => '',
 			);
 			jQ('
 field_opts = {' . implode("\n" . ', ', $type_opt) . '};
 binds.add(function ()
-	{
-		delete field_opts;
-	});
-shop = {};');
-			foreach (array('name', 'cost') as $t)
+{
+	delete field_opts;
+});');
+			foreach (array('name', 'cost', 'cost_vip') as $t)
 				jQ('
-$( ".f_' . $t . '" ).each( function ()
+$(".f_' . $t . '").each( function ()
+{
+	var t = $(this);
+	t.editInPlace(
 	{
-		t = $( this );
-		t.editInPlace(
-			{
-				url: "' . to_url($url, false) . $t . '",
-			} );
-	} );');
+		url: "' . to_url($url, false) . $t . '",
+	} );
+} );');
 		}
-		foreach ($this as $objet)
+		foreach ($this as $item)
 		{
 			$m = $i++ % $config['ITEMS_BY_LINE'];
 			if ($m === 0 && $i !== 1) //start a new line
 				$html .= '
 		</tr>
 		<tr>';
-			jQ('shop[' . $objet->id . '] = \'' .
-					javascript_string(require $router->getPath('Shop', '_form')) .
-					'\';');
-			$id = array('data-id' => $objet['id']);
-			$effects = '';
-			if ($objet->Effects->count())
-				$effects = '
-			<ul>';
-			foreach ($objet->Effects as $effect)
-			{ /* @var $effect ItemEffect */
-				if ($effect->type === NULL || $effect->type == -1 //should not happen but ...
-						|| (!$effect->isItem() && $effect->getValue() === 0 ))
-					continue; //null effect ?
-
-				$signe = ''; //+ or -
-				$showType = true;
-
-				$val = $effect->getValue(); //the "real" value
-				if ($effect->isItem())
-				{ /* @var $val ItemTemplate */
-					$isMax = $effect->type == ShopItemEffectTable::TYPE_ITEM_JETS_MAX;
-					$showType = false; //don't show the type
-					$color = 'green'; //add
-
-					$val = '</u>' . make_img('items/' . $effect->value, EXT_PNG, array(
-								'style' => 'width: 50px; height: 50px;',
-								'class' => 'showEffects',
-								'data-id' => $val instanceof ItemTemplate ? $val->id : $val,
-								'title' => $val instanceof ItemTemplate && !empty($val->statstemplate) ? str_replace('"', "'", $val->parseStats($isMax)) : NULL,
-							)) . '<span class="hideThis">:</span> <u>';
-				}#end if effect::isItem
-				else
-				{ //+ = green, - = red
-					$color = $val > 0 ? 'green' : 'red';
-					$signe = $val > 0 ? '+' : '-';
-				}
-
-				if (!isset($types[$effect->type]))
-					vdump($effect->type);
-				$type = $types[$effect->type];
-				if ($type[0] == $signe)
-					$type = substr($type, 1);
-				$effects .= tag('li', array('style' => array('color' => $color)), '<b>' . $signe . '</b><u>' . $val . '</u> '
-						. ( $showType ? $type : '<span class="hideThis">' . $type . '</span>' ));
-			}
-			$effects .= '
-			</ul>';
-			if ($config['LOAD_TYPE'] == LOAD_NONE)
-				$link_buy = make_link(array('controller' => $router->getController(), 'action' => 'show', 'id' => $objet['id']), lang('act.choose'));
-			else
-				$link_buy = js_link(sprintf('openPerso( %d )', $objet['id']), lang('act.choose'), to_url(array('controller' => $router->getController(), 'action' => 'show', 'id' => $objet['id'])));
-			$html .= sprintf('
-			<td%s>
-				<b>%s:</b> %s.<br />
-				<b>%s:</b><br />%s<br />
-				<b>%s:</b> %s.<br />
-				%s <!-- Effects -->
-				%s
-				%s
-			</td>', ( $i === $count ? ' colspan="' . strval($config['ITEMS_BY_LINE'] - $m) . '"' : ''), lang('name'), tag('span', $id + array('class' => 'f_name'), $objet['name']), lang('desc'), News::format($objet['description']), lang('cost'), pluralize(lang('point'), $objet['cost'], true, tag('span', $id + array('class' => 'f_cost'), '%%content%%')), $effects, ( $persos == NULL || $account->User->points < $objet['cost'] ? '' : $link_buy), (!level(LEVEL_ADMIN) ? '' : '<br />' .
-							make_link(to_url(array('controller' => $router->getController(), 'action' => 'edit', 'id' => $objet['id'])), lang('act.edit')) . '<br />' .
-							make_link(array('controller' => $router->getController(), 'action' => 'delete', 'id' => $objet['id']), lang('act.delete_item'))));
+			$html .= tag('td', $i === $count ? array('colspan' => strval($config['ITEMS_BY_LINE'] - $m)) : array(), $item);
 		}
 		$html .= '
 			</tr>
 	</table>';
-		echo tag('div', array(
-			'id' => 'stats',
-			'style' => array('left' => '0px', 'top' => '0px', 'background' => '#F9F2DA', 'padding' => '20px', 'display' => 'none'),
-				), $stats) . $html;
+		echo $html;
 		IG::registerEffectsTooltip();
 	}
 
 	public function atomDisplay($title = NULL, $desc = NULL, $link = NULL)
 	{
+		global $router;
+
 		if ($title === NULL)
 			$title = 'RSS';
 		if ($desc === NULL)
@@ -363,7 +253,7 @@ $( ".f_' . $t . '" ).each( function ()
 		foreach ($this as $perso)
 		{ /* @var $perso Character */
 			$persos .= $perso->asTableRow();
-			$normal .= tag('li', tag('b', '&bull;&nbsp;' . $perso->getInfoLink()));
+			$normal .= tag('li', tag('b', '&bull;&nbsp;' . make_link($perso)));
 		}
 		$less = $normalParams = $url;
 		$more = $normalParams + array(//show more (used only if JS is disabled)

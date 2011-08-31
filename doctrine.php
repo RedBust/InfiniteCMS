@@ -22,7 +22,6 @@ if (!$hasArg || ( $hasArg && $_SERVER['argv'][1] == '--generate-models' ) )
 		'baseClassName' => 'Record',
 		'baseTableClassName' => 'RecordTable',
 	);
-	$manager->setAttribute(Doctrine_Core::ATTR_QUOTE_IDENTIFIER, true);
 
 	$bdir = 'models/other/';
 	Doctrine_Core::generateModelsFromYaml($bdir . 'yaml', $bdir . 'php', $options);
