@@ -381,7 +381,7 @@
 
 				return tinymce.dom.Event.cancel(e);
 			} else
-				m.hideMenu();
+				m.hideThisnu();
 		},
 
 		_checkDone : function() {
@@ -406,7 +406,7 @@
 				t._removeWords();
 
 				if (t._menu)
-					t._menu.hideMenu();
+					t._menu.hideThisnu();
 
 				if (la)
 					t.editor.nodeChanged();

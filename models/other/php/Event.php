@@ -22,6 +22,10 @@ class Event extends BaseEvent
 	{
 		return $this->capacity == -1 ? false : $this->Participants->count() == $this->capacity;
 	}
+	public function refreshElapsed()
+	{
+		$this->elapsed = null;
+	}
 	public function isElapsed()
 	{
 		if (null === $this->elapsed)

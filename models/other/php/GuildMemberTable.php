@@ -10,4 +10,34 @@
  */
 class GuildMemberTable extends RecordTable
 {
+	protected $rightsPanel = false;
+
+	public function initRightsPanel()
+	{
+		if ($this->rightsPanel)
+			return;
+		$this->rightsPanel = true;
+
+		echo tag('div', array('id' => 'rightsPanel', 'style' => array('display' => 'none'), 'title' => lang('guild.rights')), '');
+		jQ('
+var rightsPanel = $("#rightsPanel").dialog(dialogOpt),
+	rightsPanels = [];
+
+function registerRightsPanel(rights)
+{
+	rightsPanels[rights] = $("#rights" + rights).hide().appendTo(rightsPanel);
+}
+function showRightsPanel(rights)
+{
+	rightsPanel.find(".rights").hide();
+	rightsPanels[rights].show();
+	rightsPanel.dialog("open");
+}
+bind(function ()
+{
+	rightsPanels.hide();
+	delete rightsPanel;
+	delete rightsPanels;
+});');
+	}
 }

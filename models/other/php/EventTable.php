@@ -49,6 +49,7 @@ class EventTable extends RecordTable
 		$this->_eventBoxes = array();
 
 		echo tag('div', array('style' => array('display' => 'none'), 'id' => 'eventParticipants', 'title' => lang('participants')), '');
+
 		jQ('
 var eventParticipants = $("#eventParticipants").dialog(dialogOpt),
 	events = [];
@@ -78,7 +79,7 @@ bind(function ()
 		$days = array();
 		foreach ($events as $event)
 		{
-			$days[$event->getDay()][] = $event; //no implode since it's not an array
+			$days[$event->getDay()][] = $event;
 		}
 		return $days;
 	}

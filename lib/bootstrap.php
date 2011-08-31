@@ -1,5 +1,5 @@
 <?php
-global $config, $errors, $metas, $types, $account, $router, $member;
+global $config, $errors, $metas, $types, $account, $router, $member, $guildRights;
 
 /**
  * @file $Id: bootstrap.php 56 2011-01-16 19:39:32Z nami.d0c.0 $
@@ -131,8 +131,6 @@ $routes = array(//action default : key
 	'events' => array('controller' => 'Event', 'action' => 'index'),
 );
 
-
-
 require 'lib/functions' . EXT;
 $config = require 'config' . EXT;
 
@@ -176,6 +174,9 @@ if (!DEV)
 		$config['langs'] = array($config['use_lang']);
 	//$langs[$member->getLang()]['title'] is initied when call to lang( ~, 'title )
 	$langs[$member->getLang()]['title']['Misc - server'] = sprintf(lang('Misc - server', 'title'), $config['SERVER_NAME']);
+
+	$guildRights = array(2, 4, 8, 16, 32, 64, 128, 256, 512, 4092, 8192, 16384);
+
 
 	Cache::addReplacement('%lang%', $member->getLang());
 	Cache::setDirFormat('%dir%/%lang%');

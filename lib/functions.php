@@ -201,7 +201,7 @@ function lang($key, $namespace = 'common', $default = '%%key%% (Untranslated)')
 		return $l;
 
 	return !empty($l[$key]) ? $l[$key] :
-			( $default === true ? NULL : str_replace('%%key%%', $key, $default) );
+	( $default === true ? NULL : str_replace('%%key%%', $key, $default) );
 }
 
 /**
@@ -1121,7 +1121,7 @@ function input($name, $label, $type = NULL, $value = '', $add = array())
 	{
 		$type = tag('textarea', $add + array($add, 'name' => $name, 'id' => 'form_' . $name), str_replace('</textarea>', '', $value));
 	}
-	elseif ($type === 'select')
+	else if ($type === 'select')
 	{
 		if (!is_array($add) && !isset($selected))//selected
 		{
@@ -1140,89 +1140,116 @@ function input($name, $label, $type = NULL, $value = '', $add = array())
 
 		$pre_html = $post_html = '';
 		global $calendar_opts;
-		if ($type == 'date')
+		switch ($type)
 		{
-			if (is_numeric($value))
-				$value = date('d/m/Y', $value);
-			$type = 'text';
-			jQ(sprintf('$("#form_%s").datepicker(
-				{
-					%s,
-				});', $name, $calendar_opts));
-		}
-		if ($type == 'date_range')
-		{
-			if (is_numeric($value))
-				$value = date('d/m/Y', $value);
-			static $date_range_i = -1;
-			if ($date_range_i == -1)
-			{ //first date range
-				jQ('dates = {};'); //create the date ranges array
-			}
-			$type = 'text';
-			if (is_array($name))
-			{
-				$to_name = empty($name[1]) ? $name . '2' : $name[1];
-				$name = $name[0];
-			}
-			else
-				$to_name = $name . '2';
+			case 'date':
+				if (is_numeric($value))
+					$value = date('d/m/Y', $value);
+				$type = 'text';
+				jQ(sprintf('$("#form_%s").datepicker(
+					{
+						%s,
+					});', $name, $calendar_opts));
+			break;
 
-			jQ(sprintf('dates[%d] = jQuery("#form_%s, #form_%s").datepicker(
+			case 'datetime':
+				if (!empty($value))
+					$value = datetime_to_picker($value);
+				$type = 'text';
+				$_opts = array();
+				if (isset($add['__restrict']))
 				{
-					%s,
-					changeMonth: true,
-					onSelect: function (selectedDate)
-						{
-							var option = this.name == "%3$s" ? "minDate" : "maxDate",
-								instance = $( this ).data( "datepicker" );
-								date = $.datepicker.parseDate(
-									instance.settings.dateFormat ||
-									$.datepicker._defaults.dateFormat,
-									selectedDate, instance.settings );
-							dates[%1$d].not( this ).datepicker( "option", option, date );
-						}
-				});', ++$date_range_i, $to_name, $name, $calendar_opts));
-			if (is_array($label))
-			{
-				$to_label = empty($label[1]) ? lang('date_to') : $label[1];
-				$label = $label[0]; //replace
-			}
-			else
-				$to_label = lang('date_to');
-			if (is_array($value))
-			{
-				$to_value = empty($value[1]) ? '' : date_to_picker($value[1]);
-				$value = $value[0];
-			}
-			else
-				$to_value = '';
-			$post_html = '&nbsp;' . input($to_name, $to_label, NULL, $to_value);
-			if (!empty($value))
-			{
-				if (!( $value = @date('d/m/Y', $value) ))
-				{
-					$value = false;
+					$restrict = $add['__restrict'];
+					if (!is_array($restrict))
+						$res = explode(';', $restrict);
+
+					$restrict = array();
+					if (!empty($res[0]))
+						$restrict['minDate'] = $res[0];
+					if (!empty($res[1]))
+						$restrict['minDate'] = $res[1];
+					foreach ($restrict as $t => &$res)
+					{
+						if ($res == '@today')
+							$res = date('j') . '/' . date('m') . '/' . date('Y');
+						if ($res == '@today+')
+							$res = ( date('j') + 1 ) . '/' . date('m') . '/' . date('Y');
+					}
+
+					$_opts += $restrict;
+					unset($add['restrict']);
 				}
-			}
+				jQ(sprintf('$("#form_%s").datetimepicker($.extend({%s}, %s));', $name, $calendar_opts, json_encode($_opts)));
+			break;
+			case 'date_range':
+				if (is_numeric($value))
+					$value = date('d/m/Y', $value);
+				static $date_range_i = -1; //multiple dateranges on the same page.
+				if ($date_range_i == -1)
+				{ //first date range
+					jQ('dates = {};'); //create the date ranges array
+				}
+				$type = 'text';
+				if (is_array($name))
+				{
+					$to_name = empty($name[1]) ? $name . '2' : $name[1];
+					$name = $name[0];
+				}
+				else
+					$to_name = $name . '2';
+
+				jQ(sprintf('dates[%d] = jQuery("#form_%s, #form_%s").datepicker(
+					{
+						%s,
+						changeMonth: true,
+						onSelect: function (selectedDate)
+							{
+								var option = this.name == "%3$s" ? "minDate" : "maxDate",
+									instance = $( this ).data( "datepicker" );
+									date = $.datepicker.parseDate(
+										instance.settings.dateFormat ||
+										$.datepicker._defaults.dateFormat,
+										selectedDate, instance.settings );
+								dates[%1$d].not( this ).datepicker( "option", option, date );
+							}
+					});', ++$date_range_i, $to_name, $name, $calendar_opts));
+				if (is_array($label))
+				{
+					$to_label = empty($label[1]) ? lang('date_to') : $label[1];
+					$label = $label[0]; //replace
+				}
+				else
+					$to_label = lang('date_to');
+				if (is_array($value))
+				{
+					$to_value = empty($value[1]) ? '' : date_to_picker($value[1]);
+					$value = $value[0];
+				}
+				else
+					$to_value = '';
+				$post_html = '&nbsp;' . input($to_name, $to_label, NULL, $to_value);
+				if (!empty($value))
+				{
+					if (!( $value = @date('d/m/Y', $value) ))
+					{
+						$value = false;
+					}
+				}
+			break;
+			case 'Jcheckbox':
+				jQ('$("form_' . $name . '").buttonset();');
+				$type = 'checkbox';
+			//no break.
+			case 'checkbox':
+				if ((bool) $value)
+				{
+					$params = array_merge($params, array('checked' => 'checked'));
+				}
+				$value = $params['value'] = 'on';
 		}
 		$params = array('type' => $type, 'name' => $name, 'value' => $value, 'id' => 'form_' . $name);
-		if ($type == 'Jcheckbox')
-		{
-			jQ('$("form_' . $name . '").buttonset();');
-			$type = 'checkbox';
-		}
-		if ($type == 'checkbox')
-		{
-			if ((bool) $value)
-			{
-				$params = array_merge($params, array('checked' => 'checked'));
-			}
-			$value = $params['value'] = 'on';
-		}
 		$type = $pre_html . tag('input', array_merge($params, $add)) . $post_html;
 	}
-
 	$opts_label = array('for' => 'form_' . $name);
 	if ($act_label && is_array($add))
 	{
@@ -1511,6 +1538,47 @@ function date_to_picker($date)
 	if (strlen($date) !== 10)
 		return false;
 	return $date;
+}
+/**
+ * generates a datetime from a datetimepicker
+ *
+ * @param string $date date+time to parse
+ *
+ * @return DateTime the datetime object
+ */
+function datetime_from_picker($date)
+{
+	list($date, $time) = explode(' ', $date);
+	$time = explode(':', $time);
+	if (count($time) < 2)
+		return false;
+	if (!$date = date_from_picker($date))
+		return false;
+
+	$date = $date->modify('+' . $time[0] . ' hours');
+	$date = $date->modify('+' . $time[1] . ' minutes');
+	return $date;
+}
+/**
+ * generates a datetime for a datepicker
+ *
+ * @param string $date datetime to parse
+ *
+ * @return string the new datetime
+ */
+function datetime_to_picker($datetime)
+{
+	if ($datetime instanceof DateTime)
+		$datetime = $date->format('Y-m-d H:i');
+	list($date, $time) = explode(' ', $datetime);
+	$date = implode('/', array_reverse(explode('-', $date)));
+	if (strlen($date) !== 10)
+		return false;
+	$time = explode(':', $time);
+	if (count($time) < 2)
+		return false;
+	$time = implode(':', array($time[0], $time[1]));
+	return $date . ' ' . $time;
 }
 
 /**

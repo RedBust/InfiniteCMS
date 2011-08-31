@@ -7494,7 +7494,7 @@ tinymce.create('tinymce.ui.Separator:tinymce.ui.Control', {
 
 			this.parent(id, s);
 			this.onShowMenu = new tinymce.util.Dispatcher(this);
-			this.onHideMenu = new tinymce.util.Dispatcher(this);
+			this.onhideThisnu = new tinymce.util.Dispatcher(this);
 			this.classPrefix = 'mceMenu';
 		},
 
@@ -7599,8 +7599,8 @@ tinymce.create('tinymce.ui.Separator:tinymce.ui.Control', {
 					dm = t;
 
 					while (dm) {
-						if (dm.hideMenu)
-							dm.hideMenu();
+						if (dm.hideThisnu)
+							dm.hideThisnu();
 
 						dm = dm.settings.parent;
 					}
@@ -7646,7 +7646,7 @@ tinymce.create('tinymce.ui.Separator:tinymce.ui.Control', {
 			}
 		},
 
-		hideMenu : function(c) {
+		hideThisnu : function(c) {
 			var t = this, co = DOM.get('menu_' + t.id), e;
 
 			if (!t.isMenuVisible)
@@ -7667,7 +7667,7 @@ tinymce.create('tinymce.ui.Separator:tinymce.ui.Control', {
 			if (e = DOM.get(t.id))
 				DOM.removeClass(e.firstChild, t.classPrefix + 'ItemActive');
 
-			t.onHideMenu.dispatch(t);
+			t.onhideThisnu.dispatch(t);
 		},
 
 		add : function(o) {
@@ -7683,7 +7683,7 @@ tinymce.create('tinymce.ui.Separator:tinymce.ui.Control', {
 
 		collapse : function(d) {
 			this.parent(d);
-			this.hideMenu(1);
+			this.hideThisnu(1);
 		},
 
 		remove : function(o) {
@@ -7755,7 +7755,7 @@ tinymce.create('tinymce.ui.Separator:tinymce.ui.Control', {
 					return;
 
 				case 27:
-					return this.hideMenu();
+					return this.hideThisnu();
 			}
 		},
 
@@ -7949,7 +7949,7 @@ tinymce.create('tinymce.ui.Separator:tinymce.ui.Control', {
 				return;
 
 			if (t.menu && t.menu.isMenuVisible)
-				return t.hideMenu();
+				return t.hideThisnu();
 
 			if (!t.isMenuRendered) {
 				t.renderMenu();
@@ -7977,13 +7977,13 @@ tinymce.create('tinymce.ui.Separator:tinymce.ui.Control', {
 
 			m.showMenu(0, e.clientHeight);
 
-			Event.add(DOM.doc, 'mousedown', t.hideMenu, t);
+			Event.add(DOM.doc, 'mousedown', t.hideThisnu, t);
 			DOM.addClass(t.id, t.classPrefix + 'Selected');
 
 			//DOM.get(t.id + '_text').focus();
 		},
 
-		hideMenu : function(e) {
+		hideThisnu : function(e) {
 			var t = this;
 
 			if (t.menu && t.menu.isMenuVisible) {
@@ -7993,8 +7993,8 @@ tinymce.create('tinymce.ui.Separator:tinymce.ui.Control', {
 
 				if (!e || !DOM.getParent(e.target, '.mceMenu')) {
 					DOM.removeClass(t.id, t.classPrefix + 'Selected');
-					Event.remove(DOM.doc, 'mousedown', t.hideMenu, t);
-					t.menu.hideMenu();
+					Event.remove(DOM.doc, 'mousedown', t.hideThisnu, t);
+					t.menu.hideThisnu();
 				}
 			}
 		},
@@ -8009,7 +8009,7 @@ tinymce.create('tinymce.ui.Separator:tinymce.ui.Control', {
 				max_height : 150
 			});
 
-			m.onHideMenu.add(t.hideMenu, t);
+			m.onhideThisnu.add(t.hideThisnu, t);
 
 			m.add({
 				title : t.settings.title,
@@ -8075,7 +8075,7 @@ tinymce.create('tinymce.ui.Separator:tinymce.ui.Control', {
 						}
 
 						if (v) {
-							t.hideMenu();
+							t.hideThisnu();
 							t.select(v.value);
 						}
 					});
@@ -8262,7 +8262,7 @@ tinymce.create('tinymce.ui.Separator:tinymce.ui.Control', {
 			}
 
 			if (t.isMenuVisible)
-				return t.hideMenu();
+				return t.hideThisnu();
 
 			p1 = DOM.getPos(t.settings.menu_container);
 			p2 = DOM.getPos(e);
@@ -8275,7 +8275,7 @@ tinymce.create('tinymce.ui.Separator:tinymce.ui.Control', {
 			m.settings.keyboard_focus = t._focused;
 			m.showMenu(0, e.clientHeight);
 
-			Event.add(DOM.doc, 'mousedown', t.hideMenu, t);
+			Event.add(DOM.doc, 'mousedown', t.hideThisnu, t);
 			t.setState('Selected', 1);
 
 			t.isMenuVisible = 1;
@@ -8290,13 +8290,13 @@ tinymce.create('tinymce.ui.Separator:tinymce.ui.Control', {
 				icons : t.settings.icons
 			});
 
-			m.onHideMenu.add(t.hideMenu, t);
+			m.onhideThisnu.add(t.hideThisnu, t);
 
 			t.onRenderMenu.dispatch(t, m);
 			t.menu = m;
 		},
 
-		hideMenu : function(e) {
+		hideThisnu : function(e) {
 			var t = this;
 
 			// Prevent double toogles by canceling the mouse click event to the button
@@ -8305,9 +8305,9 @@ tinymce.create('tinymce.ui.Separator:tinymce.ui.Control', {
 
 			if (!e || !DOM.getParent(e.target, '.mceMenu')) {
 				t.setState('Selected', 0);
-				Event.remove(DOM.doc, 'mousedown', t.hideMenu, t);
+				Event.remove(DOM.doc, 'mousedown', t.hideThisnu, t);
 				if (t.menu)
-					t.menu.hideMenu();
+					t.menu.hideThisnu();
 			}
 
 			t.isMenuVisible = 0;
@@ -8411,7 +8411,7 @@ tinymce.create('tinymce.ui.Separator:tinymce.ui.Control', {
 
 			t.onShowMenu = new tinymce.util.Dispatcher(t);
 
-			t.onHideMenu = new tinymce.util.Dispatcher(t);
+			t.onhideThisnu = new tinymce.util.Dispatcher(t);
 
 			t.value = s.default_color;
 		},
@@ -8428,7 +8428,7 @@ tinymce.create('tinymce.ui.Separator:tinymce.ui.Control', {
 			}
 
 			if (t.isMenuVisible)
-				return t.hideMenu();
+				return t.hideThisnu();
 
 			e = DOM.get(t.id);
 			DOM.show(t.id + '_menu');
@@ -8441,13 +8441,13 @@ tinymce.create('tinymce.ui.Separator:tinymce.ui.Control', {
 			});
 			e = 0;
 
-			Event.add(DOM.doc, 'mousedown', t.hideMenu, t);
+			Event.add(DOM.doc, 'mousedown', t.hideThisnu, t);
 			t.onShowMenu.dispatch(t);
 
 			if (t._focused) {
 				t._keyHandler = Event.add(t.id + '_menu', 'keydown', function(e) {
 					if (e.keyCode == 27)
-						t.hideMenu();
+						t.hideThisnu();
 				});
 
 				DOM.select('a', t.id + '_menu')[0].focus(); // Select first link
@@ -8456,7 +8456,7 @@ tinymce.create('tinymce.ui.Separator:tinymce.ui.Control', {
 			t.isMenuVisible = 1;
 		},
 
-		hideMenu : function(e) {
+		hideThisnu : function(e) {
 			var t = this;
 
 			// Prevent double toogles by canceling the mouse click event to the button
@@ -8465,12 +8465,12 @@ tinymce.create('tinymce.ui.Separator:tinymce.ui.Control', {
 
 			if (!e || !DOM.getParent(e.target, '.mceSplitButtonMenu')) {
 				DOM.removeClass(t.id, 'mceSplitButtonSelected');
-				Event.remove(DOM.doc, 'mousedown', t.hideMenu, t);
+				Event.remove(DOM.doc, 'mousedown', t.hideThisnu, t);
 				Event.remove(t.id + '_menu', 'keydown', t._keyHandler);
 				DOM.hide(t.id + '_menu');
 			}
 
-			t.onHideMenu.dispatch(t);
+			t.onhideThisnu.dispatch(t);
 
 			t.isMenuVisible = 0;
 		},
@@ -8539,7 +8539,7 @@ tinymce.create('tinymce.ui.Separator:tinymce.ui.Control', {
 			DOM.setStyle(t.id + '_preview', 'backgroundColor', c);
 
 			t.value = c;
-			t.hideMenu();
+			t.hideThisnu();
 			t.settings.onselect(c);
 		},
 
@@ -12169,7 +12169,7 @@ tinymce.create('tinymce.ui.Toolbar:tinymce.ui.Container', {
 					bm = ed.selection.getBookmark(1);
 				});
 
-				c.onHideMenu.add(function() {
+				c.onhideThisnu.add(function() {
 					if (bm) {
 						ed.selection.moveToBookmark(bm);
 						bm = 0;
@@ -12229,8 +12229,8 @@ tinymce.create('tinymce.ui.Toolbar:tinymce.ui.Container', {
 				});
 			}
 
-			if (c.hideMenu)
-				ed.onMouseDown.add(c.hideMenu, c);
+			if (c.hideThisnu)
+				ed.onMouseDown.add(c.hideThisnu, c);
 
 			return t.add(c);
 		},
@@ -12264,7 +12264,7 @@ tinymce.create('tinymce.ui.Toolbar:tinymce.ui.Container', {
 			if (s.menu_button) {
 				cls = cc || t._cls.menubutton || tinymce.ui.MenuButton;
 				c = new cls(id, s);
-				ed.onMouseDown.add(c.hideMenu, c);
+				ed.onMouseDown.add(c.hideThisnu, c);
 			} else {
 				cls = t._cls.button || tinymce.ui.Button;
 				c = new cls(id, s);
@@ -12311,7 +12311,7 @@ tinymce.create('tinymce.ui.Toolbar:tinymce.ui.Container', {
 			id = t.prefix + id;
 			cls = cc || t._cls.splitbutton || tinymce.ui.SplitButton;
 			c = t.add(new cls(id, s));
-			ed.onMouseDown.add(c.hideMenu, c);
+			ed.onMouseDown.add(c.hideThisnu, c);
 
 			return c;
 		},
@@ -12351,7 +12351,7 @@ tinymce.create('tinymce.ui.Toolbar:tinymce.ui.Container', {
 			id = t.prefix + id;
 			cls = cc || t._cls.colorsplitbutton || tinymce.ui.ColorSplitButton;
 			c = new cls(id, s);
-			ed.onMouseDown.add(c.hideMenu, c);
+			ed.onMouseDown.add(c.hideThisnu, c);
 
 			// Remove the menu element when the editor is removed
 			ed.onRemove.add(function() {
@@ -12366,7 +12366,7 @@ tinymce.create('tinymce.ui.Toolbar:tinymce.ui.Container', {
 					bm = ed.selection.getBookmark(1);
 				});
 
-				c.onHideMenu.add(function() {
+				c.onhideThisnu.add(function() {
 					if (bm) {
 						ed.selection.moveToBookmark(bm);
 						bm = 0;
