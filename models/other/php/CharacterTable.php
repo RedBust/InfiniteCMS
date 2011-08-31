@@ -24,7 +24,7 @@ class CharacterTable extends RecordTable
 	/**
 	 * returns the datas header for a table
 	 *
-	 * @param boolean $simple Simple datas ? (only name)
+	 * @param boolean $simple simple datas ? (only name)
 	 * @return string HTML format
 	 */
 	public function getTableHeaderDatas($simple = false)

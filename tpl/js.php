@@ -5,7 +5,8 @@ var loader = $( "#loading" );
 loader.dialog( dialogOpt );
 <?php endif ?>
 var errorDiv = $( "#errorDiv" ),
-error = $( "#error" );
+	error = $( "#error" ),
+	updateSelectorsDisabled = [];
 errorDiv.dialog( dialogOpt );
 
 <?php if (level(LEVEL_LOGGED)): ?>
@@ -18,6 +19,12 @@ function chooseMainChar(character)
 			)) ?>" + character;
 }
 var mainCharSelector = $("#selectMainChar").accordion({clearStyle: true, collapsible: true, active: false});
+<?php if (defined('IN_PM') && IN_PM): ?>
+updateSelectorsDisabled.push('#pm');
+<?php else: ?>
+$("#pm").dialog(dialogOpt);
+<?php endif; ?>
+
 <?php endif ?>
 
 function isLocalURI(href)
@@ -36,7 +43,7 @@ var href,
 	pm_info = $('#pm_info'),
 	pm_inbox = $('#pm_inbox')
 
-	inbox_html = '&nbsp;<?php echo make_link('@pm', make_img('icons/email', EXT_PNG, lang('PrivateMessage - index', 'title'))) ?>';
+	inbox_html = '&nbsp;<?php echo make_link('@pm', make_img('icons/email', EXT_PNG, lang('PrivateMessage - index', 'title')), array(), array('data-unless-selector' => '#pm')) ?>';
 
 function updateContent(URL)
 {
@@ -57,18 +64,42 @@ function updateContent(URL)
 			<?php if ($config['LOAD_TYPE'] === LOAD_MDIALOG): ?>
 			loader.dialog('close');
 			<?php endif ?>
-			//data = Title<~>Path<~>Status<~>PM Info<~>DOM
-			data = explode('<~>', data, 5);
+			//data = Title<~>Path<~>Status<~>PM Info<~>update selector<~>DOM
+			data = explode('<~>', data, 6);
 			//we need path because of URL rewriting
 			//@todo: check if the path which have to be used is not the one from the 1st page loaded
-			document.title = data[0];
 			servInfo.css('background', 'url(' + data[1] + 'static/templates/<?php echo $config['template'] ?>/images/status' + data[2] + '.<?php echo EXT_JPG ?>');
 			pm_info.html(data[3]);
 			if (data[3] == '') //no mp
 				pm_inbox.html(inbox_html);
 			else
 				pm_inbox.html('');
-			milieu.html(data[4]);
+
+			if (data[4] != '')
+			{
+				$.each(updateSelectorsDisabled, function (k, v)
+				{
+					if (v == data[4])
+					{
+						data[4] = '';
+						return false;
+					}
+				});
+			}
+			if (data[4] != '')
+			{ //may have changed
+				var updateElement = $(data[4]);
+				console.log(updateElement.length);
+				if (updateElement.length)
+					updateElement.html(data[5]);
+				else
+					data[4] = '';
+			}
+			if (data[4] == '')
+			{
+				milieu.html(data[5]);
+				document.title = data[0];
+			}
 			tinymce_include();
 			in_ajax = false;
 			binds.process('after');
@@ -77,14 +108,14 @@ function updateContent(URL)
 			{
 				popState = false;
 			}
-			else if (history && history.pushState)
+			else if (data[4] == '' && history && history.pushState)
 			{
 				history.pushState(true, data[0], URL);
 			}
 		},
 		error: function (error)
 		{
-			loader.html( "an error occured during the page loading. Try to change the 'REWRITE' setting in your config.php file." );
+			loader.html( "An error occured during the page loading. Try to change the 'REWRITE' setting in your config.php file." );
 			<?php if (DEBUG): ?>
 			loader.html( loader.html() + error );
 			<?php endif ?>
@@ -100,10 +131,12 @@ function followLink(link)
 <?php else: ?>
 function followLink(event)
 {
+	var $this = $(this);
+
 	if (typeof event == "string")
 		href = event;
 	else
-		href = $( this ).attr( "href" );
+		href = $this.attr("href");
 	if (url === href && <?php echo javascript_val(!DEBUG) ?>) //re-load same page ? useless ...
 	{
 		if (typeof event != "string")
@@ -112,6 +145,23 @@ function followLink(event)
 	}
 	else
 		url = href;
+
+	if ($this.data("unless-selector") !== undefined)
+	{
+		var unlessSelector = $($this.data("unless-selector"));
+		if (unlessSelector.length && $.trim(unlessSelector.html()) != "")
+		{
+			if (unlessSelector.is(":visible"))
+				return false;
+
+			if (unlessSelector.hasClass("ui-dialog-content"))
+				unlessSelector.dialog("open");
+			else
+				unlessSelector.show();
+
+			return false;
+		}
+	}
 	if (isLocalURI(href))
 	{
 		updateContent(href);
@@ -246,7 +296,7 @@ $( ".slideMenu" ).live( "click", function ()
 {
 	t = $( this );
 	t.next().slideToggle();
-	if( t.hasClass( "HideMe" ) )
+	if( t.hasClass( "hideThis" ) )
 		t.slideToggle();
 } );
 resetMarks();

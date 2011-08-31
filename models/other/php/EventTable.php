@@ -20,10 +20,20 @@ class EventTable extends RecordTable
     }
 
 	//AndM = And Maybe (yeah, I know, the door is fully opened ._.)
-	public function findByYearAndMonthAndMGuildId($year, $month, $guild)
+	public function findByYearMonthAndMGuildId($dates, $guild)
 	{
+				$d = array();
+		$args = array();
+		foreach ($dates as $date)
+		{
+			$d[] = '(YEAR(e.period) = ? AND MONTH(e.period) = ?)';
+			$args[] = $date[0];
+			$args[] = $date[1];
+		}
+
 		return $this->createQuery('e')
-					->where('YEAR(e.period) = ? AND MONTH(e.period) = ? AND (guild_id = ? OR guild_id = 0 OR guild_id IS NULL)', array($year, $month, $guild))
+					->where('(guild_id = ? OR guild_id = 0 OR guild_id IS NULL)', $guild)
+						->andWhere(implode(' OR ', $d), $args)
 						->leftJoin('e.Participants p INDEXBY guid')
 						->leftJoin('e.Guild g')
 					->execute();

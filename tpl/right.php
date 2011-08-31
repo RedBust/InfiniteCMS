@@ -5,7 +5,7 @@
 							$unreads = $account->User->getUnreadPM();
 							//show infos
 							echo lang('pseudo') . ': ' . make_link($account, empty($account->pseudo) ? $account->account : $account->pseudo) .
-							 tag('span', array('id' => 'pm_inbox'), $unreads->count() ? '' : '&nbsp;' . make_link('@pm', make_img('icons/email', EXT_PNG, lang('PrivateMessage - index', 'title'))) ) . tag('br') .
+							 tag('span', array('id' => 'pm_inbox'), $unreads->count() ? '' : '&nbsp;' . make_link('@pm', make_img('icons/email', EXT_PNG, lang('PrivateMessage - index', 'title')), array(), array('data-unless-selector' => '#pm')) ) . tag('br') .
 							 ( $config['PASS']['enable'] && $config['ENABLE_SHOP'] ? $account->User->getPoints() . tag('br') : '' ) .
 							 lang('level') . ': ' . $account->getLevel() . tag('br') .
 							 tag('span', array('id' => 'pm_info'), $account->User->getNextPMNotif()) .

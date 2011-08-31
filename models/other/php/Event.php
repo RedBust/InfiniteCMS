@@ -34,6 +34,14 @@ class Event extends BaseEvent
 		}
 		return $this->elapsed;
 	}
+	public function getYear()
+	{
+		return substr($this->period, 0, 4);
+	}
+	public function getMonth()
+	{
+		return substr($this->period, 5, 2);
+	}
 	public function getDay()
 	{
 		return substr($this->period, 8, 2);
@@ -70,7 +78,7 @@ class Event extends BaseEvent
 		{
 			$participants = array();
 			$winnerId = $this->relatedExists('Winner') && $this->isElapsed() ? $this->Winner->guid : -1;
-			if ($winnerId === -1 && $this->isElapsed())
+			if ($winnerId === -1 && $this->isElapsed() && level(LEVEL_MJ))
 			{
 				$winner = make_form(array(array('char', lang('winner'))), array('controller' => 'Event', 'action' => 'win', 'id' => $this->id), array('submit_hideThis' => true));
 				if ($this->Participants->count() > 0)

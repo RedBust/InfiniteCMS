@@ -622,7 +622,7 @@ function redirect($loc = NULL, $wait = 0)
 
 	if ($router->isAjax())
 	{
-		$js = 'title<~>getP<~>server state<~>nextPMNotif<~>' . js(sprintf('window.setTimeout(function () { followLink("%s"); }, %d)', $loc, $wait == 0.0 ? 0 : $wait * 1000));
+		$js = 'title<~>getP<~>server state<~>nextPMNotif<~>updateSelector<~>' . js(sprintf('window.setTimeout(function () { followLink("%s"); }, %d)', $loc, $wait == 0.0 ? 0 : $wait * 1000));
 		if ($wait)
 			echo $js;
 		else

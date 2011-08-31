@@ -56,7 +56,7 @@ return array(
 	'PollOption - delete' => 'Suppression d\'une option',
 	'PollOption - vote' => 'Voter',
 
-	'PrivateMessage - index' => 'Boîte de réception',
+	'PrivateMessage - index' => 'Messagerie',
 	'PrivateMessage - show' => 'Vue d\'un message privé',
 	'PrivateMessage - create' => 'Nouveau message privé',
 

@@ -250,18 +250,18 @@ if (!DEV)
 								->leftJoin('u.Review r')
 						->where('guid = ?', $_SESSION['guid'])
 						->fetchOne();
-		if (!$account)
-			unset($_SESSION['guid']);
-		/* @var $account Account */
-		if (!$account->relatedExists('User'))
+		if ($account)
 		{
-			$account->User = UserTable::getInstance()->fromGuid($account->guid);
+			if (!$account->relatedExists('User'))
+				$account->User = UserTable::getInstance()->fromGuid($account);
+			if ($account->getMainChar())
+				load_models('static');
 		}
-		if ($account->getMainChar())
-			load_models('static');
+		else
+			unset($_SESSION['guid']);
+
 		if (DEBUG)
 			$mem .= memory_get_usage() . ': Acc loaded ... - ' . __FILE__ . ':' . __LINE__ . '<br />';
 	}
 }
-
 /* @var $account Account */

@@ -115,7 +115,8 @@ try
 			));
 			if ($router->isAjax())
 			{
-				echo implode('<~>', array($title, getPath(), SERVER_STATE, ($member->isConnected() ? $account->User->getNextPMNotif() : ''), $data));
+				echo implode('<~>', array($title, getPath(), SERVER_STATE,
+				 ($member->isConnected() ? $account->User->getNextPMNotif() : ''), defined('UPDATE_SELECTOR') ? UPDATE_SELECTOR : '', $data));
 				if ($config['JAVASCRIPT'])
 				{
 					$jQ = jQ();
