@@ -1,8 +1,7 @@
 ﻿(AJaX = pas de rechargement de la page)
 @todo
 ban ips
-contact form
-link to account's profile from character's profile
+link to account's profile from character's profileBox (=> unless current page ?)
 consider Event as VIP-only if Reward.is_vip ???
 1.3(?):
  Fixed Shop#delete redirects to a bad URL
@@ -129,7 +128,8 @@ consider Event as VIP-only if Reward.is_vip ???
   showing : Character name. Account pseudo. Breed + gender + level. Guild infos (name + lvl).
    Alignment infos (name + rank + honor + dishonor if >0). Kamas + statsPoints + spellsPoints.
    Stats : int, wisdom, str, agi, luck, vita. AP + MP. Add if >0 : CC, +dmg, %dmg
- Added a stats page, with 3 pie charts (genders + breeds + aligns) and a lot of informations (counters, averages, ...)
+ Added a stats page, with 3 pie charts (genders + breeds + aligns) formatted as : "name: per% (count)",
+  and a lot of informations (counters, averages, ...).
  Integrated AJaX system with history.pushState, if avalaible
 1.2.2:
  Many others bugs fixed (I'm thinking about validating inputs one-by-one ...)

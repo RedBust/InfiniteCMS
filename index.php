@@ -147,6 +147,5 @@ try
 		exit('Problems during page loading. Please contact the server admin.');
 }
 __shutdown();
-
 if (DEBUG && !$router->isAjax() && $headers)
 	echo $mem . memory_get_usage() . ': Fin<br />';

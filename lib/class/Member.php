@@ -82,9 +82,10 @@ class Member extends Multiton
 	public static function getLevels()
 	{
 		return array(
+			LEVEL_BANNED => lang('rank.banned'),
 			LEVEL_GUEST => lang('rank.guest'),
 			LEVEL_LOGGED => lang('rank.player'),
-			LEVEL_VIP => lang('rank.vip'),
+			'' . LEVEL_VIP => lang('rank.vip'),
 			LEVEL_TEST => lang('rank.test'),
 			LEVEL_MODO => lang('rank.mod'),
 			LEVEL_MJ => lang('rank.gm'),
@@ -95,9 +96,10 @@ class Member extends Multiton
 	public static function getFormattedLevels()
 	{
 		return array(
+			LEVEL_BANNED => '<strike>' . lang('rank.banned') . '</strike>',
 			LEVEL_GUEST => lang('rank.guest'),
 			LEVEL_LOGGED => '<i>' . lang('rank.player') . '</i>',
-			LEVEL_VIP => '<b>' . lang('rank.vip') . '</b>',
+			'' . LEVEL_VIP => '<b>' . lang('rank.vip') . '</b>',
 			LEVEL_TEST => '<u>' . lang('rank.test') . '</u>',
 			LEVEL_MODO => '<b><i>' . lang('rank.mod') . '</i></b>',
 			LEVEL_MJ => '<b><u>' . lang('rank.gm') . '</u></b>',

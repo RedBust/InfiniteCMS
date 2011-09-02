@@ -58,7 +58,6 @@ foreach ($table->getProtectedFilters() as $filter)
 }
 
 $pager = new Doctrine_Pager($itemsDql, $router->requestVar('page'), $config['ITEM_LINES_BY_PAGE'] * $config['ITEMS_BY_LINE']);
-
 $items = $pager->execute();
 $url_ary = array('controller' => $router->getController(), 'action' => $router->getAction()) + $search_params + array('page' => '');
 $layout = new Doctrine_Pager_Layout($pager, new Doctrine_Pager_Range_Sliding(array('chunk' => 4)), to_url($url_ary) . '{%page_number}');
@@ -143,3 +142,7 @@ if (level(LEVEL_ADMIN))
 {
 	echo tag('br') . make_link(array('controller' => $router->getController(), 'action' => 'update'), lang('act.new'));
 }
+
+$items->free(true);
+$itemsDql->free(true);
+unset($table, $items, $pager, $layout, $itemsDql);

@@ -46,7 +46,7 @@ if ($cache = Cache::start($router->getController() . '_stats', 1))//'+6 hours'))
 
 	if ($counts['characters'])
 	{
-		foreach ($characters as $character)
+		foreach ($characters as &$character)
 		{
 			if (isset($counts['breed'][$character['class']]))
 				++$counts['breed'][$character['class']];
@@ -63,102 +63,26 @@ if ($cache = Cache::start($router->getController() . '_stats', 1))//'+6 hours'))
 
 			if (isset($character['GuildMember']))
 				++$counts['guilded'];
+
+			unset($character);
 		}
-		foreach ($guilds as $guild)
+		foreach ($guilds as &$guild)
 		{
 			$counts['gLevel'] += $guild['lvl'];
+			unset($guild);
 		}
 		$counts['avgCLevel'] = $counts['cLevel'] / $counts['characters'];
-		$counts['avgGLevel'] = $counts['gLevel'] / $counts['guilds'];
+		if ($counts['guilds'])
+			$counts['avgGLevel'] = $counts['gLevel'] / $counts['guilds'];
 		$counts['avgKamas'] = $counts['kamas'] / $counts['characters'];
 		echo tag('ul', tag('li', tag('b', lang('character.avg_level')) . ': ' . number_format($counts['avgCLevel'], 0, '.', ' ')) .
 		 tag('li', tag('b', lang('character.avg_kamas')) . ': ' . number_format($counts['avgKamas'], 0, '.', ' ')) .
 		 tag('li', tag('b', pluralize(lang('character.guilded'), $counts['guilded'], false)) . ': ' . number_format($counts['guilded'], 0, '.', ' ')) .
-		 tag('li', tag('b', lang('guild.avg_level')) . ': ' . number_format($counts['avgGLevel'], 0, '.', ' '))) .
-			tag('div', array('id' => 'highGender'), '') . tag('div', array('id' => 'highBreed'), '');
+		 ( $counts['guilds'] ? tag('li', tag('b', lang('guild.avg_level')) . ': ' . number_format($counts['avgGLevel'], 0, '.', ' ')) : '' ));
+
 		if (count($counts['gender']) > 1)
-		{
-			$js_genders = array();
-			foreach ($counts['gender'] as $gender => $count)
-			{
-				$js_genders[] = '["' . lang('gender_.' . $gender) . ' ' . '' . '", ' . round(($count * 100) / $counts['characters'], 2) . ']';
-			}
-			$js_genders = implode(', ', $js_genders);
-			jQ("
-	chart = new Highcharts.Chart({
-		  chart: {
-			 renderTo: 'highGender',
-			 plotBackgroundColor: null,
-			 plotBorderWidth: null,
-			 plotShadow: false
-		  },
-		  title: {
-			 text: '" . pluralize(lang('acc.ladder.sex'), 2, false) . "'
-		  },
-		  tooltip: {
-			 formatter: function() {
-				return '<b>'+ this.point.name +'</b>: '+ this.y +' %';
-			 }
-		  },
-		  plotOptions: {
-			 pie: {
-				allowPointSelect: true,
-				cursor: 'pointer',
-				dataLabels: {
-				   enabled: true
-				},
-				showInLegend: true
-			 }
-		  },
-		   series: [{
-			 type: 'pie',
-			 data: [
-				{$js_genders}
-			 ]
-		  }]
-	   });");
-		} //end count.genders
+			echo chart(pluralize(lang('acc.ladder.sex'), 2, false), $counts['gender'], 'gender_.');
 		if (count($counts['breed']) > 1)
-		{
-			$js_breeds = array();
-			foreach ($counts['breed'] as $breed => $count)
-			{
-				$js_breeds[] = '["' . lang('breed.' . $breed) . '", ' . round(($count * 100) / $counts['characters'], 2) . ']';
-			}
-			$js_breeds = implode(', ', $js_breeds);
-			jQ("
-	chart = new Highcharts.Chart({
-		  chart: {
-			 renderTo: 'highBreed',
-			 plotBackgroundColor: null,
-			 plotBorderWidth: null,
-			 plotShadow: false
-		  },
-		  title: {
-			 text: '" . pluralize(lang('acc.ladder.class'), 2, false) . "'
-		  },
-		  tooltip: {
-			 formatter: function() {
-				return '<b>'+ this.point.name +'</b>: '+ this.y +' %';
-			 }
-		  },
-		  plotOptions: {
-			 pie: {
-				allowPointSelect: true,
-				cursor: 'pointer',
-				dataLabels: {
-				   enabled: true
-				},
-				showInLegend: true
-			 }
-		  },
-		   series: [{
-			 type: 'pie',
-			 data: [
-				{$js_breeds}
-			 ]
-		  }]
-	   });");
-		}
+			echo chart(pluralize(lang('acc.ladder.class'), 2, false), $counts['breed'], 'breed.');
 	}
 }

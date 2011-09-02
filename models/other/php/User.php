@@ -49,6 +49,14 @@ class User
 		}
 		return true;
 	}
+	public function canPurchase(ShopItem $si)
+	{
+		if ($this->Account->level >= LEVEL_ADMIN)
+			return true;
+		if ($si->is_vip && !$this->Account->vip)
+			return false;
+		return $this->points >= $si->getCost();
+	}
 	public function canReview()
 	{
 		return level(LEVEL_ADMIN) || !$this->relatedExists('Review'); //if this can make happy admins \o/

@@ -56,8 +56,14 @@ class Cache
 		}
 		else
 		{
-			if (!@mkdir($dir))
-				throw ExceptionManager::cantCreate('cache dir');
+			$dir = explode('/', str_replace(DIRECTORY_SEPARATOR, '/', $dir));
+			$cDir = ''; //complete dir;
+			foreach ($dir as $d)
+			{
+				$cDir .= $d . '/';
+				if (!@mkdir($cDir))
+					throw ExceptionManager::cantCreate('cache dir (' . $cDir . ')');
+			}
 		}
 	}
 	static public function getDir()

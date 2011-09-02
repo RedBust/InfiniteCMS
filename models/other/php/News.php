@@ -103,4 +103,13 @@ class News extends BaseNews
 		  '  ' . $edit_link . ' ' .
 		  make_link($params['delete'], lang('act.delete')) : '' );
 	}
+
+	public function getName()
+	{
+		return $this->title;
+	}
+	public function getId()
+	{
+		return $this->id;
+	}
 }

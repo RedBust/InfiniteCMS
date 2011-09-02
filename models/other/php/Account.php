@@ -135,7 +135,7 @@ if($c = Cache::start("Account_show_profil_' . $this->guid . '_" . ($connected ? 
 	}
 	public function isVIP()
 	{
-		if (level(LEVEL_TEST)) //in-test mod (reminder)
+		if (level(LEVEL_ADMIN))
 			return true;
 		return $this->vip;
 	}
@@ -154,6 +154,19 @@ if($c = Cache::start("Account_show_profil_' . $this->guid . '_" . ($connected ? 
 				return false;
 		}
 		return true;
+	}
+	public function canSetWinner(Event $e)
+	{
+		if ($this->level >= LEVEL_ADMIN)
+			return true;
+		if (!$e->relatedExists('Guild'))
+			return false;
+
+		if (!$mainChar = $this->getMainChar())
+			return false;
+		if (!$mainChar->isGM($e->guild_id))
+			return false;
+		return $mainChar->GuildMember->guild == $e->guild_id;
 	}
 
 	public function getCharactersList($accordion = false)
@@ -238,11 +251,42 @@ if($c = Cache::start("Account_show_profil_' . $this->guid . '_" . ($connected ? 
 			$columns[] = 'email';
 		}
 		if (level(LEVEL_ADMIN))
-			$columns = array_merge($columns, array('banned', 'level'));
+			$columns = array_merge($columns, array('level'));
 
 		return $columns;
 	}
 
+	public function setLevel($level)
+	{
+		$level = floatval($level);
+		if ($level == LEVEL_BANNED) //just put "banned", don't modify the level. But ... "LEVEL_BANNED" is not in the ranks list !
+		{
+			$this->banned = 1;
+			$level = LEVEL_LOGGED;
+		}
+		else if ($this->banned)
+			$this->banned = 0;
+
+		if ($level == LEVEL_VIP)
+		{
+			$this->vip = 1; //@todo reset level to LOGGED ?
+			return;
+		}
+		else if ($level == LEVEL_LOGGED && $this->vip)
+			$this->vip = 0; //no continue.
+		else if ($level <= LEVEL_GUEST)
+			$level = LEVEL_LOGGED;
+		else if ($level > LEVEL_ADMIN)
+			$level = LEVEL_ADMIN;
+
+		$this->_set('level', $level);
+	}
+
+	public function setUp()
+	{
+		parent::setUp();
+		$this->hasMutator('level', 'setLevel');
+	}
 	/**
 	 * updates the account
 	 *
@@ -281,27 +325,6 @@ if($c = Cache::start("Account_show_profil_' . $this->guid . '_" . ($connected ? 
 			}
 			else
 			{
-				if ($t === 'level')
-				{
-					if ($values[$t] == LEVEL_BANNED)
-					{ //just put "banned", don't modify the level. But ... "LEVEL_BANNED" is not in the ranks list !
-						$this->banned = 1;
-						continue;
-					}
-					if ($values[$t] == LEVEL_VIP)
-					{
-						$this->vip = 1;
-						continue; //reset level to LOGGED? 
-					}
-					if ($values[$t] == LEVEL_GUEST)
-						$values[$t] = LEVEL_LOGGED; //would delete the account ... and it'd be stupid.
-					if ($values[$t] == LEVEL_LOGGED && $this->vip)
-					{
-						$this->vip = 0; //no continue.
-					}
-					if ($values[$t] > LEVEL_ADMIN)
-						$values[$t] = LEVEL_ADMIN;
-				}
 				$this->$t = $values[$t];
 			}
 		}

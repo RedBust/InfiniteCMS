@@ -73,14 +73,14 @@ define('STATE_RESOLVING', 1);
 define('STATE_RESOLVED', 2);
 
 //User levels
-define('LEVEL_BANNED', -2);
-define('LEVEL_GUEST', -1);
-define('LEVEL_LOGGED', 0);
+define('LEVEL_BANNED', -2.0);
+define('LEVEL_GUEST', -1.0);
+define('LEVEL_LOGGED', 0.0);
 define('LEVEL_VIP', 0.5); //[...]
-define('LEVEL_TEST', 1);
-define('LEVEL_MODO', 2);
-define('LEVEL_MJ', 3);
-define('LEVEL_ADMIN', 4);
+define('LEVEL_TEST', 1.0);
+define('LEVEL_MODO', 2.0);
+define('LEVEL_MJ', 3.0);
+define('LEVEL_ADMIN', 4.0);
 
 $calendar_opts = '
 					showButtonPanel: true,
@@ -202,6 +202,7 @@ $manager->setAttribute(Doctrine_Core::ATTR_MODEL_LOADING,
 		Doctrine_Core::MODEL_LOADING_CONSERVATIVE);
 $manager->setAttribute(Doctrine_Core::ATTR_QUOTE_IDENTIFIER, true);
 $manager->setAttribute(Doctrine_Core::ATTR_AUTO_FREE_QUERY_OBJECTS, true);
+unset($manager);
 set_include_path(implode(PATH_SEPARATOR, array(
 	ROOT, //see #0.3.2a
 	ROOT . 'lib/class/', //local libs > global libs
@@ -241,7 +242,7 @@ if (!DEV)
 
 	if (!empty($_SESSION['guid']))
 	{ //retrieve account
-		$account = Query::create()
+		$accountQ = Query::create()
 						->from('Account a')
 							->leftJoin('a.Characters c INDEXBY guid')
 								->leftJoin('c.Events e INDEXBY e.id')
@@ -249,8 +250,9 @@ if (!DEV)
 								->leftJoin('u.PollOptions po')
 									->leftJoin('po.Poll p')
 								->leftJoin('u.Review r')
-						->where('guid = ?', $_SESSION['guid'])
-						->fetchOne();
+						->where('guid = ?', $_SESSION['guid']);
+		$account = $accountQ->fetchOne();
+		unset($accountQ);
 		if ($account)
 		{
 			if (!$account->relatedExists('User'))

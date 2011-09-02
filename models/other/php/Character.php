@@ -39,6 +39,17 @@ class Character extends BaseCharacter
 	{
 		return $this->guid;
 	}
+	//is guild master
+	public function isGM($guild = NULL)
+	{
+		if (!$this->relatedExists('GuildMember'))
+			return false;
+		if ($this->GuildMember->rank != 1)
+			return false;
+		if ($guild == NULL || $guild == -1)
+			return true;
+		return $this->GuildMember->guild == $guild;
+	}
 
 	public function __toString()
 	{
@@ -157,12 +168,12 @@ class Character extends BaseCharacter
 	}
 
 	/**
-	 * getSpellMean
+	 * getSpellAvgLevel
 	 * return the mean of the levels of spells
 	 *
 	 * @return integer mean
 	 */
-	public function getSpellMean()
+	public function getSpellAvgLevel()
 	{
 		$spellLevels = 0;
 		foreach ($this->getSpells() as $sort)

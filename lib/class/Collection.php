@@ -122,7 +122,7 @@ class Collection extends Doctrine_Collection
 			echo tag('h3', lang('shop.item.no_by_criteria'));
 			return;
 		}
-		$itemsID = array(); //BIG array of alls items ID
+		$itemsID = array(); //BIG array of all items ID
 		foreach ($this as $obj)
 		{
 			foreach ($obj->Effects as $ef)
@@ -134,11 +134,7 @@ class Collection extends Doctrine_Collection
 					->whereIn('id', $itemsID)
 				->execute();
 
-		$count = $this->count();
-		$i = 0;
-		$html .= '
-	<table border="1">
-		<tr>';
+		
 		define('FROM_INCLUDE', true);
 		if (level(LEVEL_ADMIN))
 		{
@@ -172,19 +168,32 @@ $(".f_' . $t . '").each( function ()
 	} );
 } );');
 		}
-		foreach ($this as $item)
+
+		$count = $this->count();
+		$i = 0;
+		echo '
+	<table border="1">
+		<tr>';
+		foreach ($this as &$item)
 		{
 			$m = $i++ % $config['ITEMS_BY_LINE'];
 			if ($m === 0 && $i !== 1) //start a new line
-				$html .= '
+				echo '
 		</tr>
 		<tr>';
-			$html .= tag('td', $i === $count ? array('colspan' => strval($config['ITEMS_BY_LINE'] - $m)) : array(), $item);
+			echo tag('td', $i === $count ? array('colspan' => strval($config['ITEMS_BY_LINE'] - $m)) : array(), $item);
+			$item->free(true);
+			unset($item);
 		}
-		$html .= '
+		echo '
 			</tr>
 	</table>';
 		echo $html;
+		foreach ($items as &$i)
+		{
+			$i->free(true);
+			unset($i);
+		}
 		IG::registerEffectsTooltip();
 	}
 
@@ -263,7 +272,7 @@ $(".f_' . $t . '").each( function ()
 		echo tag('div', array(
 			'id' => 'normal',
 			'style' => 'display: ' . ( $modeNormal ? 'block' : 'none' ) . ';',
-				), tag('ul', $normal), js_link(sprintf($toggle, 'normal', 'adv'), lang('more'), to_url($more))),
+		), tag('ul', $normal), js_link(sprintf($toggle, 'normal', 'adv'), lang('more'), to_url($more))),
 		tag('div', array(
 			'id' => 'adv',
 			'style' => 'display: ' . ( $modeNormal ? 'none' : 'block' ) . ';'
@@ -306,7 +315,7 @@ $(".f_' . $t . '").each( function ()
 				'id' => 'c_profil',
 				'style' => 'display: none;',
 				'title' => lang('infos'),
-					), '');
+			), '');
 			jQ('
 var cProfils = {},
 	cProfilBox = $( "#c_profil" );

@@ -61,5 +61,6 @@ return array(
 	'PrivateMessage - create' => 'Nouveau message privé',
 
 	'Event - index' => 'Évènements',
-	'Event - update' => 'Nouvel évènement',
+	'Event - update' => 'Édition d\'évènement',
+	'Event - create' => 'Nouvel évènement',
 );

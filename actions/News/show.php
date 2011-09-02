@@ -116,12 +116,12 @@ binds.add(function ()
 				'id' => '%%t.data("id")%%',
 			),
 		);
-		#foreach ($cols as $col)
-		#{
+		foreach ($cols as $col)
+		{
 			$url_com[$col] = to_url($url_com['_base'] + array(
 				'col' => $col,
 			), false);
-		#}
+		}
 		jQ('
 	$( "#newsTitle" ).editInPlace(
 	{
@@ -130,8 +130,8 @@ binds.add(function ()
 	}
 	if ($config['MAX_COMMENTS'] != 0)
 	{
-		#foreach ($cols as $col)
-		#{
+		foreach ($cols as $col)
+		{
 			jQ('
 $( ".comment-' . $col . '" ).each( function()
 	{
@@ -151,7 +151,7 @@ $( ".comment-' . $col . '" ).each( function()
 			},
 		} );
 	} );');
-		#}
+		}
 	}
 	$cache->save();
 }

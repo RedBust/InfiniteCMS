@@ -1,9 +1,11 @@
 <?php
-if (!check_level(LEVEL_ADMIN))
+if (!check_level(LEVEL_LOGGED))
 	return;
 
 if ($event = EventTable::getInstance()->find($id = $router->requestVar('id')))
-{
+{	
+	if (!check_level(LEVEL_ADMIN))
+		return;
 	if ($event->isElapsed())
 	{
 		echo lang('event.elapsed');
@@ -14,12 +16,35 @@ if ($event = EventTable::getInstance()->find($id = $router->requestVar('id')))
 else
 	$event = new Event;
 
+if (( $mainChar = $account->getMainChar() ) && $mainChar->isGM())
+	$guildId = $mainChar->GuildMember->guild;
+else if (level(LEVEL_ADMIN))
+	$guildId = -1;
+else
+{
+	define('HTTP_CODE', 404);
+	return;
+}
+
 if (!empty($_POST))
 {
 	if (!empty($_POST['name']))
-		$event->name = $_POST['name'];
+		$event->name = level(LEVEL_ADMIN) ? $_POST['name'] : html($_POST['name']);
 	if (!empty($_POST['name']) && $period = datetime_from_picker($_POST['period']))
 		$event->period = $period->format('Y-m-d H:i:00');
+
+	if ($guildId != -1 && level(LEVEL_ADMIN) && empty($_POST['is_guild']))
+		$guildId = -1;
+	if ($guildId != -1)
+		$event->guild_id = $guildId;
+	else if (level(LEVEL_ADMIN) && !empty($_POST['reward']) && $_POST['reward'] != -1)
+	{
+		$reward = ShopItemTable::getInstance()->find($_POST['reward']);
+		if ($reward)
+			$event->Reward = $reward;
+		else
+			$errors['reward'] = lang('shop.does_not_exists');
+	}
 
 	if (empty($event->name))
 		$errors[] = sprintf(lang('must_!empty'), 'name');
@@ -28,12 +53,13 @@ if (!empty($_POST))
 	else if ($event->isElapsed())
 		$errors[] = lang('event.elapsed');
 
+
 	if (empty($errors))
 		$event->save();
 }
 if (empty($_POST) || $errors != array())
 {
-	partial('_form', array('event'), PARTIAL_CONTROLLER);
+	partial('_form', array('event', 'guildId'), PARTIAL_CONTROLLER);
 }
 else if (!empty($_POST) && $errors == array() && $headers)
 {

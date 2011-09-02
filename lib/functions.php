@@ -181,10 +181,12 @@ function check_level($lvl = LEVEL_ADMIN, $lt = false)
  *
  * @return string The key translated or "Untranslated"
  */
-function lang($key, $namespace = 'common', $default = '%%key%% (Untranslated)')
+function lang($key, $namespace = NULL, $default = '%%key%% (Untranslated)')
 {
 	global $langs, $member;
 	static $lang = NULL;
+	if ($namespace === NULL)
+		$namespace = 'common';
 	if ($lang === NULL)
 	{
 		if (!isset($langs[$member->getLang()]))
@@ -523,9 +525,10 @@ function replace_url($url, $strict = true)
 	{
 		if ($url instanceof Doctrine_Record)
 		{
+			global $recordName;
 			if ($url->exists())
 			{ //no way to edit_path, I know. fuck you :3
-				global $recordName;
+				vdump($recordName, $url->toArray());
 				if (method_exists($url, 'getLink') && $recordName !== false)
 					return $url->getLink($recordName);
 				else
@@ -536,7 +539,11 @@ function replace_url($url, $strict = true)
 				}
 			}
 			else
+			{
+				if (empty($recordName))
+					$recordName = lang(get_class($url) . ' - create', 'title');
 				return to_url(array('controller' => get_class($url), 'action' => 'update')); //Account#update redirects to #create ;)
+			}
 		}
 		else if (is_array($url))
 			return to_url($url);
@@ -716,10 +723,75 @@ function url_for_image($url, $ext = EXT_JPG)
 }
 
 /**
+ * creates an HighChart pie
+ *
+ * @param string $title the pie's name
+ * @param array $datas {'name' => count}
+ * @param string name_prefix name prefix for each 'name' (in $datas)
+ */
+function chart($title, array $datas, $name_prefix = '')
+{
+	$total = 0;
+	foreach ($datas as $c)
+		$total += $c;
+
+	$series = array();
+	foreach ($datas as $k => $count)
+		$series[] = array(
+			'name' => lang($name_prefix . $k, NULL, '%%key%%'),
+			'y' => round(($count * 100) / $total, 2),
+			'count' => $count,
+		);
+	$series = json_encode($series);
+
+	$renderTo = reset($datas) . '-' . $total;
+
+	jQ("
+chart = new Highcharts.Chart({
+	chart:
+	{
+		renderTo: '{$renderTo}',
+		plotBackgroundColor: null,
+		plotBorderWidth: null,
+		plotShadow: true
+	},
+	title:
+	{
+		text: '{$title}'
+	},
+	tooltip:
+	{
+		formatter: function()
+		{
+			return '<b>'+ this.point.name +'</b>: '+ this.y +' % (' + this.point.count + ')';
+		}
+	},
+	plotOptions:
+	{
+		pie:
+		{
+			allowPointSelect: true,
+			cursor: 'pointer',
+			dataLabels:
+			{
+			   enabled: true
+			},
+			showInLegend: true
+		}
+	},
+	series:
+	[{
+		type: 'pie',
+		data: {$series}
+	}]
+});");
+	return tag('div', array('id' => $renderTo), '');
+}
+/**
  * stocks jQuery Code or creates a slot for (ob)
  *
  * @package Helper
- * @subpackage HTML
+ * @subpackage JS
  *
  * @param string $put jQuery code to put
  * @return string actual jQuery code
@@ -854,7 +926,7 @@ function make_link($_url, $n = NULL, $opt = array(), $add = array(), $js = true)
 		$js = false; //force JS to be off
 
 	if ($_url instanceof Doctrine_Record && method_exists($_url, 'getLink') && $_url->exists() && $n !== false)
-		return $_url->getLink();
+		return $_url->getLink($n);
 
 	if ((is_array($_url) || $_url instanceof Doctrine_Record)
 	 && !empty($opt) && empty($add))
@@ -1062,7 +1134,7 @@ function paginate(Doctrine_Pager_Layout $layout, $sep = ' ')
  * @subpackage HTML
  *
  * @param string $name Name of input
- * @param string $label Label of input
+ * @param string $label Label of input (treated as $value if $type == 'label')
  * @param string $type Type of input
  * @param string $value Value of input
  * @param array $add Attributes for input
@@ -1073,9 +1145,12 @@ function input($name, $label, $type = NULL, $value = '', $add = array())
 {
 	$act_label = false;
 	$args = func_get_args();
+	$params = array(); //contains everything for the input
+	$type = strtolower($type); //convention
 
-	if (is_array($value) && $add === array() && $type !== 'select' && $type !== 'date_range')
-	{ //replace $add & $value IF it's not a (select || date_range) 
+	if (is_array($value) && $add === array()
+	 && $type !== 'select' && $type !== 'date_range' && $type !== 'record')
+	{ //replace $add && $value IF it's not a (select || date_range) 
 		$add = $value;
 		$value = '';
 	}
@@ -1088,49 +1163,64 @@ function input($name, $label, $type = NULL, $value = '', $add = array())
 		$value = $label;
 		$label = NULL;
 	}
-	$type = strtolower($type); //Conventions
 
-	if ($type !== 'select')
+	if ($type == 'select' || $type == 'record')
 	{
-		if (!is_array($add) && isset($args[0]) && is_array($args[0]))
+		// if (is_array($add))
+		// {
+			// foreach (array('type', 'name', 'value') as $n)
+			// {
+				// if (isset($add[$n]))
+				// {
+					// unset($add[$n]);
+				// }
+			// }
+		// }
+		// else
+		if (!is_array($add))
 		{ //if add is not array, then add is the default select's value. Then, try to take $add from $args[0] (the arg after $add)
 			$selected = $add;
-			$add = $args[0];
+			$add = isset($args[5]) ? $args[5] : array();
 		}
-	}
-	else
-	{
-		if (is_array($add))
-		{
-			foreach (array('type', 'name', 'value') as $n)
-			{
-				if (isset($add[$n]))
-				{
-					unset($add[$n]);
-				}
-			}
-		}
-		if (isset($args[0]))
+		if (isset($args[5]))
 		{ //act as a label ?
-			$act_label = (bool) $args[0];
+			$act_label = (bool) $args[5];
 		}
 	}
 
-	$value = str_replace('</', '&lt;/', $value); //On vire les caract�res sp�ciaux de $value
+	if (is_string($value))
+		$value = str_replace('</', '&lt;/', $value); //remove special chars from $value
 	if ($type === 'textarea')
 	{
 		$type = tag('textarea', $add + array($add, 'name' => $name, 'id' => 'form_' . $name), str_replace('</textarea>', '', $value));
 	}
-	else if ($type === 'select')
+	else if ($type === 'select' || $type == 'record')
 	{
-		if (!is_array($add) && !isset($selected))//selected
+		if ($type == 'record')
 		{
-			$selected = intval($add);
+			if (!isset($value['getter']))
+				$value['getter'] = 'getName';
+
+			$t = Doctrine_Core::getTable($value['model']);
+			$identifier = $t->getIdentifier();
+
+			if (isset($value['query']))
+				$records = $value['query']->execute();
+			else
+				$records = $t->findAll();
+			$v = array();
+
+			if (!empty($add['empty']))
+				$v['-1'] = lang('empty');
+
+			foreach ($records as $record)
+				$v[$record[$identifier]] = call_user_func(array($record, $value['getter']));
+
+			$value = $v;
 		}
-		else
-		{
-			$selected = empty($args[0]) ? NULL : $args[0];
-		}
+
+		if (!isset($selected))
+			$selected = NULL;
 		$type = tag('select', array('name' => $name, 'id' => 'form_' . $name), input_select_options($value, $selected));
 	}
 	else
@@ -1140,22 +1230,23 @@ function input($name, $label, $type = NULL, $value = '', $add = array())
 
 		$pre_html = $post_html = '';
 		global $calendar_opts;
-		switch ($type)
+		$params = array('type' => $type, 'name' => $name, 'value' => $value, 'id' => 'form_' . $name);
+		switch ($params['type'])
 		{
 			case 'date':
-				if (is_numeric($value))
-					$value = date('d/m/Y', $value);
-				$type = 'text';
+				if (is_numeric($params['value']))
+					$params['value'] = date('d/m/Y', $params['value']);
+				$params['type'] = 'text';
 				jQ(sprintf('$("#form_%s").datepicker(
 					{
 						%s,
-					});', $name, $calendar_opts));
+					});', $params['name'], $calendar_opts));
 			break;
 
 			case 'datetime':
-				if (!empty($value))
-					$value = datetime_to_picker($value);
-				$type = 'text';
+				if (!empty($params['value']))
+					$params['value'] = datetime_to_picker($params['value']);
+				$params['type'] = 'text';
 				$_opts = array();
 				if (isset($add['__restrict']))
 				{
@@ -1179,24 +1270,24 @@ function input($name, $label, $type = NULL, $value = '', $add = array())
 					$_opts += $restrict;
 					unset($add['restrict']);
 				}
-				jQ(sprintf('$("#form_%s").datetimepicker($.extend({%s}, %s));', $name, $calendar_opts, json_encode($_opts)));
+				jQ(sprintf('$("#form_%s").datetimepicker($.extend({%s}, %s));', $params['name'], $calendar_opts, json_encode($_opts)));
 			break;
 			case 'date_range':
-				if (is_numeric($value))
-					$value = date('d/m/Y', $value);
+				if (is_numeric($params['value']))
+					$params['value'] = date('d/m/Y', $params['value']);
 				static $date_range_i = -1; //multiple dateranges on the same page.
 				if ($date_range_i == -1)
 				{ //first date range
 					jQ('dates = {};'); //create the date ranges array
 				}
-				$type = 'text';
-				if (is_array($name))
+				$params['type'] = 'text';
+				if (is_array($params['name']))
 				{
-					$to_name = empty($name[1]) ? $name . '2' : $name[1];
-					$name = $name[0];
+					$to_name = empty($params['name'][1]) ? $params['name'] . '2' : $params['name'][1];
+					$params['name'] = $params['name'][0];
 				}
 				else
-					$to_name = $name . '2';
+					$to_name = $params['name'] . '2';
 
 				jQ(sprintf('dates[%d] = jQuery("#form_%s, #form_%s").datepicker(
 					{
@@ -1212,7 +1303,7 @@ function input($name, $label, $type = NULL, $value = '', $add = array())
 										selectedDate, instance.settings );
 								dates[%1$d].not( this ).datepicker( "option", option, date );
 							}
-					});', ++$date_range_i, $to_name, $name, $calendar_opts));
+					});', ++$date_range_i, $to_name, $params['name'], $calendar_opts));
 				if (is_array($label))
 				{
 					$to_label = empty($label[1]) ? lang('date_to') : $label[1];
@@ -1220,34 +1311,34 @@ function input($name, $label, $type = NULL, $value = '', $add = array())
 				}
 				else
 					$to_label = lang('date_to');
-				if (is_array($value))
+				if (is_array($params['value']))
 				{
-					$to_value = empty($value[1]) ? '' : date_to_picker($value[1]);
-					$value = $value[0];
+					$to_value = empty($params['value'][1]) ? '' : date_to_picker($params['value'][1]);
+					$params['value'] = $params['value'][0];
 				}
 				else
 					$to_value = '';
 				$post_html = '&nbsp;' . input($to_name, $to_label, NULL, $to_value);
-				if (!empty($value))
+				if (!empty($params['value']))
 				{
-					if (!( $value = @date('d/m/Y', $value) ))
+					if (!( $params['value'] = @date('d/m/Y', $params['value']) ))
 					{
-						$value = false;
+						$params['value'] = false;
 					}
 				}
 			break;
-			case 'Jcheckbox':
-				jQ('$("form_' . $name . '").buttonset();');
-				$type = 'checkbox';
+			case 'jcheckbox':
+				jQ('$("form_' . $params['name'] . '").button();');
+				$params['type'] = 'checkbox';
 			//no break.
 			case 'checkbox':
-				if ((bool) $value)
+				if ((bool) $params['value'])
 				{
-					$params = array_merge($params, array('checked' => 'checked'));
+					$params['checked'] = 'checked';
 				}
-				$value = $params['value'] = 'on';
+				$params['value'] = 'on';
 		}
-		$params = array('type' => $type, 'name' => $name, 'value' => $value, 'id' => 'form_' . $name);
+		extract($params);
 		$type = $pre_html . tag('input', array_merge($params, $add)) . $post_html;
 	}
 	$opts_label = array('for' => 'form_' . $name);
@@ -1638,16 +1729,17 @@ function load_models($cat)
  */
 function __shutdown()
 {
-	global $router, $account;
+	global $account, $member, $mem;
 	if (level(LEVEL_LOGGED))
 	{
 		if ($account !== NULL && $account->relatedExists('User'))
 		{
 			$account->save();
 		}
-		if (DEBUG && !$router->isAjax())
-			echo '<!-- Saving... -->';
+		$account->free(true);
+		unset($account);
 	}
+	unset($member);
 }
 
 if (DEBUG && !DEV)

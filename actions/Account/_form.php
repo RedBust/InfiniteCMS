@@ -19,7 +19,6 @@ $fields = array(
 		array( 'guid', NULL, 'hidden', $acc->guid ),
 	),
 	lang('acc.register.adv') => ( level(LEVEL_ADMIN) ? array(
-		array('banned', lang('acc.register.banned') . $newl, 'checkbox', intval($acc->banned)),
 		array('level', $newl . lang('level') . $newl, 'select', Member::getLevels(), $acc->level)
 	) : array() )
 );

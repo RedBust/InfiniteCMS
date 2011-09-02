@@ -35,7 +35,7 @@ function showRightsPanel(rights)
 }
 bind(function ()
 {
-	rightsPanels.hide();
+	rightsPanel.dialog("close");
 	delete rightsPanel;
 	delete rightsPanels;
 });');

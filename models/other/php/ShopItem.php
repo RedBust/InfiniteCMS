@@ -121,8 +121,10 @@ class ShopItem extends BaseShopItem
 		{
 			$effects = '
 			<ul>';
-			foreach ($this->Effects as $effect)
+			foreach ($this->Effects as &$effect)
+			{
 				$effects .= $effect;
+			}
 			$effects .= '
 			</ul>';
 		}
@@ -141,8 +143,8 @@ class ShopItem extends BaseShopItem
 		 $this->getCostInfo(),
 		 $this->getTypesInfo(),
 		 $effects,
-		 ( $account->getMainChar() === NULL || $account->User->points < $this->getCost() ? '' : $this->getPurchaseLink()),
-		 ( !level(LEVEL_ADMIN) ? '' : tag('br') . $this->getUpdateLink() . '<br />' . $this->getDeleteLink() ));
+		 ( level(LEVEL_LOGGED) ? ( $account->getMainChar() === NULL || $account->User->canPurchase($this) ? '' : $this->getPurchaseLink()) : '' ),
+		 ( level(LEVEL_ADMIN) ? tag('br') . $this->getUpdateLink() . '<br />' . $this->getDeleteLink() : '' ));
 	}
 
 	public function getDataId()
@@ -160,7 +162,7 @@ class ShopItem extends BaseShopItem
 			$types[] = lang('shop.is_vip');
 		if ($this->is_lottery)
 			$types[] = lang('shop.is_lottery');
-		if ($this->is_hidden)
+		if ($this->is_hidden && level(LEVEL_ADMIN))
 			$types[] = lang('shop.is_hidden');
 
 		return implode(' &bull; ', $types);
@@ -170,6 +172,10 @@ class ShopItem extends BaseShopItem
 		if (level(LEVEL_VIP))
 			return $this->cost_vip;
 		return $this->cost;
+	}
+	public function getName()
+	{
+		return $this->name;
 	}
 	public function getCostInfo()
 	{

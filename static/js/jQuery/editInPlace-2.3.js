@@ -289,7 +289,7 @@ $.extend(InlineEditor.prototype, {
 		if( classes == ' ' )
 			classes = '';
 		// Refactoring ~ Nami-D0C | End
-		return ' name="inplace_value" class="inplace_field' + classes + '" ';
+		return ' name="inplace_value" class="inplace_field ' + classes + '" ';
 	},
 
 	createSelectEditor: function() {
@@ -298,10 +298,8 @@ $.extend(InlineEditor.prototype, {
 			+ '</select>');
 
 		var optionsArray = this.settings.select_options,
-		// Refactor ~ Nami-D0C | Begin
-			in_optgroup = false,
-			optgroup,
 			title;
+		console.log(optionsArray);
 		for( val in optionsArray )
 		{
 			title = optionsArray[val];
@@ -310,16 +308,17 @@ $.extend(InlineEditor.prototype, {
 				val = title[0];
 				title = title[1];
 			}
-			if( val < 0 )
+			/*Not needed
+			if( val <= MIN_BEFORE_OPTGROUP )
 			{
 				in_optgroup = true;
 				optgroup = $( '<optgroup label="' + title + '" />');
 				editor.append( optgroup );
 				continue;
-			}
+			}*/
 
 			$( '<option value="' + val + '">' + title + '</option>' )
-				.appendTo( in_optgroup ? optgroup : editor );
+				.appendTo( editor );
 		}
 		// Refactor ~ Nami-D0C | End
 

@@ -310,15 +310,10 @@ if (level(LEVEL_ADMIN))
 	$level_opt = array();
 	$levels = Member::getLevels();
 	unset($levels[LEVEL_GUEST]);
-	foreach ($levels as $val => $text)
-		$level_opt[] = '"' . $val . '": "' . $text . '"';
-	$level_opt = '{' . implode(', ', $level_opt) . '}';
-	jQ('
-	var level_opts = ' . $level_opt . ';
-	$.each( level_opts, function (k, v)
-	{
-		level_opts[k] = v;
-	} );');
+	foreach (array_reverse($levels) as $val => $text)
+		$level_opt[] = '"' . floatval($val) . '": "' . $text . '"';
+	$level_opt = implode(', ', $level_opt);
+	jQ('var level_opts = {' . $level_opt . '};');
 	
 	$spec = array('level' => '
 	field_type: "select",

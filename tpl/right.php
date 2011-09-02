@@ -27,7 +27,7 @@
 					?>
 					</div>
 					<?php if ($connected && $mainChar = $account->getMainChar()): ?>
-					<div class="module<?php echo $mainChar->relatedExists('GuildMember') && $mainChar->GuildMember->relatedExists('Guild') ? '2' : '5' ?> mainChar">
+					<div class="module2 mainChar">
 						<div class="title slideMenu" style="margin-left: 20px;">
 							<?php
 							echo make_link($mainChar);
@@ -56,7 +56,9 @@
 					<div class="module4">
 						<div class="title slideMenu" style="margin-left: 20px;"><?php echo lang('part.count') ?></div>
 						<?php
-						if ($cache = Cache::start('layout_right_stats', '+1 hour')):
+						if (!level(LEVEL_LOGGED) && $cache = Cache::start('layout_right_stats', '+1 hour')):
+						//I don't see any reason for caching when logged? since we already load one table
+						// (the biggest memory "blow" is done at the first Doctrine_Core::getTable())
 							$created = array();
 							$qC = Query::create()
 									->select('count(guid) as count')
@@ -95,7 +97,8 @@
 						</ul>
 					</div>
 					<?php
-							$cache->save();
+							if (!empty($cache))
+								$cache->save();
 						endif;
 					endif;
 					?>

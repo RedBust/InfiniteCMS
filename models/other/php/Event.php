@@ -82,7 +82,7 @@ class Event extends BaseEvent
 		{
 			$participants = array();
 			$winnerId = $this->relatedExists('Winner') && $this->isElapsed() ? $this->Winner->guid : -1;
-			if ($winnerId === -1 && $this->isElapsed() && level(LEVEL_MJ))
+			if ($winnerId === -1 && $this->isElapsed() && level(LEVEL_LOGGED) && $account->canSetWinner($this))
 			{
 				$winner = make_form(array(array('char', lang('winner'))), array('controller' => 'Event', 'action' => 'win', 'id' => $this->id), array('submit_hideThis' => true));
 				if ($this->Participants->count() > 0)

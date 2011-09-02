@@ -1,5 +1,5 @@
 <?php
-if (!check_level(LEVEL_MJ))
+if (!check_level(LEVEL_LOGGED))
 	return; //MJ are allowed to select winner
 
 if (!( $event = EventTable::getInstance()
@@ -11,6 +11,11 @@ if (!( $event = EventTable::getInstance()
 						->fetchOne() ))
 {
 	define('HTTP_CODE', 404);
+	return;
+}
+if (!$account->canSetWinner($event))
+{
+	define('LEVEL_FALLBACK', true);
 	return;
 }
 if (!$event->isElapsed())
