@@ -19,7 +19,7 @@ if ($config['URL_VOTE'] != -1):
 		<li>
 		<?php if (!$connected && $config['ENABLE_REG']): ?>
 		<li>
-			<?php echo make_link(new Account, '~ ' . lang('Account - create', 'title')) ?>
+			<?php echo make_link(array('controller' => 'Account', 'action' => 'create'), '~ ' . lang('Account - create', 'title')) ?>
 		</li>
 		<?php endif ?>
 		<li>

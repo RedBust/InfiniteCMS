@@ -25,17 +25,15 @@ class Collection extends Doctrine_Collection
 		/** @var $rec Record */
 			$this->add($rec);
 	}
-	/**
-	 * creates an array of each $record[$key]
-	 *
-	 * @return array [records[0].key, records[1].key, ...]
-	 */
-	public function getKeyArray($key)
+
+	public function toKeyValueArray($key, $val = NULL)
 	{
-		$records = array();
-		foreach ($this as $record)
-			$records[] = $record[$key];
-		return $records;
+		if ($val === NULL)
+		{
+			$val = $key;
+			$key = $this->getTable()->getIdentifier();
+		}
+		return parent::toKeyValueArray($key, $val);
 	}
 
 	/**
@@ -114,7 +112,6 @@ class Collection extends Doctrine_Collection
 	public function shopDisplay()
 	{
 		global $config, $types, $account, $router;
-		$html = '';
 		$table = ShopItemTable::getInstance();
 
 		if ($this->isEmpty())
@@ -188,7 +185,6 @@ $(".f_' . $t . '").each( function ()
 		echo '
 			</tr>
 	</table>';
-		echo $html;
 		foreach ($items as &$i)
 		{
 			$i->free(true);

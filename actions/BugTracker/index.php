@@ -9,7 +9,7 @@ $bugsDql = Query::create()
 					->orderBy( 'b.created_at ASC' );
 $pager = new Doctrine_Pager( $bugsDql, News::actualPage(), $config['BUGS_BY_PAGE'] );
 $bugs = $pager->execute( array(), Doctrine_Core::HYDRATE_ARRAY );
-$affichage = new Doctrine_Pager_Layout( $pager, new Doctrine_Pager_Range_Jumping( array( 'chunk' => 4 ) ), to_url( array( 'controller' => $router->getController(), 'action' => $router->getAction(), 'page' => '' ) ) . '%page_number' );
+$affichage = new Doctrine_Pager_Layout( $pager, new Doctrine_Pager_Range_Jumping( array( 'chunk' => 4 ) ), to_url( array( 'controller' => $router->getController(), 'action' => $router->getAction(), 'page' => '' ) ) );
 $affichage->setTemplate( '[<a href="{%url}">{%page}</a>]' );
 $affichage->setSelectedTemplate( '[<b>{%page}</b>]' );
 

@@ -1,6 +1,6 @@
 <?php
 $id = $router->requestVar('id', -1);
-$return_back = '<br /><br />' . make_link('@shop', lang('back_to_index'));
+$return_back = '<br />' . make_link('@shop', lang('back_to_index'));
 $admin = level( LEVEL_ADMIN );
 
 if (!( $shopItem = Query::create()
@@ -37,15 +37,19 @@ if (!$admin)
 		return;
 	}
 }
-$shopItem->giveTo($p);
+$effect = $shopItem->giveTo($char);
 if ($shopItem->is_lottery && $shopItem->Effects->count() > 1)
 {
-	printf(lang('shop.bought'),	$shopItem['name'], $effect, $return_back);
+	printf(lang('shop.lottery_bought'),	$shopItem['name'], str_replace(tag('br'), '', $effect));
 }
 else
 {
-	printf(lang('shop.bought'), $shopItem['name'], $return_back);
+	printf(lang('shop.bought'), $shopItem['name']);
 }
 
-if(!$admin) //so yeah, if you're admin your points won't decrease ... That's not a bug, that's a feature ...
+if($admin) //so yeah, if you're admin your points won't decrease ... That's not a bug, that's a feature ...
+	echo tag('br') . tag('br') . lang('shop.undecredited_because_admin');
+else
 	$account->User['points'] -= $shopItem['cost'];
+
+echo tag('br') . $return_back;

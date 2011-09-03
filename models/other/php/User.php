@@ -51,6 +51,9 @@ class User
 	}
 	public function canPurchase(ShopItem $si)
 	{
+		if (!$this->Account->getMainChar())
+			return false;
+
 		if ($this->Account->level >= LEVEL_ADMIN)
 			return true;
 		if ($si->is_vip && !$this->Account->vip)

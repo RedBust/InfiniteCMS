@@ -514,7 +514,7 @@ function to_url($params, $strict = true, $rewrite = true)
  *    - else
  *     - unless $recordName.is_a String
  *      - $recordName = $url.getName()
- *     - routes to [$url.class.to_s]/show/[$url.getId()]
+ *     - routes to [$url.class.to_s]/show/[$url.[$url.table.identifier]]
  *  - anything else : returns it.
  * @return string URL modified
  */
@@ -528,14 +528,13 @@ function replace_url($url, $strict = true)
 			global $recordName;
 			if ($url->exists())
 			{ //no way to edit_path, I know. fuck you :3
-				vdump($recordName, $url->toArray());
 				if (method_exists($url, 'getLink') && $recordName !== false)
 					return $url->getLink($recordName);
 				else
 				{
 					if (!is_string($recordName))
 						$recordName = $url->getName();
-					return to_url(array('controller' => get_class($url), 'action' => 'show', 'id' => $url->getId()));
+					return to_url(array('controller' => get_class($url), 'action' => 'show', 'id' => $url->get($url->getTable()->getIdentifier())));
 				}
 			}
 			else
@@ -1086,42 +1085,42 @@ function encode_url_params(array $params = array(), $strict = true, $rewrite = t
 function paginate(Doctrine_Pager_Layout $layout, $sep = ' ')
 {
 	$pager = $layout->getPager();
+	if (!$pager->haveToPaginate())
+		return '';
+
 	$navigation = '';
-	if ($pager->haveToPaginate())
+	$uri = $layout->getUrlMask();
+
+	// First and previous page
+	if ($pager->getPage() != 1)
 	{
-		$uri = $layout->getUrlMask();
- 
-		// First and previous page
-		if ($pager->getPage() != 1)
-		{
-			$navigation .= make_link($uri.'1', make_img('first', EXT_PNG, array('align' => 'absmiddle')));
-			if ($pager->getPage() != 2)
-			{ //if it's the second page, this link is useless ...
-				$navigation .= make_link($uri.$pager->getPreviousPage(), make_img('previous', EXT_PNG, array('align' => 'absmiddle')));
-			}
-			$navigation .= $sep;
+		$navigation .= make_link($uri.'1', make_img('first', EXT_PNG, array('align' => 'absmiddle')));
+		if ($pager->getPage() != 2)
+		{ //if it's the second page, this link is useless ...
+			$navigation .= make_link($uri.$pager->getPreviousPage(), make_img('previous', EXT_PNG, array('align' => 'absmiddle')));
 		}
- 
-		// Pages one by one
-		$links = array();
-		foreach ($layout->getPagerRange()->rangeAroundPage() as $page)
-		{
-			if ($pager->getPage() == $page)
-				$links[] = tag('b', $page);
-			else
-				$links[] = make_link($uri.$page, $page);
+		$navigation .= $sep;
+	}
+
+	// Pages one by one
+	$links = array();
+	foreach ($layout->getPagerRange()->rangeAroundPage() as $page)
+	{
+		if ($pager->getPage() == $page)
+			$links[] = tag('b', $page);
+		else
+			$links[] = make_link($uri.$page, $page);
+	}
+	$navigation .= implode('   ', $links);
+
+	// Next and last page
+	if ($pager->getPage() != $pager->getLastPage())
+	{
+		if ($pager->getLastPage() != $pager->getNextPage())
+		{ //the "last" & "next" page are the same
+			$navigation .= $sep.make_link($uri.$pager->getNextPage(), make_img('next', EXT_PNG, array('align' => 'absmiddle')));
 		}
-		$navigation .= implode('   ', $links);
- 
-		// Next and last page
-		if ($pager->getPage() != $pager->getLastPage())
-		{
-			if ($pager->getLastPage() != $pager->getNextPage())
-			{ //the "last" & "next" page are the same
-				$navigation .= $sep.make_link($uri.$pager->getNextPage(), make_img('next', EXT_PNG, array('align' => 'absmiddle')));
-			}
-			$navigation .= make_link($uri.$pager->getLastPage(), make_img('last', EXT_PNG, array('align' => 'absmiddle')));
-		}
+		$navigation .= make_link($uri.$pager->getLastPage(), make_img('last', EXT_PNG, array('align' => 'absmiddle')));
 	}
  
 	return $navigation;
@@ -1192,14 +1191,29 @@ function input($name, $label, $type = NULL, $value = '', $add = array())
 		$value = str_replace('</', '&lt;/', $value); //remove special chars from $value
 	if ($type === 'textarea')
 	{
-		$type = tag('textarea', $add + array($add, 'name' => $name, 'id' => 'form_' . $name), str_replace('</textarea>', '', $value));
+		if (!defined('FORM_TEXTAREA'))
+		{
+			/*
+			 * hours spent trying to understand why I have to nest this $(function() { ... });
+			 *  in the jQ() one :
+			 *  ACTUALLY MORE THAN 5 HOURS
+			 * This bug exists from the very start of the CMS, I tried to resolve it for hours and hours,
+			 *  and I just figured out that this silly solution is working.
+			 * You may also try to only put this JS at the very end (like jQ('tinymce blah'); echo jQ();),
+			 *  it wouldn't work. Ok anyway, it's resolved now, I won't touch it anymore.
+			 */
+			if (level(LEVEL_ADMIN))
+				jQ('$(function() { $("textarea").tinymce(tinyMCEOpt); });');
+			define('FORM_TEXTAREA', true);
+		}
+		$type = tag('textarea', $add + array($add, 'name' => $name, 'id' => 'form_' . $name), str_replace('</textarea', '', $value));
 	}
 	else if ($type === 'select' || $type == 'record')
 	{
 		if ($type == 'record')
 		{
-			if (!isset($value['getter']))
-				$value['getter'] = 'getName';
+			if (!isset($value['column']))
+				$value['column'] = 'name';
 
 			$t = Doctrine_Core::getTable($value['model']);
 			$identifier = $t->getIdentifier();
@@ -1208,15 +1222,10 @@ function input($name, $label, $type = NULL, $value = '', $add = array())
 				$records = $value['query']->execute();
 			else
 				$records = $t->findAll();
-			$v = array();
 
-			if (!empty($add['empty']))
-				$v['-1'] = lang('empty');
-
-			foreach ($records as $record)
-				$v[$record[$identifier]] = call_user_func(array($record, $value['getter']));
-
-			$value = $v;
+			$value = $records->toKeyValueArray($value['column']);
+			if (!empty($value['empty']))
+				$value['-1'] = lang('empty');
 		}
 
 		if (!isset($selected))

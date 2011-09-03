@@ -5,10 +5,10 @@ $table = ShopItemTable::getInstance();
 /* @var $item Item */
 $preNl = FROM_INCLUDE ? '' : '<br />';
 $loc = FROM_INCLUDE ? to_url(array(
-			'controller' => 'Shop',
-			'action' => 'update',
-			'id' => $item['id'],
-		)) : '#';
+	'controller' => 'Shop',
+	'action' => 'update',
+	'id' => $item['id'],
+)) : '#';
 $fields = array(
 	array('name', lang('name') . '<br />', NULL, $item->name),
 	array('cost', $preNl . sprintf(lang('shop.cost'), $config['POINTS_CREDIT'], $config['POINTS_VOTE'], $config['POINTS_CREDIT_VIP'], $config['POINTS_VOTE_VIP']) . '<br />', NULL, $item->cost),
@@ -16,8 +16,8 @@ $fields = array(
 	array('description', $preNl . lang('content') . '<br />', 'textarea', $item->description),
 	tag('div', array('id' => 'options'), 
 	 input('is_vip', lang('shop.is_vip'), 'checkbox', $item->is_vip) .
-	 input('is_lottery', lang('shop.is_lottery'), 'checkbox', $item->is_vip) .
-	 input('is_hidden', lang('shop.is_hidden'), 'checkbox', $item->is_vip) . tag('br')
+	 input('is_lottery', lang('shop.is_lottery'), 'checkbox', $item->is_lottery) .
+	 input('is_hidden', lang('shop.is_hidden'), 'checkbox', $item->is_hidden) . tag('br')
 	 ),
 );
 /* array( 'type', $preNl . lang( 'action' ) . '<br />', 'select', $types, $item->type ),

@@ -392,10 +392,6 @@ if($c = Cache::start("Account_show_profil_' . $this->guid . '_" . ($connected ? 
 		return $errors;
 	}
 
-	public function getId()
-	{
-		return $this->guid;
-	}
 	public function getMainChar()
 	{
 		if (!$this->Characters->count())

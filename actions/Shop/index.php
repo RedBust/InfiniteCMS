@@ -60,7 +60,7 @@ foreach ($table->getProtectedFilters() as $filter)
 $pager = new Doctrine_Pager($itemsDql, $router->requestVar('page'), $config['ITEM_LINES_BY_PAGE'] * $config['ITEMS_BY_LINE']);
 $items = $pager->execute();
 $url_ary = array('controller' => $router->getController(), 'action' => $router->getAction()) + $search_params + array('page' => '');
-$layout = new Doctrine_Pager_Layout($pager, new Doctrine_Pager_Range_Sliding(array('chunk' => 4)), to_url($url_ary) . '{%page_number}');
+$layout = new Doctrine_Pager_Layout($pager, new Doctrine_Pager_Range_Sliding(array('chunk' => 4)), to_url($url_ary));
 $layout->setTemplate('[<a href="{%url}">{%page}</a>]');
 $layout->setSelectedTemplate('[<b>{%page}</b>]');
 if ($pager->haveToPaginate())

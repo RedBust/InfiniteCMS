@@ -13,7 +13,7 @@ $usersDql = Query::create()
 				->orderBy('u.votes DESC');
 $pager = new Doctrine_Pager($usersDql, $router->requestVar('id', 1), 20); //$config['ARTICLES_BY_PAGE'] );
 $ladder = $pager->execute();
-$layout = new Doctrine_Pager_Layout($pager, new Doctrine_Pager_Range_Sliding(array('chunk' => 4)), to_url(array('controller' => $router->getController(), 'action' => $router->getAction(), 'id' => '')) . '{%page_number}');
+$layout = new Doctrine_Pager_Layout($pager, new Doctrine_Pager_Range_Sliding(array('chunk' => 4)), to_url(array('controller' => $router->getController(), 'action' => $router->getAction(), 'id' => '')));
 $layout->setTemplate('[<a href="{%url}">{%page}</a>]');
 $layout->setSelectedTemplate('[<b>{%page}</b>]');
 
@@ -38,6 +38,4 @@ foreach ($ladder as $user)
 echo '
 </table>';
 
-echo tag('br');
-if ($layout->getPager()->haveToPaginate())
-	$affichage->display();
+echo tag('br'), echo paginate($layout);

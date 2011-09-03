@@ -35,6 +35,7 @@ return array(
 	'Shop - create' => 'Création d\'un objet',					#fake
 	'Shop - update' => 'Édition d\'un objet',
 	'Shop - delete' => 'Suppression d\'un objet',
+	'Shop - search' => 'Recherche d\'objet(s)',
 
 	'Character - ladder' => 'Classement PvM',
 	'Character - search' => 'Recherche de personnage',

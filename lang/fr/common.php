@@ -144,7 +144,7 @@ return array(
 	'shop.item.saved' => 'L\'Objet a bien été sauvegardé !',
 	'shop.item.search' => 'Rechercher un objet',
 	'shop.item.name' => 'Nom de l\'objet',
-	'shop.uncredited_because_admin' => 'Vous n\'avez pas été dé-crédité car vous êtes administrateur.',
+	'shop.undecredited_because_admin' => 'Vous n\'avez pas été dé-crédité car vous êtes administrateur.',
 	'shop.item.no_by_criteria' => 'Aucun objet ne correspond à vos critères de recherche',
 	'shop.need_filter' => 'Vous devez au moins activer un filtre',
 	'shop.check_to_filter' => 'Pour activer un filtre, cochez la case au début de la ligne',
@@ -154,12 +154,13 @@ return array(
 	'shop.any_objects' => 'Aucun objet !',
 	'shop.must_be_logged' => 'Vous devez &ecirc;tre connecté pour avoir accès à la boutique',
 	'shop.!buy_but_credit' => 'Vous n\'avez pas assez de points pour acheter <b>%s</b> !<br />Mais vous pouvez <i>%s</i> ou <i>%s</i> ...%s', // First %s = item to buy, 2 = credit, 3 = vote, 4 = return_back
-	'shop.bought' => 'Vous avez bien acheté <b>%s</b> !<br />Vous recevrez votre cadeau en jeu d\'ici maximum cinq minutes%s', // first %s = item, second = go back
-	'shop.lottery_bought' => 'Vous avez bien acheté <b>%s</b> en Loterie, vous avez reçu <b>%s</b> !<br />Vous recevrez votre cadeau en jeu d\'ici maximum cinq minutes%s', // first %s = item, second = effect (coz lottery), third = go back
+	'shop.bought' => 'Vous avez bien acheté <b>%s</b> !<br />Vous recevrez votre cadeau en jeu d\'ici maximum cinq minutes. Jusqu\'à la réception, vous ne devez ni vous déconnecter ni entrer en combat.', // first %s = item, second = go back
+	'shop.lottery_bought' => 'Vous avez bien acheté <b>%s</b> en Loterie, vous avez reçu <b>%s</b> !<br />Vous recevrez votre cadeau en jeu d\'ici maximum cinq minutes. Jusqu\'à la réception, vous ne devez ni vous déconnecter ni entrer en combat.', // first %s = item, second = effect (coz lottery), third = go back
 	'shop.fill_before_add' => 'Vous devez remplir tous les effets avant d\'en ajouter',
 	'shop.is_vip' => 'VIP',
 	'shop.is_lottery' => 'Loterie',
 	'shop.is_hidden' => 'Caché',
+	'shop.cost_vip_lower' => 'Le coût pour VIP doit être inférieur au coût normal.',
 	'character.does_not_exists' => 'Le personnage n\'existe pas',
 	'character.on_acc' => '<b>%s</b> est sur votre compte', //%s = character name
 	'character.on_acc_of' => '<b>%s</b> est sur le compte de %s', //first %s = character name, second = account pseudo

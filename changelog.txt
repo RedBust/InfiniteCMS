@@ -4,6 +4,7 @@ ban ips
 link to account's profile from character's profileBox (=> unless current page ?)
 consider Event as VIP-only if Reward.is_vip ???
 1.3(?):
+ Fixed THE TinyMCE bug. Ok, I won't touch that crap anymore.
  Fixed Shop#delete redirects to a bad URL
  Added ability to select a reward (ShopItem) and to select a winner in an Event (with jQ.UI.AutoComplete).
   The prize will be given via LiveAction. The ShopItem should'nt be VIP (or should it make the Event for VIP only ?)

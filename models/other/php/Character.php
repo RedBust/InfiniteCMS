@@ -35,10 +35,6 @@ class Character extends BaseCharacter
 			return tag('u', $this->name);
 		return $this->name;
 	}
-	public function getId()
-	{
-		return $this->guid;
-	}
 	//is guild master
 	public function isGM($guild = NULL)
 	{

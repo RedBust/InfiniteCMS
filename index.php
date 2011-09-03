@@ -99,8 +99,8 @@ try
 			&& ( HTTP_CODE == 404 && HTTP_CODE != 301 ))
 		|| defined('LEVEL_FALLBACK')) #301 auth
 		$title = sprintf('(%s)', lang('unknow'));
-	else
-		jQ('tinymce_include();'); //wrong place. I know. Fuck you. (2nd AFAIR)
+#	else
+#		jQ('tinymce_include();'); //wrong place. I know. Fuck you. (2nd AFAIR)
 
 	if ($output)
 	{

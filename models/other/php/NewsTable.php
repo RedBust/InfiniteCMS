@@ -40,7 +40,6 @@ function newsEditPanel(id)
 	
 	if( f )
 	{
-		tinymce_include();
 		f = false;
 	}
 }

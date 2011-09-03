@@ -14,8 +14,7 @@ if (!( $item = Query::create()
 	$title = lang($router->getController() . ' - create', 'title');
 }
 
-$sent = count($_POST) > 0;
-if ($sent)
+if ($sent = ( count($_POST) > 0 ))
 {
 	$col = $router->requestVar('col', '');
 	$vals = $_POST;

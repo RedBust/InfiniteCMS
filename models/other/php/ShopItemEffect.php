@@ -43,7 +43,7 @@ class ShopItemEffect extends BaseShopItemEffect
 
 		if ($this->type === NULL || $this->type == -1 //should not happen but ...
 			|| (!$this->isItem() && $this->getValue() === 0 ))
-			continue; //null effect ?
+			return ''; //null effect ?
 
 		$signe = ''; //+ or -
 		$showType = true;
@@ -72,7 +72,7 @@ class ShopItemEffect extends BaseShopItemEffect
 		$type = $types[$this->type];
 		if ($type[0] == $signe)
 			$type = substr($type, 1);
-		return tag('li', array('style' => array('color' => $color)), '<b>' . $signe . '</b><u>' . $val . '</u> '
+		return tag('span', array('style' => array('color' => $color)), '<b>' . $signe . '</b><u>' . $val . '</u> '
 				. ( $showType ? $type : '<span class="hideThis">' . $type . '</span>' ));
 	}
 

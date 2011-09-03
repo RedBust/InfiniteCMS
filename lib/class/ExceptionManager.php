@@ -57,7 +57,7 @@ class ExceptionManager extends Exception
 	 */
 	static public function cantCreate($file)
 	{
-		throw new self(sprintf('Unable to create %s', $file));
+		throw new self(sprintf('Unable to create %s. If it already exists, try to delete it then hit F5 to reload the page.', $file));
 	}
 
 	/**
@@ -66,15 +66,14 @@ class ExceptionManager extends Exception
 	 * @param string $class
 	 * @param string $method
 	 * @return string
-	 *
-	 * @access protected
 	 */
 	protected static function _getClassFor($class, $method)
 	{
 		if ($class[0] == '!')
 		{
 			$class = substr($class, 1); //don't add class
-		} elseif (strpos('::', $class) === false) //no class
+		}
+		else if (strpos('::', $class) === false) //no class
 		{
 			$class = explode('::', $method);
 			$class = $class[0] . '::' . $class;
@@ -83,11 +82,9 @@ class ExceptionManager extends Exception
 	}
 
 	/**
-	 * return the last called method, with file+line
+	 * returns the last called method, with file+line (except this one + the caller)
 	 *
 	 * @param $backtrace_index Where to start the backtrace ? (default : 1, with 0 the method calling this method'd be returned)
-	 * 
-	 * @access protected
 	 */
 	protected static function _getLastMethodCalled($backtrace_index = 1)
 	{

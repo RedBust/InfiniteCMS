@@ -89,7 +89,7 @@ class Event extends BaseEvent
 					jQ('
 var form_char = $("#form_char").autocomplete(
 {
-	source: ' . json_encode($this->Participants->getKeyArray('name')) . ',
+	source: ' . json_encode($this->Participants->toKeyValueArray('name')) . ',
 	select: function (event, ui)
 	{
 		form_char.val(ui.item.value);

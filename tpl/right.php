@@ -21,14 +21,14 @@
 							 . input('send_login', NULL, 'hidden')
 							 . '<input class="ok" type="submit" value="" />');
 							if ($config['ENABLE_REG']):
-								echo tag('ul', tag('li', make_link(new Account, '+ ' . lang('Account - create', 'title'))));
+								echo tag('ul', tag('li', make_link(array('controller' => 'Account', 'action' => 'create'), '+ ' . lang('Account - create', 'title'))));
 							endif;
 						endif;
 					?>
 					</div>
 					<?php if ($connected && $mainChar = $account->getMainChar()): ?>
 					<div class="module2 mainChar">
-						<div class="title slideMenu" style="margin-left: 20px;">
+						<div class="title" style="margin-left: 20px;">
 							<?php
 							echo make_link($mainChar);
 							if ($account->Characters->count() > 1)
@@ -56,7 +56,7 @@
 					<div class="module4">
 						<div class="title slideMenu" style="margin-left: 20px;"><?php echo lang('part.count') ?></div>
 						<?php
-						if (!level(LEVEL_LOGGED) && $cache = Cache::start('layout_right_stats', '+1 hour')):
+						if (level(LEVEL_LOGGED) ? true : $cache = Cache::start('layout_right_stats', '+1 hour')):
 						//I don't see any reason for caching when logged? since we already load one table
 						// (the biggest memory "blow" is done at the first Doctrine_Core::getTable())
 							$created = array();

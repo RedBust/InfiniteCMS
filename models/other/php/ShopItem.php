@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Item
+ * ShopItem
  *
  * @package    InfiniteCMS
  * @subpackage Models
@@ -16,7 +16,11 @@ class ShopItem extends BaseShopItem
 			return;
 
 		if ($this->is_lottery)
-			$p->give($shopItem->Effects[rand(0, $shopItem->Effects->count())]);
+		{
+			$effect = $this->Effects[rand(0, $this->Effects->count())];
+			$p->give($effect);
+			return $effect;
+		}
 		else
 		{
 			foreach ($this->Effects as $effect)
@@ -38,7 +42,8 @@ class ShopItem extends BaseShopItem
 		if( $columns === NULL ) //WHERE vip & hidden ? for VIP-destined draw.
 			$columns = array('description', 'name', 'cost', 'cost_vip', 'is_vip', 'is_lottery', 'is_hidden');
 		if( is_string( $columns ) )
-			$columns = explode( ';', $columns ); 
+			$columns = explode( ';', $columns );
+		$prev = $this->exists() ? $this->toArray() : array();
 
 		foreach ((array)$columns as $t)
 		{
@@ -51,7 +56,7 @@ class ShopItem extends BaseShopItem
 			}
 			else
 			{
-				if (substr($t, 0, 3) == 'is_')
+				if (substr($t, 0, 3) == 'is_' )
 				{
 					$values[$t] = isset($values[$t]) && ( $values[$t] == 'on' || $values[$t] == '1' );
 				}
@@ -61,6 +66,19 @@ class ShopItem extends BaseShopItem
 				else
 					$this->$t = $values[$t];
 			}
+		}
+		if ($this->cost_vip < $this->cost)
+		{
+			if (empty($prev['cost_vip']))
+				$this->cost_vip = $this->cost - 1; //shouldn't eq:0
+			else
+			{
+				if ($this->cost > $prev['cost_vip'])
+					$this->cost = $prev['cost'];
+
+				$this->cost_vip = $prev['cost_vip'];
+			}	
+			$errors[] = lang('shop.cost_vip_lower');
 		}
 		if (!empty( $values['type'] ) && !empty( $values['value'] ) )
 		{
@@ -123,7 +141,7 @@ class ShopItem extends BaseShopItem
 			<ul>';
 			foreach ($this->Effects as &$effect)
 			{
-				$effects .= $effect;
+				$effects .= tag('li', $effect);
 			}
 			$effects .= '
 			</ul>';
@@ -143,7 +161,7 @@ class ShopItem extends BaseShopItem
 		 $this->getCostInfo(),
 		 $this->getTypesInfo(),
 		 $effects,
-		 ( level(LEVEL_LOGGED) ? ( $account->getMainChar() === NULL || $account->User->canPurchase($this) ? '' : $this->getPurchaseLink()) : '' ),
+		 ( level(LEVEL_LOGGED) && $account->User->canPurchase($this) ? $this->getPurchaseLink() : '' ),
 		 ( level(LEVEL_ADMIN) ? tag('br') . $this->getUpdateLink() . '<br />' . $this->getDeleteLink() : '' ));
 	}
 

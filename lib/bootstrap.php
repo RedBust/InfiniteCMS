@@ -238,7 +238,7 @@ if (!DEV)
 		);
 
 	if (DEBUG)
-		$mem .= memory_get_usage() . ': Models loaded ... - ' . __FILE__ . ':' . __LINE__ . '<br />';
+		$mem .= ($prev_mem = memory_get_usage()) . ': Models loaded ... - ' . __FILE__ . ':' . __LINE__ . '<br />';
 
 	if (!empty($_SESSION['guid']))
 	{ //retrieve account
@@ -253,6 +253,8 @@ if (!DEV)
 						->where('guid = ?', $_SESSION['guid']);
 		$account = $accountQ->fetchOne();
 		unset($accountQ);
+#		exit('Memory used by ONE Query from Account WHERE guid = ? fetchOne WITHOUT ANY JOIN + Query object free\'d + unset\'d : ' . ( memory_get_usage() - $prev_mem));
+#		for those answering : the result is 4 221 424 (1 try only, it's not an average)
 		if ($account)
 		{
 			if (!$account->relatedExists('User'))

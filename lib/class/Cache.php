@@ -61,7 +61,7 @@ class Cache
 			foreach ($dir as $d)
 			{
 				$cDir .= $d . '/';
-				if (!@mkdir($cDir))
+				if (!file_exists($cDir) && !@mkdir($cDir))
 					throw ExceptionManager::cantCreate('cache dir (' . $cDir . ')');
 			}
 		}

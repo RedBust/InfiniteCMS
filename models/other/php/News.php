@@ -65,9 +65,11 @@ class News extends BaseNews
 			else
 				$this->$t = $values[$t];
 		}
-		$this->Author = $account->User;
+		if (!$this->exists())
+			$this->Author = $account->User;
 		if ($errors == array())
 		{
+			Cache::destroyPrefix(__CLASS__);
 			$this->save();
 		}
 
@@ -99,17 +101,11 @@ class News extends BaseNews
 			$edit_link = js_link('newsEditPanel( ' . $this['id'] . ' )', lang('act._edit'), to_url($params['update']), array('class' => 'edit_link_' . $this['id']));
 
 		return ( $router->getAction() == 'index' ? make_link($params['show'], $title) : $title ) .
-		 ( $auth ?
-		  '  ' . $edit_link . ' ' .
-		  make_link($params['delete'], lang('act.delete')) : '' );
+		 ( $auth ? ' ' . $edit_link . ' ' . make_link($params['delete'], lang('act.delete')) : '' );
 	}
 
 	public function getName()
 	{
 		return $this->title;
-	}
-	public function getId()
-	{
-		return $this->id;
 	}
 }

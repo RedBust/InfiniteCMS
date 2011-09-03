@@ -10,7 +10,7 @@ $reviewsDql = Query::create()
 /* @var $newsDql Query */
 $pager = new Doctrine_Pager($reviewsDql, $router->requestVar('id', 0), $config['RATES_BY_PAGE']);
 $reviews = $pager->execute();
-$affichage = new Doctrine_Pager_Layout( $pager, new Doctrine_Pager_Range_Sliding(array('chunk' => 4)), to_url(array('controller' => $router->getController(), 'action' =>  $router->getAction(), 'id' => '')) . '{%page_number}');
+$affichage = new Doctrine_Pager_Layout( $pager, new Doctrine_Pager_Range_Sliding(array('chunk' => 4)), to_url(array('controller' => $router->getController(), 'action' =>  $router->getAction(), 'id' => '')));
 $affichage->setTemplate('[<a href="{%url}" class="link">{%page}</a>]');
 $affichage->setSelectedTemplate('[<b>{%page}</b>]');
 if ($reviews->count())
@@ -39,8 +39,7 @@ if ($reviews->count())
 		 sprintf(lang('created'), $review['created_at']),
 		 $review['comment']);
 	}
-	if ($reviews->count() >= $config['RATES_BY_PAGE'])
-		$affichage->display();
+	echo paginate($layout);
 }
 else
 	echo lang('rate.any');

@@ -27,10 +27,6 @@ if (count($_POST) < 1 || $errors != array())
 }
 elseif (count($_POST) > 0 && $errors == array())
 {
-	Cache::destroyPrefix($router->getController());
-	if ($headers)
-	{
-		echo lang('news.saved') . make_link('@root', lang('back_to_index'));
-		redirect(array('controller' => $router->getController(), 'action' => 'show', 'id' => $news['id']));
-	}
+	echo lang('news.saved') . make_link('@root', lang('back_to_index'));
+	redirect(array('controller' => $router->getController(), 'action' => 'show', 'id' => $news['id']));
 }

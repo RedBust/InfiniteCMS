@@ -52,8 +52,7 @@ if ($persos->count())
 		array('character', lang('name'), NULL, $char),
 	)), str_repeat(tag('br'), 3);
 	$persos->ladderDisplay(($layout->getPager()->getPage() - 1) * $config['LADDER_LIMIT'], $char);
-	if ($layout->getPager()->haveToPaginate())
-		$layout->display();
+	echo paginate($layout);
 }
 else
 	echo tag('b', lang('acc.ladder.no_character'));
