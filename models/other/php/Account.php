@@ -169,14 +169,36 @@ if($c = Cache::start("Account_show_profil_' . $this->guid . '_" . ($connected ? 
 		return $mainChar->GuildMember->guild == $e->guild_id;
 	}
 
-	public function getCharactersList($accordion = false)
+	/**
+	 * returns characters list as string, to select something
+	 *
+	 * @param bool $accordion format for accordion (h3 + p) ?
+	 * @param array $exclude characters ID to exclude from being SELECTED (still shown, may modify this behavior later)
+	 * @param string $fn the JS function to call. You must include the 1st parenthesis (that allows to call, i.e. ...(.., .., 'doWTFYaWant(1, 3, ')
+	 * @param mixed $normalLink link for replacement in js_link
+	 *
+	 * @return string html (jq-ui-accordeon'able if $accordion) list
+	 */
+	public function getCharactersList($accordion = false, $exclude = array(), $fn = 'choosePerso(', $normalLink = array())
 	{
+		if (empty($exclude))
+			$exclude = array();
+		else if (!is_array($exclude))
+			$exclude = array($exclude);
+
+		if (is_array($fn) && empty($normalLink))
+		{
+			$normalLink = $fn;
+			$fn = NULL;
+		}
+
 		if ($this->Characters->count())
 		{
 			$persos = '';
 			foreach ($this->Characters as $character)
 			{ //@todo refactor to allow molet-clic
-				$persos .= $character->toString(true, $accordion) . js_link('choosePerso(' . $character->guid . ' )', lang('choose')) .
+				$persos .= $character->toString(true, $accordion) .
+				 (in_array($character->guid, $exclude) ? '' : js_link($fn . $character->guid . ')', lang('choose'), to_url($normalLink).$character->guid)) .
 				 ($accordion ? "</p></div>\n" : tag('br') . tag('br'));
 			}
 			return $persos;

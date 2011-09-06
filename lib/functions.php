@@ -871,6 +871,12 @@ function js_link($js, $text, $link = '#', $add = array(), $event = NULL)
 		$in = false;
 
 	static $JSs = array();
+
+	if ($js === NULL)
+	{
+		return make_link($link, $text, array(), $add);
+	}
+
 	if (!$event)
 		$event = 'click';
 	$event = (array) $event;
@@ -1223,7 +1229,7 @@ function input($name, $label, $type = NULL, $value = '', $add = array())
 			else
 				$records = $t->findAll();
 
-			$value = $records->toKeyValueArray($value['column']);
+			$value = $records->toValueArray($value['column']);
 			if (!empty($value['empty']))
 				$value['-1'] = lang('empty');
 		}
@@ -1506,6 +1512,7 @@ function make_form($columns, $loc = '#', $opts = array())
 	$str = render_errors();
 	$temp = '';
 	$first = true;
+
 	foreach ($columns as $i => $column)
 	{
 		if (empty($column))
@@ -1547,6 +1554,13 @@ function make_form($columns, $loc = '#', $opts = array())
 			$temp = ''; //reset the temp data
 		}
 	}
+
+	//highly experimental, do not use
+	if ($opts['method'] == Router::POST && empty($opts['disable_csrf']))
+	{
+		$str .= input_csrf_token();
+	}
+
 	unset($temp);
 	if ($loc === '#')
 	{
@@ -1565,6 +1579,16 @@ function make_form($columns, $loc = '#', $opts = array())
 	if ($opts['submit_text'] !== NULL)
 		$str .= input('send', $opts['submit_text'], 'submit', NULL, $opts['submit_add']);
 	return $opts['append_form_tag'] ? tag('form', array('method' => $opts['method'], 'action' => $loc, 'id' => 'form'), $str) : $str;
+}
+
+function input_csrf_token()
+{
+	if (!defined('CSRF_TOKEN'))
+	{ //_csrf_token shouldn't be already defined
+		define('CSRF_TOKEN', $_SESSION['_csrf_token'] = md5(rand(0, 999)));
+	}
+
+	return input('_csrf_token', NULL, 'hidden', CSRF_TOKEN);
 }
 
 /**

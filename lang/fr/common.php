@@ -190,6 +190,9 @@ return array(
 Votre personnage principal a été changé (vous pouvez le voir dans le menu, en dessous des informations sur votre compte).<br />
 Votre personnage principal est le personnage qui recevra vos commandes boutique, qui sera celui inscrit aux évènements et, s\'il mène une guilde, il pourra organiser des évènements pour celui-ci. En outre, dans les messages privés, ce sera le personnage montré.<br /><b>Note :</b> vous pouvez le changer à tout moment via l\'icone à côté de son nom. La modification n\'est pas rétro-active, c\'est-à-dire que si vous vous êtes inscrit avec un autre personnage à un évènement (par exemple), celui-ci ne prendra pas sa place.',
 	'character.main.lempty' => 'Vous n\'avez pas de personnage.', //lempty = list empty
+	'character.main.req_>1' => 'Vous devez avoir plus d\'un personnage pour changer de personnage principal.',
+	'character.main.modified' => 'Votre personnage principal a bien été modifié',
+	'character.main.warpd' => 'Votre personnage principal <b>%s</b> a bien été téléporté à la carte de départ. Reconnectez-vous pour que les modifications prennent effet.',
 
 	'acc.register.accept_tos' => 'J\'accepte les ' . make_link('@tos', 'Conditions Générales d\'utilisations'), //ugly ? no, it's ONLY a link.
 	'acc.register.password' => 'Mot de passe',

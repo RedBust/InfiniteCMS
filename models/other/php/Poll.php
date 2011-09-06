@@ -35,13 +35,13 @@ class Poll extends BasePoll
 		return $this->_get('name');
 	}
 
-	public function maj($vals)
+	public function update_attributes($vals)
 	{
 		$errors = array();
 
 		if (!empty($vals['name']))
 			$this->name = $vals['name'];
-		else if (!$this->exists())
+		else if ($this->exists() ? empty($vals['name']) : true)
 			$errors['name'] = sprintf(lang('must_!empty'), lang('name'));
 
 		$pre_dates = $dateTimes = array();

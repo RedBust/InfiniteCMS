@@ -16,10 +16,11 @@
 						else:
 							$pseudo = $router->postVar( Member::CHAMP_PSEUDO );
 							echo tag('form', array('method' => 'POST', 'action' => replace_url('@sign_in'), 'id' => 'login_form'),
-							   input(Member::CHAMP_PSEUDO, NULL, NULL, $pseudo, array('class' => 'text'))
-							 . input(Member::CHAMP_PASS, NULL, 'password', array('class' => 'pwd'))
-							 . input('send_login', NULL, 'hidden')
-							 . '<input class="ok" type="submit" value="" />');
+							 input(Member::CHAMP_PSEUDO, NULL, NULL, $pseudo, array('class' => 'text')) .
+							 input(Member::CHAMP_PASS, NULL, 'password', array('class' => 'pwd')) .
+							 input('send_login', NULL, 'hidden') .
+							 '<input class="ok" type="submit" value="" />' .
+							 input_csrf_token());
 							if ($config['ENABLE_REG']):
 								echo tag('ul', tag('li', make_link(array('controller' => 'Account', 'action' => 'create'), '+ ' . lang('Account - create', 'title'))));
 							endif;
@@ -32,7 +33,7 @@
 							<?php
 							echo make_link($mainChar);
 							if ($account->Characters->count() > 1)
-								echo '&nbsp;', js_link('mainCharSelector.dialog("show")', make_img('user_edit', EXT_PNG), array('controller' => 'Character', 'action' => 'main'));
+								echo '&nbsp;', js_link('mainCharSelector.dialog("open");', make_img('icons/user_edit', EXT_PNG), array('controller' => 'Character', 'action' => 'main'));
 							?>
 						</div>
 						<ul>

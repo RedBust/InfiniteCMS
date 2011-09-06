@@ -13,7 +13,7 @@ if (!empty($_POST))
 		$col = array();
 	else //replace $vals
 		$vals = array($col => $_POST['update_value']);
-	$errors = $category->maj($vals, $col);	
+	$errors = $category->update_attributes($vals, $col);	
 	if (!empty($col) && !is_array($col))
 		exit(nl2br($category[$col]));
 }

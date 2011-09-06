@@ -64,7 +64,7 @@ $mem .= memory_get_usage() . ': Avant controller+action<br />';
 try
 {
 	ob_start();
-	$file_include = str_replace(DS.$infos['action'], DS.'_include', $router->getPath());
+	$file_include = str_replace(DS . $infos['action'], DS . '_include', $router->getPath());
 	if (file_exists($file_include) && substr($file_include, -1) != DS)
 		require_once $file_include;
 	$error = tag('br') . tag('p',

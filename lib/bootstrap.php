@@ -219,23 +219,39 @@ if (!DEV)
 
 	//Shop item types
 	$types = array(
-			ShopItemEffectTable::TYPE_LEVEL_UP => lang('shop.level_up'),
-			-2 => lang('shop._add'),
-			ShopItemEffectTable::TYPE_ADD_XP => lang('shop.xp'),
-			ShopItemEffectTable::TYPE_ADD_K => lang('shop.K'),
-			ShopItemEffectTable::TYPE_ADD_CAPITAL => lang('shop.capital'),
-			ShopItemEffectTable::TYPE_ADD_SPELLPOINT => lang('shop.spellpoint'),
-			-3 => lang('shop._items'),
-			ShopItemEffectTable::TYPE_ITEM_JETS_ALEATOIRES => lang('shop.item_random'),
-			ShopItemEffectTable::TYPE_ITEM_JETS_MAX => lang('shop.item_perfect'),
-			-4 => lang('shop._stats'),
-			ShopItemEffectTable::TYPE_CARAC_FORCE => lang('shop.stat.strength'),
-			ShopItemEffectTable::TYPE_CARAC_AGILITE => lang('shop.stat.agility'),
-			ShopItemEffectTable::TYPE_CARAC_CHANCE => lang('shop.stat.chance'),
-			ShopItemEffectTable::TYPE_CARAC_SAGESSE => lang('shop.stat.wisdom'),
-			ShopItemEffectTable::TYPE_CARAC_VITALITE => lang('shop.stat.vitality'),
-			ShopItemEffectTable::TYPE_CARAC_INTELLIGENCE => lang('shop.stat.intell'),
-		);
+		//TODO all those have to be moved to LiveActionTable ...
+		ShopItemEffectTable::TYPE_LEVEL_UP => lang('shop.level_up'),
+		-2 => lang('shop._add'),
+		ShopItemEffectTable::TYPE_ADD_XP => lang('shop.xp'),
+		ShopItemEffectTable::TYPE_ADD_K => lang('shop.K'),
+		ShopItemEffectTable::TYPE_ADD_CAPITAL => lang('shop.capital'),
+		ShopItemEffectTable::TYPE_ADD_SPELLPOINT => lang('shop.spellpoint'),
+		-3 => lang('shop._items'),
+		ShopItemEffectTable::TYPE_ITEM_JETS_ALEATOIRES => lang('shop.item_random'),
+		ShopItemEffectTable::TYPE_ITEM_JETS_MAX => lang('shop.item_perfect'),
+		-4 => lang('shop._stats'),
+		ShopItemEffectTable::TYPE_CARAC_FORCE => lang('shop.stat.strength'),
+		ShopItemEffectTable::TYPE_CARAC_AGILITE => lang('shop.stat.agility'),
+		ShopItemEffectTable::TYPE_CARAC_CHANCE => lang('shop.stat.chance'),
+		ShopItemEffectTable::TYPE_CARAC_SAGESSE => lang('shop.stat.wisdom'),
+		ShopItemEffectTable::TYPE_CARAC_VITALITE => lang('shop.stat.vitality'),
+		ShopItemEffectTable::TYPE_CARAC_INTELLIGENCE => lang('shop.stat.intell'),
+	);
+
+	//this is highly experimental, do not use
+	if (!empty($_SESSION['_csrf_token']) && $router->isPost())
+	{
+		$requestToken = $router->postVar('_csrf_token');
+		if ($requestToken === $_SESSION['_csrf_token']) //using === here is VERY SIGNIFICANT
+			unset($_SESSION['_csrf_token']); //remove that token.
+		else
+		{
+			if (DEBUG)
+				exit('invalid token');
+			else
+				define('HTTP_CODE', 404);
+		}
+	}
 
 	if (DEBUG)
 		$mem .= ($prev_mem = memory_get_usage()) . ': Models loaded ... - ' . __FILE__ . ':' . __LINE__ . '<br />';
@@ -254,7 +270,7 @@ if (!DEV)
 		$account = $accountQ->fetchOne();
 		unset($accountQ);
 #		exit('Memory used by ONE Query from Account WHERE guid = ? fetchOne WITHOUT ANY JOIN + Query object free\'d + unset\'d : ' . ( memory_get_usage() - $prev_mem));
-#		for those answering : the result is 4 221 424 (1 try only, it's not an average)
+#		for those asking : the result is 4 221 424 (1 try only, it's not an average)
 		if ($account)
 		{
 			if (!$account->relatedExists('User'))

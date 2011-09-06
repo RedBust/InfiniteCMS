@@ -13,7 +13,7 @@ if (!empty($_POST))
 		$col = array();
 	else //replace $vals
 		$vals = array($col => $_POST['update_value']);
-	$errors = $poll->maj($vals, $col);	
+	$errors = $poll->update_attributes($vals, $col);	
 	if (!empty($col) && !is_array($col))
 	{
 		$val = $poll[$col];
@@ -26,7 +26,7 @@ if (empty($_POST) || $errors != array())
 {
 	partial('_form', array('poll'), PARTIAL_CONTROLLER);
 }
-elseif (!empty($_POST) && $errors == array() && $headers)
+else if (!empty($_POST) && $errors == array() && $headers)
 {
 	echo lang('poll.saved') . make_link('@root', lang('back_to_index'));
 	redirect(array('controller' => $router->getController(), 'action' => 'show', 'id' => $poll['id']));

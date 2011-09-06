@@ -10,9 +10,9 @@ $reviewsDql = Query::create()
 /* @var $newsDql Query */
 $pager = new Doctrine_Pager($reviewsDql, $router->requestVar('id', 0), $config['RATES_BY_PAGE']);
 $reviews = $pager->execute();
-$affichage = new Doctrine_Pager_Layout( $pager, new Doctrine_Pager_Range_Sliding(array('chunk' => 4)), to_url(array('controller' => $router->getController(), 'action' =>  $router->getAction(), 'id' => '')));
-$affichage->setTemplate('[<a href="{%url}" class="link">{%page}</a>]');
-$affichage->setSelectedTemplate('[<b>{%page}</b>]');
+$layout = new Doctrine_Pager_Layout( $pager, new Doctrine_Pager_Range_Sliding(array('chunk' => 4)), to_url(array('controller' => $router->getController(), 'action' =>  $router->getAction(), 'id' => '')));
+$layout->setTemplate('[<a href="{%url}" class="link">{%page}</a>]');
+$layout->setSelectedTemplate('[<b>{%page}</b>]');
 if ($reviews->count())
 {
 	foreach ($reviews as $review)

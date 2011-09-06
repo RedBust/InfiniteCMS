@@ -9,6 +9,9 @@ define('ROOT_ACTIONS', ROOT . 'actions/');
  */
 class Router extends Multiton
 {
+	const GET = 'GET',
+		POST = 'POST';
+
 	protected $def_controller = 'Index',
 	$def_action = 'index',
 	$def_ext = EXT,
@@ -16,7 +19,7 @@ class Router extends Multiton
 		'ext' => array(
 			'/' => EXT, //fallback value
 		),
-			),
+	),
 	$_controller = false,
 	$_action = false,
 	$_ext = false,
@@ -462,5 +465,19 @@ class Router extends Multiton
 		$a = $a === NULL ? $this->getAction() : $a;
 		$e = $this->getExtFor($e);
 		return ROOT_ACTIONS . $c . DS . $a . $e;
+	}
+
+
+	public function isMethod($method)
+	{
+		return $_SERVER['REQUEST_METHOD'] == $method;
+	}
+	public function isPost()
+	{
+		return $this->isMethod(self::POST);
+	}
+	public function isGet()
+	{
+		return $this->isMethod(self::GET);
 	}
 }

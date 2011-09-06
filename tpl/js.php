@@ -11,16 +11,17 @@ errorDiv.dialog( dialogOpt );
 
 <?php if (level(LEVEL_LOGGED)): ?>
 function chooseMainChar(character)
-{
+{ //not using followLink to refresh mainChar panel
 	document.location = "<?php echo to_url(array(
 				'controller' => 'User',
 				'action' => 'main',
 				'id' => ''
 			)) ?>" + character;
 }
-var mainCharSelector = $("#selectMainChar").accordion({clearStyle: true, collapsible: true, active: false});
+var mainCharSelector = $("#selectMainChar").dialog(dialogOpt);
+$('#charactersList').accordion({clearStyle: true, collapsible: true, active: false});
 <?php if (defined('IN_PM') && IN_PM): ?>
-//THIS IS CRAPPY TO DO REMOVE THAT
+//THIS IS CRAPPY @TO DO REMOVE THAT
 updateSelectorsDisabled.push('#pm');
 <?php else: ?>
 $("#pm").dialog(dialogOpt);
@@ -201,9 +202,10 @@ lang["FORM.MUST_SPECIFY_pa"] = <?php echo javascript_val(lang('acc.login.spec_pa
 var LoginForm_force = false, //force to submit ?
 	LoginForm_processing = false, //in AJaX request
 
-	field_pseudo = $('#form_<?php echo Member::CHAMP_PSEUDO ?>'),
-	field_pass = $('#form_<?php echo Member::CHAMP_PASS ?>');
-$('#login_form').submit(function(event)
+	form_login = $('#login_form'),
+	field_pseudo = form_login.find('#form_<?php echo Member::CHAMP_PSEUDO ?>'),
+	field_pass = form_login.find('#form_<?php echo Member::CHAMP_PASS ?>');
+form_login.submit(function(event)
 {
 	if (LoginForm_force)
 		return;

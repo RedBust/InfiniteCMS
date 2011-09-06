@@ -41,6 +41,7 @@ return array(
 	'Character - search' => 'Recherche de personnage',
 	'Character - show' => 'Vue de personnage',
 	'Character - give' => 'Faire un don',
+	'Character - warp' => 'Téléporter le personnage principal',
 
 	'Guild - show' => 'Informations sur la guilde %s',
 

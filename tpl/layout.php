@@ -61,7 +61,7 @@
 				'id' => 'selectMainChar',
 				'style' => 'display: none;',
 				'title' => lang('character.main'),
-			), $account->getCharactersList(true)),
+			), tag('div', array('id' => 'charactersList'), $account->getCharactersList(true, $account->getMainChar() ? $account->getMainChar()->guid : array(), 'chooseMainChar('))),
 			tag('div', array(
 				'id' => 'pm',
 				'style' => 'display: none;',

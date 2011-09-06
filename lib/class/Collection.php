@@ -26,14 +26,9 @@ class Collection extends Doctrine_Collection
 			$this->add($rec);
 	}
 
-	public function toKeyValueArray($key, $val = NULL)
+	public function toValueArray($val = NULL)
 	{
-		if ($val === NULL)
-		{
-			$val = $key;
-			$key = $this->getTable()->getIdentifier();
-		}
-		return parent::toKeyValueArray($key, $val);
+		return parent::toKeyValueArray($this->getTable()->getIdentifier(), $val);
 	}
 
 	/**
