@@ -47,6 +47,50 @@ var href,
 
 	inbox_html = '&nbsp;<?php echo make_link('@pm', make_img('icons/email', EXT_PNG, lang('PrivateMessage - index', 'title')), array(), array('data-unless-selector' => '#pm')) ?>';
 
+function populateContent(data)
+{
+	binds.process('before');
+	<?php if ($config['LOAD_TYPE'] === LOAD_MDIALOG): ?>
+	loader.dialog('close');
+	<?php endif ?>
+	//we need path because of URL rewriting
+	//@todo: check if the path which have to be used is not the one from the 1st page loaded
+	servInfo.css('background', 'url(' + data[1] + 'static/templates/<?php echo $config['template'] ?>/images/status' + data[2] + '.<?php echo EXT_JPG ?>');
+	pm_info.html(data[3]);
+	if (data[3] == '') //no mp
+		pm_inbox.html(inbox_html);
+	else
+		pm_inbox.html('');
+
+	if (data[4] != '')
+	{
+		$.each(updateSelectorsDisabled, function (k, v)
+		{
+			if (v == data[4])
+			{
+				data[4] = '';
+				return false;
+			}
+		});
+	}
+	if (data[4] != '')
+	{ //may have changed
+		var updateElement = $(data[4]);
+		console.log(updateElement.length);
+		if (updateElement.length)
+			updateElement.html(data[5]);
+		else
+			data[4] = '';
+	}
+	if (data[4] == '')
+	{
+		milieu.html(data[5]);
+		document.title = data[0];
+	}
+	in_ajax = false;
+	binds.process('after');
+	binds.reset();
+}
 function updateContent(URL)
 {
 	if( in_ajax )
@@ -62,49 +106,9 @@ function updateContent(URL)
 		url: URL,
 		success: function (data)
 		{
-			binds.process('before');
-			<?php if ($config['LOAD_TYPE'] === LOAD_MDIALOG): ?>
-			loader.dialog('close');
-			<?php endif ?>
 			//data = Title<~>Path<~>Status<~>PM Info<~>update selector<~>DOM
 			data = explode('<~>', data, 6);
-			//we need path because of URL rewriting
-			//@todo: check if the path which have to be used is not the one from the 1st page loaded
-			servInfo.css('background', 'url(' + data[1] + 'static/templates/<?php echo $config['template'] ?>/images/status' + data[2] + '.<?php echo EXT_JPG ?>');
-			pm_info.html(data[3]);
-			if (data[3] == '') //no mp
-				pm_inbox.html(inbox_html);
-			else
-				pm_inbox.html('');
-
-			if (data[4] != '')
-			{
-				$.each(updateSelectorsDisabled, function (k, v)
-				{
-					if (v == data[4])
-					{
-						data[4] = '';
-						return false;
-					}
-				});
-			}
-			if (data[4] != '')
-			{ //may have changed
-				var updateElement = $(data[4]);
-				console.log(updateElement.length);
-				if (updateElement.length)
-					updateElement.html(data[5]);
-				else
-					data[4] = '';
-			}
-			if (data[4] == '')
-			{
-				milieu.html(data[5]);
-				document.title = data[0];
-			}
-			in_ajax = false;
-			binds.process('after');
-			binds.reset();
+			populateContent(data);
 			if (popState)
 			{
 				popState = false;

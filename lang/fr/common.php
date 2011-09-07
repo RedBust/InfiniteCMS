@@ -61,6 +61,7 @@ return array(
 	'incorrect_type' => 'Type incorrect',
 	'incorrect_value' => 'Valeur incorrecte',
 	'datetime' => 'Date et heure',
+	'category' => 'Catégorie',
 
 	'must_!empty' => 'Le champ "%s" ne doit pas &ecirc;tre vide', //%s = name of input
 	'incorrect_date' => '"%s" : date incorrecte',
@@ -439,8 +440,6 @@ Vous pouvez vous inscrire %register%.{/register}{log}-->{/log}', //{log} = if lo
 	'mail.subject' => 'Sujet de l\'e-mail',
 	'mail.msg' => 'Message',
 	'mail.sent' => 'Message envoyé à %d personnes', //expecting you're not the only one on your server :p
-
-	'ticket_category.new' => 'Nouvelle catégorie',
 
 	'pm.receivers' => 'Destinataires <i>(uniquement les personnes qui vous ont dans vos amis)</i>',
 	'pm.any' => 'Vous n\'avez aucun message privé.',

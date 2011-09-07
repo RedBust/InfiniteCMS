@@ -13,6 +13,7 @@ $fields = array(
 	array('name', lang('name') . '<br />', NULL, $item->name),
 	array('cost', $preNl . sprintf(lang('shop.cost'), $config['POINTS_CREDIT'], $config['POINTS_VOTE'], $config['POINTS_CREDIT_VIP'], $config['POINTS_VOTE_VIP']) . '<br />', NULL, $item->cost),
 	array('cost_vip', $preNl . lang('cost_vip') . '<br />', NULL, $item->cost_vip),
+	array('category_id', $preNl . lang('category') . '<br />', 'record', array('type' => 'one', 'model' => 'ShopCategory'), $item->category_id),
 	array('description', $preNl . lang('content') . '<br />', 'textarea', $item->description),
 	tag('div', array('id' => 'options'), 
 	 input('is_vip', lang('shop.is_vip'), 'checkbox', $item->is_vip) .

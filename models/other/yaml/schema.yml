@@ -35,9 +35,20 @@ Comment:
       local: author_id
       foreign: id
 
+ShopCategory:
+  connection: other
+  columns:
+    name: varchar(255)
+  relations:
+    Items:
+      class: ShopItem
+      type: many
+      local: id
+      foreign: category_id
 ShopItem:
   connection: other
   columns:
+    category_id: int(9)
     name: varchar(255)
     cost: integer(9)
     cost_vip: integer(9)
@@ -57,6 +68,11 @@ ShopItem:
       type: many
       local: id
       foreign: item_id
+    Category:
+      class: ShopCategory
+      type: one
+      local: category_id
+      foreign: id
 ShopItemEffect:
   connection: other
   columns:

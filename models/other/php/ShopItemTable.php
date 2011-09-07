@@ -12,15 +12,15 @@ class ShopItemTable extends RecordTable
 {
 	public function getNumericCols()
 	{
-		return array('cost', 'cost_vip', 'value');
+		return array('cost', 'cost_vip', 'value', 'category_id');
 	}
 	public function getAllFilters()
 	{
-		return array('name', 'cost', 'cost2', 'is_lottery', 'is_vip', 'is_hidden');
+		return array('name', 'cost', 'cost2', 'cat', 'is_lottery', 'is_vip', 'is_hidden');
 	}
 	public function getFilters()
 	{
-		$filters = array('name', 'cost', 'cost2', 'is_lottery');
+		$filters = array('name', 'cat', 'cost', 'cost2', 'is_lottery');
 		if (level(LEVEL_VIP))
 			$filters[] = 'is_vip';
 		if (level(LEVEL_ADMIN))
@@ -40,6 +40,8 @@ class ShopItemTable extends RecordTable
 		{
 			$search_val[$filter] = $router->requestVar($filter) ?: '';
 		}
+		if ($search_val['cat'] === '')
+			$search_val['cat'] = -1;
 
 		$options = tag_open('div', array('id' => 'options')) . '>';
 		$options .= input('is_lottery', lang('shop.is_lottery'), 'checkbox', $search_val['is_lottery']);
@@ -52,15 +54,17 @@ class ShopItemTable extends RecordTable
 
 		return tag('b', lang('shop.check_to_filter'))
 		  . make_form(array(
-				array('e_name', NULL, 'checkbox', '1', array(), false),
-				array('name', '&nbsp;' . lang('shop.item.name') . '&nbsp;', NULL, $search_val['name']),
-				array('e_cost', NULL, 'checkbox', '1', array(), false),
-				array('cost', '&nbsp;'
-				 . sprintf(lang('shop.cost_simple'), $config['POINTS_CREDIT' . (level(LEVEL_VIP) ? '_VIP' : '')], $config['POINTS_VOTE' . (level(LEVEL_VIP) ? '_VIP' : '')]) . ', '
-				 . lang('between') . '&nbsp;',
-				 NULL, intval($search_val['cost']), array(), false),
-				array('cost2', '&nbsp;' . lang('and') . '&nbsp;', NULL, intval($search_val['cost2'])),
-				$options
+			 array('e_name', NULL, 'checkbox', '1', array(), false),
+			 array('name', '&nbsp;' . lang('shop.item.name') . '&nbsp;', NULL, $search_val['name']),
+			 array('e_cat', NULL, 'checkbox', '1', array(), false),
+			 array('cat', '&nbsp;' . lang('category'), 'record', array('empty' => true, 'type' => 'one', 'model' => 'ShopCategory'), $search_val['cat']),
+			 array('e_cost', NULL, 'checkbox', '1', array(), false),
+			 array('cost', '&nbsp;' .
+			  sprintf(lang('shop.cost_simple'), $config['POINTS_CREDIT' . (level(LEVEL_VIP) ? '_VIP' : '')], $config['POINTS_VOTE' . (level(LEVEL_VIP) ? '_VIP' : '')]) . ', ' .
+			  lang('between') . '&nbsp;',
+			  NULL, intval($search_val['cost']), array(), false),
+			 array('cost2', '&nbsp;' . lang('and') . '&nbsp;', NULL, intval($search_val['cost2'])),
+			 $options
 			));
 	}
 }

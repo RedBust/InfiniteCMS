@@ -4,7 +4,7 @@ return array(
 	//Titres des pages
 	'News - index' => 'Index',
 	'News - show' => 'Vue d\'une news',
-	'News - create' => 'Création d\'une news',					#fake
+	'News - create' => 'Création d\'une news',								#fake
 	'News - update' => 'Édition d\'une news',
 	'News - delete' => 'Suppression d\'une news',
 	'News - comment' => 'Commenter',
@@ -13,15 +13,15 @@ return array(
 	'Account - create' => 'Inscription',
 	'Account - update' => 'Gestion de compte',
 	'Account - show' => 'Informations sur un compte',
-	'Account - list' => 'Liste des comptes',					#admin
-	'Account - mass_mail' => 'E-mail de masse',					#admin
+	'Account - list' => 'Liste des comptes',								#admin
+	'Account - mass_mail' => 'E-mail de masse',								#admin
 
 	'User - ladder_vote' => 'Classement vote',
 	'User - login' => 'Connexion',
 	'User - delog' => 'Déconnexion',
 	'User - credit' => 'Créditer son compte',
 	'User - vote' => 'Vote',
-	'User - update' => 'Gestion des informations de compte',	#admin
+	'User - update' => 'Gestion des informations de compte',				#admin
 
 	'Misc - staff' => 'L\'équipe',
 	'Misc - tos' => 'Conditions générales d\'utilisation',
@@ -32,10 +32,14 @@ return array(
 
 	'Shop - index' => 'Boutique',
 	'Shop - show' => 'Achat d\'un objet',
-	'Shop - create' => 'Création d\'un objet',					#fake
-	'Shop - update' => 'Édition d\'un objet',
-	'Shop - delete' => 'Suppression d\'un objet',
-	'Shop - search' => 'Recherche d\'objet(s)',
+	'Shop - create' => 'Création d\'un objet boutique',						#fake
+	'Shop - update' => 'Édition d\'un objet boutique',
+	'Shop - delete' => 'Suppression d\'un objet boutique',
+	'Shop - search' => 'Recherche d\'objet boutique',
+
+	'ShopCategory - create' => 'Création d\'une catégorie d\'objet',	#fake
+	'ShopCategory - update' => 'Édition d\'une catégorie d\'objet',
+	'ShopCategory - delete' => 'Suppression d\'une catégorie d\'objet',
 
 	'Character - ladder' => 'Classement PvM',
 	'Character - search' => 'Recherche de personnage',

@@ -40,7 +40,7 @@ class ShopItem extends BaseShopItem
 		global $types;
 		$errors = array();
 		if( $columns === NULL ) //WHERE vip & hidden ? for VIP-destined draw.
-			$columns = array('description', 'name', 'cost', 'cost_vip', 'is_vip', 'is_lottery', 'is_hidden');
+			$columns = array('description', 'name', 'cost', 'category_id', 'cost_vip', 'is_vip', 'is_lottery', 'is_hidden');
 		if( is_string( $columns ) )
 			$columns = explode( ';', $columns );
 		$prev = $this->exists() ? $this->toArray() : array();
@@ -67,7 +67,9 @@ class ShopItem extends BaseShopItem
 					$this->$t = $values[$t];
 			}
 		}
-		if ($this->cost_vip < $this->cost)
+		if (!$this->relatedExists('Category'))
+			$errors[] = sprintf(lang('must_!empty'), lang('category'));
+		if ($this->cost < $this->cost_vip)
 		{
 			if (empty($prev['cost_vip']))
 				$this->cost_vip = $this->cost - 1; //shouldn't eq:0

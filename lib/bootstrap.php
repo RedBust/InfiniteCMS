@@ -247,7 +247,7 @@ if (!DEV)
 		else
 		{
 			if (DEBUG)
-				exit('invalid token');
+				echo 'invalid token<hr />'; //simple notice ...
 			else
 				define('HTTP_CODE', 404);
 		}

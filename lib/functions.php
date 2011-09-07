@@ -1218,6 +1218,7 @@ function input($name, $label, $type = NULL, $value = '', $add = array())
 	{
 		if ($type == 'record')
 		{
+			$addEmpty = !empty($value['empty']);
 			if (!isset($value['column']))
 				$value['column'] = 'name';
 
@@ -1230,7 +1231,7 @@ function input($name, $label, $type = NULL, $value = '', $add = array())
 				$records = $t->findAll();
 
 			$value = $records->toValueArray($value['column']);
-			if (!empty($value['empty']))
+			if ($addEmpty)
 				$value['-1'] = lang('empty');
 		}
 
