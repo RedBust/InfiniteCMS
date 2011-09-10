@@ -319,7 +319,7 @@ if (level(LEVEL_ADMIN))
 	$level_opt = array();
 	$levels = Member::getLevels();
 	unset($levels[LEVEL_GUEST]);
-	foreach (array_reverse($levels) as $val => $text)
+	foreach (array_reverse($levels, true) as $val => $text)
 		$level_opt[] = '"' . floatval($val) . '": "' . $text . '"';
 	$level_opt = implode(', ', $level_opt);
 	jQ('var level_opts = {' . $level_opt . '};');

@@ -132,17 +132,17 @@ categories.tabs({selected: ' . $selected . '});');
 	$layout->setSelectedTemplate('[<b>{%page}</b>]');
 	echo paginate($layout);
 
+	//not used in case of any (all)objects
+	$search_url = array(
+		'controller' => $router->getController(),
+		'action' => $router->getAction(),
+		'mode' => 'search',
+	);
+
 	if ($items->count() || count($search_params))
 	{
 		$i = 0; //where are we in da items foreash ?
 		$items->shopDisplay();
-
-		//not used in case of any objects
-		$search_url = array(
-			'controller' => $router->getController(),
-			'action' => $router->getAction(),
-			'mode' => 'search',
-		);
 		foreach ($filter_names as $filter_name)
 		{
 			if (isset($search_params[$filter_name]))
@@ -203,6 +203,7 @@ categories.tabs({selected: ' . $selected . '});');
 	</div>
 </div>';
 
+	if (count($allItems))
 		echo tag('br') . js_link('searchItem.dialog("open");', tag('h1', lang('shop.item.search')), to_url($search_url)) .
 		 tag('div', array(
 			'style' => 'display: none;',

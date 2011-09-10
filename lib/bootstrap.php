@@ -239,8 +239,10 @@ if (!DEV)
 	);
 
 	//this is highly experimental, do not use
-	if (!empty($_SESSION['_csrf_token']) && $router->isPost())
-	{
+	if (!empty($_SESSION['_csrf_token']) && !isset($_REQUEST['update_value']) && $router->isPost())
+	{ //disable _csrf_token if using edit in place (I currently have no other solution :<)
+	 //the way I see that would be having a JS var _csrf_token which eIP would send WITH the actual form
+	 //and this is what I'm gonna do when I'll have free time + motive to edit that script ...
 		$requestToken = $router->postVar('_csrf_token');
 		if ($requestToken === $_SESSION['_csrf_token']) //using === here is VERY SIGNIFICANT
 			unset($_SESSION['_csrf_token']); //remove that token.
