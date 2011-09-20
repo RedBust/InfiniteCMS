@@ -62,6 +62,7 @@ return array(
 	'incorrect_value' => 'Valeur incorrecte',
 	'datetime' => 'Date et heure',
 	'category' => 'Catégorie',
+	'move_to' => 'Déplacer vers',
 
 	'must_!empty' => 'Le champ "%s" ne doit pas &ecirc;tre vide', //%s = name of input
 	'incorrect_date' => '"%s" : date incorrecte',
@@ -162,6 +163,7 @@ return array(
 	'shop.is_lottery' => 'Loterie',
 	'shop.is_hidden' => 'Caché',
 	'shop.cost_vip_lower' => 'Le coût pour VIP doit être inférieur au coût normal.',
+	'shop.cat.move_items_to' => 'Déplacer les objets dans cette catégorie vers',
 	'character.does_not_exists' => 'Le personnage n\'existe pas',
 	'character.on_acc' => '<b>%s</b> est sur votre compte', //%s = character name
 	'character.on_acc_of' => '<b>%s</b> est sur le compte de %s', //first %s = character name, second = account pseudo
@@ -174,6 +176,7 @@ return array(
 	'character.item_no' => '<b>%s</b> n\'a pas d\'objets.', //%s = character name
 	'character.item' => 'objet',
 	'character.spell' => 'sort',
+	'character.prefix_name' => 'Préfixe au nom du personnage',
 	'character.search' => 'Chercher un personnage',
 	'character.spell_name' => 'Nom du sort',
 	'character.spell_level' => 'Niveau du sort',
@@ -183,7 +186,7 @@ return array(
 	'character._rank_of' => '<b>%s</b> chez %s',
 	'character.guild_infos' => '<b>%s</b> appartient à la guilde %s, niveau %d.', //%1: character name | %2: guild emblem + guild name, %d: guild level
 	'character.give' => 'Faire un don',
-	'character.given' => 'Vous avez donné une action de type <b>%s</b> avec la valeur <b>%s</b> à <b>%s</b>', //1 => effect name. 2 = effect value. 3 = character name
+	'character.given' => 'Vous avez donné une action de type <b>%s</b> avec la valeur <b>%s</b> à <b>%s</b>.', //1 => effect name. 2 = effect value. 3 = character name
 	'character.!on_acc' => 'Le personnage n\'existe pas ou n\'est pas sur votre compte.',
 	'character.!on_event' => 'Le personnage n\'existe pas ou ne participe pas à cet évènement.',
 	'character.main' => 'Personnage principal',
@@ -324,6 +327,7 @@ Vous pouvez vous inscrire %register%.{/register}{log}-->{/log}', //{log} = if lo
 
 	'poll.new' => 'Nouveau sondage',
 	'poll.any' => 'Il n\'y a pas de sondage actuellement.',
+	'poll.elapsed' => 'Ce sondage est terminé',
 	'poll.date.start' => 'Date de départ',
 	'poll.date.end' => 'Date de fin',
 	'poll.not_exists' => 'Le sondage %d n\'existe pas',
@@ -441,10 +445,10 @@ Vous pouvez vous inscrire %register%.{/register}{log}-->{/log}', //{log} = if lo
 	'mail.msg' => 'Message',
 	'mail.sent' => 'Message envoyé à %d personnes', //expecting you're not the only one on your server :p
 
-	'pm.receivers' => 'Destinataires <i>(uniquement les personnes qui vous ont dans vos amis)</i>',
+	'pm.receivers' => 'Destinataires <i>(uniquement les personnes que vous avez en ami, et réciproquement)</i>',
 	'pm.any' => 'Vous n\'avez aucun message privé.',
 	'pm.info' => '<b>%s</b>, avec %s. ',
-	'pm.last_answer_by_on' => 'Dernière message de %s, le %s.',
+	'pm.last_answer_by_on' => 'Dernier message de %s, le %s.',
 	'pm.does_not_exist' => 'Cette conversation n\'existe pas, ou vous n\'y participez pas.',
 	'pm.back' => 'Revenir à la boîte de réception',
 	'pm.answer' => 'Répondre',

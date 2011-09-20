@@ -1,6 +1,6 @@
 <?php
-//this file is out of layout because you want to modify it manytimes more you
-// want to edit the global layout. This avoid mistakes.
+//this file is out of layout because you may edit it lots more than you
+// may wanna edit the global layout. This avoids any mistake.
 //Ce fichier est en-dehors du layout pour vous permettre de modifier le menu en étant sûr de ne pas toucher au reste
 if ($config['URL_VOTE'] != -1):
 ?>
@@ -23,7 +23,7 @@ if ($config['URL_VOTE'] != -1):
 		</li>
 		<?php endif ?>
 		<li>
-			<?php echo make_link('@staff', '~ ' . lang('Misc - staff', 'title')) ?>
+			<?php echo make_link('@staff', '~ ' . lang('StaffRole - index', 'title')) ?>
 		</li>
 		<li>
 			<?php echo make_link('@tos', '~ ' . lang('menu.rules')) ?>
@@ -59,7 +59,8 @@ if ($config['URL_VOTE'] != -1):
 		</li>
 		<?php
 		endif;
-		if ($config['ENABLE_SHOP']): ?>
+		if ($config['ENABLE_SHOP']):
+		?>
 		<li>
 			<?php echo make_link('@shop', '~ ' . lang('shop.title')) ?>
 		</li>
@@ -90,10 +91,10 @@ if ($config['URL_VOTE'] != -1):
 	<div class="title slideMenu"><?php echo lang('part.admin') ?>  </div>
 		<ul>
 			<li>
-				<?php echo make_link('@character.search', lang('acc.find')) ?>
+				<?php /*@todo move this to interactiv ?*/ echo make_link('@character.search', lang('acc.find')) ?>
 			</li>
 			<li>
-				<?php echo make_link('@mass_mail', lang('Account - mass_mail', 'title')) ?>
+				<?php echo make_link('@mass_mail', lang('Misc - mass_mail', 'title')) ?>
 			</li>
 		</ul>
 </div>

@@ -10,27 +10,8 @@
  */
 class ShopItemEffectTable extends RecordTable
 {
-	const TYPE_LEVEL_UP = 1,
+	const TYPE_ADD_PREFIX = 300;
 
-		TYPE_ADD_XP = 2,
-		TYPE_ADD_K = 3,
-		TYPE_ADD_CAPITAL = 4,
-		TYPE_ADD_SPELLPOINT = 5,
-
-		TYPE_ITEM_JETS_ALEATOIRES = 20,
-		TYPE_ITEM_JETS_MAX = 21,
-
-		TYPE_CARAC_FORCE = 118,
-		TYPE_CARAC_AGILITE = 119,
-		TYPE_CARAC_CHANCE = 123,
-		TYPE_CARAC_SAGESSE = 124,
-		TYPE_CARAC_VITALITE = 125,
-		TYPE_CARAC_INTELLIGENCE = 156,
-
-		//mAncestra
-		TYPE_ADD_PA = 6,
-		TYPE_ADD_PM = 7,
-		TYPE_RESTAT = 10;
 
 	/**
 	 * items
@@ -52,31 +33,30 @@ class ShopItemEffectTable extends RecordTable
 	protected function _initItems()
 	{
 		if( $this->items === array() )
-			$this->items = lang( NULL, 'item' );
+			$this->items = lang(NULL, 'item');
 	}
 
 	/**
 	 * Determinates if the type is an item
 	 *
 	 * @param integer $type The type of the item
-	 * @access public
-	 * @static
+	 *
 	 * @return boolean whether it's an item or not ?
 	 */
 	public function isItem($type)
 	{
-		if( $type instanceof ShopItemEffect || is_array( $type ) )
+		if ($type instanceof ShopItemEffect || is_array($type))
 			$type = $type['type'];
 
-		return in_array( intval( $type ), $this->getItemTypes() );
+		return in_array(intval($type), LiveActionTable::getInstance()->getItemTypes());
 	}
-
-	public function getItemTypes()
+	public function isLiveAction($type)
 	{
-		return array( self::TYPE_ITEM_JETS_ALEATOIRES, self::TYPE_ITEM_JETS_MAX );
+		if ($type instanceof ShopItemEffect || is_array($type))
+			$type = $type['type'];
+
+		return in_array(intval($type), LiveActionTable::getInstance()->getTypes());
 	}
-
-
 
 	/**
 	 * doFindItem
@@ -91,11 +71,11 @@ class ShopItemEffectTable extends RecordTable
 	public function doFindItem($id)
 	{
 		$this->_initItem();
-		if( $id instanceof ItemEffect )
-			return $this->doFindItemIf( $id->value, $this->isItem( $id ) );
+		if ($id instanceof ItemEffect)
+			return $this->doFindItemIf($id->value, $this->isItem($id));
 
-		$id = intval( $id );
-		return isset( $this->items[$id] ) ? $this->items[$id] : sprintf( lang( 'shop.item.not_exists' ), $id );
+		$id = intval($id);
+		return isset($this->items[$id]) ? $this->items[$id] : sprintf(lang('shop.item.not_exists'), $id);
 	}
 	/**
 	 * doFindByName
@@ -111,7 +91,7 @@ class ShopItemEffectTable extends RecordTable
 	public function doFindByName($n)
 	{
 		$this->_initItems();
-		return array_search( $n, $this->items );
+		return array_search($n, $this->items);
 	}
 	/**
 	 * doFindItemIf
@@ -125,7 +105,7 @@ class ShopItemEffectTable extends RecordTable
 	 * @param boolean $c The condition
 	 * @return Doctrine_Record|$i Doctrine_Record instance if the item exists && $c, else $i
 	 */
-	public function doFindItemIf($i, $c) { return $c ? $this->doFindItem( $i ) : $i; }
+	public function doFindItemIf($i, $c) { return $c ? $this->doFindItem($i) : $i; }
 	/**
 	 * doFindItemUnless
 	 * execute a doFindItem UNLESS ...
@@ -138,21 +118,21 @@ class ShopItemEffectTable extends RecordTable
 	 * @param boolean $c The condition
 	 * @return Doctrine_Record|$i Doctrine_Record instance if the item exists && !$c, else $i
 	 */
-	public function doFindItemUnless($i, $c) { return $this->doFindItemIf( $i, !$c ); }
+	public function doFindItemUnless($i, $c) { return $this->doFindItemIf($i, !$c); }
 
 
 	/** @var $templates ItemTemplate[] */
 	protected $templates = array();
 	public function doFindItemTemplate($id)
 	{
-		if( $id instanceof ShopItemEffect )
+		if ($id instanceof ShopItemEffect)
 			$id = $id->value;
-		if( !isset( $this->templates[$id] ) )
+		if (!isset( $this->templates[$id]))
 		{
-			$this->templates[$id] = ItemTemplateTable::getInstance()->find( $id ); //fetch the record
+			$this->templates[$id] = ItemTemplateTable::getInstance()->find($id); //fetch the record
 		}
 		return $this->templates[$id];
 	}
-	public function doFindItemTemplateIf($i, $c) { return $c ? $this->doFindItemTemplate( $i ) : $c; }
-	public function doFindItemTemplateUnless($i, $c) { return $this->doFindItemTemplateIf( $i, !$c ); }
+	public function doFindItemTemplateIf($i, $c) { return $c ? $this->doFindItemTemplate($i) : $c; }
+	public function doFindItemTemplateUnless($i, $c) { return $this->doFindItemTemplateIf($i, !$c); }
 }

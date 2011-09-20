@@ -2,7 +2,7 @@
 if (!check_level(LEVEL_ADMIN))
 	return;
 
-if (NULL !== ( $title = $router->requestVar('title') ) && NULL !== ( $body = $router->requestVar('body') ))
+if (NULL !== ( $subject = $router->requestVar('subject') ) && NULL !== ( $body = $router->requestVar('body') ))
 {
 	$accountsQ = Query::create()
 							->select('email')
@@ -17,12 +17,12 @@ if (NULL !== ( $title = $router->requestVar('title') ) && NULL !== ( $body = $ro
 	{
 		$recipients[] = $account['email'];
 	}
-	mail(implode(', ', $recipients), $title, $content);
+	mail(implode(', ', $recipients), $subject, $content);
 }
 else
 {
-	echo tag('h1', lang()), make_form(array(
-		array('title', NULL, lang('mail.title')),
-		array('body', 'textarea', lang('content')),
+	echo tag('h1', lang('Misc - mass_mail', 'title')), make_form(array(
+		array('subject', lang('mail.subject') . tag('br')),
+		array('body', tag('br') . lang('content'), 'textarea'),
 	));
 }

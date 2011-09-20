@@ -505,6 +505,8 @@ function to_url($params, $strict = true, $rewrite = true)
  *   - else
  *    - routes to $url
  *  - an array : routes to key/value pairs
+ *  - a Doctrine_Table object :
+ *   - routes to [table.recordName]/index
  *  - a Doctrine_Record object :
  *   - if !$url.exists? :
  *    - routes to [$url.class.to_s]/update
@@ -544,6 +546,8 @@ function replace_url($url, $strict = true)
 				return to_url(array('controller' => get_class($url), 'action' => 'update')); //Account#update redirects to #create ;)
 			}
 		}
+		else if ($url instanceof Doctrine_Table)
+			return to_url(array('controller' => substr(get_class($url), 0, -5), 'action' => 'index'));
 		else if (is_array($url))
 			return to_url($url);
 		else
@@ -951,8 +955,14 @@ function make_link($_url, $n = NULL, $opt = array(), $add = array(), $js = true)
 			unset($recordName);
 		}
 	}
+	else if ($_url instanceof Doctrine_Table)
+	{
+		$url = replace_url($_url);
+		if (empty($n))
+			$n = lang(substr(get_class($url), -6) . ' - index', 'title');
+	}
 	else
-	$url = replace_url($_url);
+		$url = replace_url($_url);
 
 	if (is_array($url) && ( $opt === array() || $opt === NULL ))
 	{
@@ -1219,8 +1229,13 @@ function input($name, $label, $type = NULL, $value = '', $add = array())
 		if ($type == 'record')
 		{
 			$addEmpty = !empty($value['empty']);
-			if (!isset($value['column']))
+			if (!isset($value['displayMethod']))
+				$value['displayMethod'] = NULL;
+			if (!isset($value['column']) && empty($value['displayMethod']))
 				$value['column'] = 'name';
+			if (method_exists($value['model'], $dMethod = 'get'.Doctrine_Inflector::classify($value['column']))
+			 && ($value['displayMethod'] === NULL || $value['displayMethod'] === true))
+				$value['displayMethod'] = $dMethod;
 
 			$t = Doctrine_Core::getTable($value['model']);
 			$identifier = $t->getIdentifier();
@@ -1230,9 +1245,26 @@ function input($name, $label, $type = NULL, $value = '', $add = array())
 			else
 				$records = $t->findAll();
 
-			$value = $records->toValueArray($value['column']);
+			$exclude = isset($value['exclude']) ? (array) $value['exclude'] : array();
+
+			if (empty($value['displayMethod']))
+				$value = $records->toValueArray($value['column']);
+			else
+			{
+				$method = $value['displayMethod'];
+				$value = array();
+				foreach ($records as $record)
+					$value[$record[$identifier]] = $record->$method();
+			}
+
 			if ($addEmpty)
 				$value['-1'] = lang('empty');
+
+			if (count($exclude))
+			{
+				foreach ($exclude as $exc)
+					unset($value[$exc]);
+			}
 		}
 
 		if (!isset($selected))
@@ -1246,7 +1278,7 @@ function input($name, $label, $type = NULL, $value = '', $add = array())
 
 		$pre_html = $post_html = '';
 		global $calendar_opts;
-		$params = array('type' => $type, 'name' => $name, 'value' => $value, 'id' => 'form_' . $name);
+		$params = array('type' => $type, 'name' => $name, 'value' => $value);
 		switch ($params['type'])
 		{
 			case 'date':
@@ -1299,11 +1331,11 @@ function input($name, $label, $type = NULL, $value = '', $add = array())
 				$params['type'] = 'text';
 				if (is_array($params['name']))
 				{
-					$to_name = empty($params['name'][1]) ? $params['name'] . '2' : $params['name'][1];
+					$to_name = empty($params['name'][1]) ? $params['name'][0] . '2' : $params['name'][1];
 					$params['name'] = $params['name'][0];
 				}
 				else
-					$to_name = $params['name'] . '2';
+					$to_name = $name . '2';
 
 				jQ(sprintf('dates[%d] = jQuery("#form_%s, #form_%s").datepicker(
 					{
@@ -1354,7 +1386,8 @@ function input($name, $label, $type = NULL, $value = '', $add = array())
 				}
 				$params['value'] = 'on';
 		}
-		extract($params);
+		$params['id'] = 'form_' . $params['name'];
+		$name = $params['name'];
 		$type = $pre_html . tag('input', array_merge($params, $add)) . $post_html;
 	}
 	$opts_label = array('for' => 'form_' . $name);

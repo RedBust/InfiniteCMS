@@ -73,9 +73,8 @@
 		<div id="contenteur"><!-- Template and div id's from Woa, not me :p -->
 		<?php
 		echo tag('div', array('id' => 'header'),
-		 "\n\t\t\t\t" . tag('div', array('class' => 'play'),
-		  "\n\t\t\t\t\t" . make_link('@join', make_img('playr', EXT_PNG)) . "\n\t\t\t\t") .
-		 "\n\t\t\t") //not so clean :/
+		 tag('div', array('class' => 'play'),
+		  make_link('@join', make_img('playr', EXT_PNG)))) //not so clean :/
 		?>
 
 			<div id="contenu">
@@ -90,12 +89,15 @@
 				</div>
 			</div>
 			<!--div id="footer">
+				THIS IS A FOOTER, SO RIGHT SO GOOD ISN'T IT (AC, actually commented. Don't you know how to remove <!-- and -- > ?!
 				<!--InfiniteCMS <?php echo VERSION ?> by Nami-Doc. 2009-<?php echo date('Y') ?> -- >
 			</div-->
 			<?php
 			if ($config['JAVASCRIPT']):
 				partial('js', PARTIAL_FULL);
-				echo jQ(); ?>
+				echo jQ();
+				//I should remove the script tag from here ...
+			?>
 			</script>
 			<?php endif ?>
 		</div>

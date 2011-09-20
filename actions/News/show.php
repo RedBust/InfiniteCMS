@@ -6,9 +6,10 @@ if ($id == -1)
 	return;
 }
 if ($cache = Cache::start($router->getController() . '_show_' . $id .
-	 '_' . (int)level(LEVEL_ADMIN)))
+	 '_' . $member->getLevel()))
 {
-	if (!( $news = NewsTable::getInstance()->createQuery('n')
+	if (!( $news = NewsTable::getInstance()
+							->createQuery('n')
 							->where('n.id = ?', $id)
 							->leftJoin('n.Author u')
 								->leftJoin('u.Account a')
@@ -43,14 +44,7 @@ binds.add(function ()
 		/* @var $com Comment */
 		if ($config['MAX_COMMENTS'] != -1 && ++$com_actual > $config['MAX_COMMENTS'])
 			break; //stop the foreach if we reached the limit
-		$date = explode(' ', $com['created_at']);
-		$date = sprintf(lang('at'), $date[0], $date[1]);
-		if ($com->relatedExists('Author') && $com->Author->relatedExists('Account'))
-			$author = sprintf(lang('by'), make_link(array('controller' => 'Account', 'action' => 'show', 'id' => $com->Author->guid), $com->Author->Account->pseudo));
-		$coms = tag('h3', array('class' => 'comment-date'), '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' . tag('span', array('class' => 'comment-title'), $com['title']) . ' - <i>' .
-						sprintf(lang('created'), $date) . ( empty($author) ? '' : ' ' . $author ) . '</i>' .
-						( level(LEVEL_ADMIN) ? make_link(to_url(array('controller' => $router->getController(), 'action' => 'comment', 'mode' => 'censor', 'id' => $com['id'])), lang('censor'), array(), array(), false) : '')) .
-				tag('div', array('class' => 'comment-content', 'data-id' => $com['id'], 'style' => 'height: 220px !important;'), nl2br(News::format($com['content']))) . $coms; //xss protection already done
+		$coms = $com . $coms;
 	}
 	unset($com);
 	$coms = sprintf('
@@ -86,7 +80,7 @@ binds.add(function ()
 					<!-- -->
 				</div>', make_link(array('controller' => $router->getController(), 'action' => 'index'), lang('back_to_index')),
 			$news->buildLinks(),
-			sprintf(lang('by'), $news->relatedExists('Author') && $news->Author->relatedExists('Account') ? make_link($news->Author->Account) : '?'), sprintf(lang('created'), $news['created_at']), $news['updated_at'] && $news['updated_at'] != $news['created_at'] ? sprintf(lang('last_update'), $news['updated_at']) : '',
+			$news->getAuthorString(), sprintf(lang('created'), $news['created_at']), $news['updated_at'] && $news['updated_at'] != $news['created_at'] ? sprintf(lang('last_update'), $news['updated_at']) : '',
 			News::format($news['content']),
 			$config['MAX_COMMENTS'] == 0 ? '<!--' : '', //comments are disabled
 			( $canComment ? js_link('$( "#form_coms").slideToggle(); $("#comments").slideToggle();', $comsTitle) : ( count($news->Comments) ? $comsTitle : '' )),
@@ -100,11 +94,11 @@ binds.add(function ()
 	if (level(LEVEL_ADMIN))
 	{
 		$url = to_url(array(//URL for editInPlace of the title of the news
-					'controller' => $router->getController(),
-					'action' => 'update',
-					'col' => 'title',
-					'output' => 0,
-					'id' => $news->id,
+			'controller' => $router->getController(),
+			'action' => 'update',
+			'col' => 'title',
+			'output' => 0,
+			'id' => $news->id,
 		), false);
 		$url_com = array(
 			'_base' => array(//url for editInPlace of the content of a comment

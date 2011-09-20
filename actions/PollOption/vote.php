@@ -10,6 +10,11 @@ if (!( $poll_option = Query::create()
 	echo lang('poll.option.not_exists');
 	return;
 }
+if ($poll_option->Poll->isElapsed())
+{
+	define('HTTP_CODE', 404);
+	return;
+}
 if (!$account->User->canVote($poll_option->Poll))
 {
 	echo lang('poll.option.cannot_vote');

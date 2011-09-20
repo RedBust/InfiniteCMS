@@ -88,39 +88,43 @@ if (count($categories))
 		$category = isset($allowCats[0]) ? $categories[$allowCats[0]] : NULL;
 
 	$url_ary = array_merge(array('controller' => $router->getController(), 'action' => $router->getAction()), $search_params);
-	if (count($allowCats) > 0 && !$raw)
+	if (count($allowCats) > 0)
 	{
 		$url_ary['cat'] = $category->id;
-		echo '
-<div id="categories">
-	<ul>';
-		$selected = 0;
-		$hasSelected = false;
-		foreach ($allowCats as $cat)
+
+		if (!$raw)
 		{
-			$cat = $categories[$cat];
-			$cat_url = to_url(array_merge($url_ary, array('cat' => $cat->id, 'raw' => 1, 'ajaxData' => 0)));
-
-			if (!$hasSelected)
+			echo '
+	<div id="categories">
+		<ul>';
+			$selected = 0;
+			$hasSelected = false;
+			foreach ($allowCats as $cat)
 			{
-				if ($cat->id == $category->id)
-					$hasSelected = true;
-				else
-					++$selected;
+				$cat = $categories[$cat];
+				$cat_url = to_url(array_merge($url_ary, array('cat' => $cat->id, 'raw' => 1, 'ajaxData' => 0)));
+
+				if (!$hasSelected)
+				{
+					if ($cat->id == $category->id)
+						$hasSelected = true;
+					else
+						++$selected;
+				}
+
+				echo tag('li', $cat->id == $category->id ? tag('a', array('href' => '#cat-' . $cat->id), $cat->getName()) :
+				  make_link($cat_url, $cat->getName(), array(), array('data-href' => $cat_url), false));
 			}
+			if ($selected >= count($allowCats))
+				$selected = count($allowCats) - 1;
 
-			echo tag('li', $cat->id == $category->id ? tag('a', array('href' => '#cat-' . $cat->id), $cat->name) :
-			  make_link($cat_url, $cat->name, array(), array('data-href' => $cat_url), false));
+			echo '
+		</ul>
+		<div id="cat-' . $category->id . '">';
+			jQ('
+	var categories = $("#categories");
+	categories.tabs({selected: ' . $selected . '});');
 		}
-		if ($selected >= count($allowCats))
-			$selected = count($allowCats) - 1;
-
-		echo '
-	</ul>
-	<div id="cat-' . $category->id . '">';
-		jQ('
-var categories = $("#categories");
-categories.tabs({selected: ' . $selected . '});');
 	}
 
 	if ($category !== NULL)
@@ -223,7 +227,7 @@ if (level(LEVEL_ADMIN) && !$raw)
 {
 	if ($categories->count())
 		echo tag('br') . make_link(array('controller' => $router->getController(), 'action' => 'update'), lang('act.new'));
-	echo tag('br') . make_link(array('controller' => 'ShopCategory', 'action' => 'update'), lang('ShopCategory - create', 'title'));
+	echo tag('br') . make_link(array('controller' => 'ShopCategory', 'action' => 'index'), lang('ShopCategory - index', 'title'));
 }
 $categories->free(true);
 unset($categories);

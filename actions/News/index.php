@@ -37,20 +37,18 @@ if ($cache = Cache::start($router->getController() . '_index_' . intval($p = $ro
 					</div>
 				</div>',
 					$new['id'], $new->buildLinks(),
-					sprintf(lang('by'), $new->relatedExists('Author') && $new->Author->relatedExists('Account') ? make_link($new->Author->Account) : '?'), sprintf(lang('created'), $new['created_at']), $new['updated_at'] && $new['updated_at'] != $new['created_at'] ? sprintf(lang('last_update'), $new['updated_at']) : '', pluralize(lang('news.com.title'), count($new['Comments']), true),
+					$new->getAuthorString(), sprintf(lang('created'), $new['created_at']), $new['updated_at'] && $new['updated_at'] != $new['created_at'] ? sprintf(lang('last_update'), $new['updated_at']) : '', pluralize(lang('news.com.title'), count($new['Comments']), true),
 					$new['id'], $content);
 		}
 		echo paginate($layout);
 		unset($new);
 	}
 	else
-	{
-		echo '<p align="center">' . lang('news.any') . '</p><br />';
-	}
+		echo '<p align="center">', lang('news.any'), '</p><br />';
+
 	if (level(LEVEL_ADMIN))
-	{
 		echo '<br />' . make_link(array('action' => 'update'), lang('act.news_new'));
-	}
+
 	$cache->save();
 	$news->free();
 	unset($pager, $layout);

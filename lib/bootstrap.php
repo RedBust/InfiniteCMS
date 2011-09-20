@@ -105,7 +105,7 @@ $routes = array(//action default : key
 	'character.give' => array('controller' => 'Character', 'action' => 'give'),
 
 	'join' => array('controller' => 'Misc'),
-	'staff' => array('controller' => 'Misc'),
+	'staff' => array('controller' => 'StaffRole', 'action' => 'index'),
 	'stats' => array('controller' => 'Misc'),
 	'mass_mail' => array('controller' => 'Misc'),
 
@@ -219,23 +219,23 @@ if (!DEV)
 
 	//Shop item types
 	$types = array(
-		//TODO all those have to be moved to LiveActionTable ...
-		ShopItemEffectTable::TYPE_LEVEL_UP => lang('shop.level_up'),
+#		ShopItemEffectTable::TYPE_ADD_PREFIX => lang('character.prefix_name'),
 		-2 => lang('shop._add'),
-		ShopItemEffectTable::TYPE_ADD_XP => lang('shop.xp'),
-		ShopItemEffectTable::TYPE_ADD_K => lang('shop.K'),
-		ShopItemEffectTable::TYPE_ADD_CAPITAL => lang('shop.capital'),
-		ShopItemEffectTable::TYPE_ADD_SPELLPOINT => lang('shop.spellpoint'),
+		LiveActionTable::TYPE_LEVEL_UP => lang('shop.level_up'),
+		LiveActionTable::TYPE_ADD_XP => lang('shop.xp'),
+		LiveActionTable::TYPE_ADD_K => lang('shop.K'),
+		LiveActionTable::TYPE_ADD_CAPITAL => lang('shop.capital'),
+		LiveActionTable::TYPE_ADD_SPELLPOINT => lang('shop.spellpoint'),
 		-3 => lang('shop._items'),
-		ShopItemEffectTable::TYPE_ITEM_JETS_ALEATOIRES => lang('shop.item_random'),
-		ShopItemEffectTable::TYPE_ITEM_JETS_MAX => lang('shop.item_perfect'),
+		LiveActionTable::TYPE_ITEM_JETS_ALEATOIRES => lang('shop.item_random'),
+		LiveActionTable::TYPE_ITEM_JETS_MAX => lang('shop.item_perfect'),
 		-4 => lang('shop._stats'),
-		ShopItemEffectTable::TYPE_CARAC_FORCE => lang('shop.stat.strength'),
-		ShopItemEffectTable::TYPE_CARAC_AGILITE => lang('shop.stat.agility'),
-		ShopItemEffectTable::TYPE_CARAC_CHANCE => lang('shop.stat.chance'),
-		ShopItemEffectTable::TYPE_CARAC_SAGESSE => lang('shop.stat.wisdom'),
-		ShopItemEffectTable::TYPE_CARAC_VITALITE => lang('shop.stat.vitality'),
-		ShopItemEffectTable::TYPE_CARAC_INTELLIGENCE => lang('shop.stat.intell'),
+		LiveActionTable::TYPE_CARAC_FORCE => lang('shop.stat.strength'),
+		LiveActionTable::TYPE_CARAC_AGILITE => lang('shop.stat.agility'),
+		LiveActionTable::TYPE_CARAC_CHANCE => lang('shop.stat.chance'),
+		LiveActionTable::TYPE_CARAC_SAGESSE => lang('shop.stat.wisdom'),
+		LiveActionTable::TYPE_CARAC_VITALITE => lang('shop.stat.vitality'),
+		LiveActionTable::TYPE_CARAC_INTELLIGENCE => lang('shop.stat.intell'),
 	);
 
 	//this is highly experimental, do not use

@@ -15,7 +15,7 @@ else
 	$characters = Query::create()
 					->from('Character p')
 						->where('name LIKE ?', str_replace('*', '%', $router->postVar('name')))
-					->limit(10) //yeah, DYPY (Do your paginator yourself). I may consider having might for maybe do that ... But I don't think so. My beliefs told me not to touch that !
+					->limit(10) //yeah, DYPY (Do your paginator yourself). I may consider having might for maybe do that ... But I don't think so. My beliefs told me to not touch that !
 					->execute();
 	if ($characters->count())
 	{
@@ -26,6 +26,8 @@ else
 			echo tag('li', $char->getInfoBox());
 		}
 		echo '</ul>';
+
+		/* */
 	}
 	else
 		echo tag('h3', lang('no_result'));

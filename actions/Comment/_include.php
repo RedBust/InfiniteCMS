@@ -1,2 +1,2 @@
 <?php
-Cache::destroyPrefix($router->getController() . '_show');
+Cache::destroyPrefix('News_show');

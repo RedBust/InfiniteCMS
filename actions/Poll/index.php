@@ -1,17 +1,26 @@
 <?php
-$pollsQ = Query::create()
-			->from('Poll p')
+$polls = Query::create()
+			->from('Poll p INDEXBY p.id')
 				->leftJoin('p.Options o')
 					->leftJoin('o.Polleds u'); //User
-if( !level( LEVEL_ADMIN ) )
+if (!level(LEVEL_ADMIN))
 { //PLAEZ DO NOT OVERDID THAT. Don't put OVER NINE THOUSANDS POLLS in the same daterange. kthx.
-	$pollsQ->where('p.date_start < ?', new Doctrine_Expression('NOW()'))
-			->andWhere('p.date_end > NOW()');
-}
-$polls = $pollsQ->execute();
-$pollsQ->free();
+	$polls->where('NOW() BETWEEN p.date_start AND p.date_end'); //Doctrine_Expression does not work. Don't wanna seek why
 
-if ($polls->count())
+	$lastElapsedPoll = Query::create()
+								->from('Poll p')
+									->leftJoin('p.Options o')
+								->where('p.date_end < NOW()')
+								->limit(1)
+								->fetchOne();
+}
+$polls = $polls->execute();
+
+if (!empty($lastElapsedPoll))
+	$polls->add($lastElapsedPoll);
+
+
+if ($polls->count() || $lastElapsedPoll)
 {
 	foreach ($polls as $poll)
 	{ /* @var $poll Poll */
@@ -24,6 +33,4 @@ else
 	echo tag('b', lang('poll.any'));
 
 if (level(LEVEL_ADMIN))
-{ //display the "create" link if admin?
 	echo make_link('@poll.new', lang('poll.new'));
-}

@@ -12,4 +12,23 @@
  */
 class PrivateMessageAnswer extends BasePrivateMessageAnswer
 {
+	public function getDatesInfo()
+	{
+		$created = explode(' ', $this->created_at);
+		return sprintf(lang('_the_at'), $created[0], $created[1]);
+	}
+	public function getPage()
+	{
+		if (!$this->exists())
+			throw new LogicException('Can\'t paginate unexistant record');
+
+		$prev = Query::create()
+					->select('COUNT(pma.id) AS prev')
+					->from('PrivateMessageAnswer pma')
+					->where('pma.id < ?', $this->id)
+						->andWhere('pma.thread_id = ?', $this->Thread->id)
+					->fetchOneArray();
+		$prev = $prev['prev'];
+		return 1 + ($prev - ($prev % $config['PMA_BY_PAGE'])) / $config['PMA_BY_PAGE'];
+	}
 }

@@ -108,4 +108,12 @@ class News extends BaseNews
 	{
 		return $this->title;
 	}
+
+	public function getAuthorString()
+	{
+		if ($this->relatedExists('Author') && $this->Author->relatedExists('Account'))
+			return sprintf(lang('by'), make_link($this->Author->Account));
+
+		return sprintf(lang('by'), '?');
+	}
 }

@@ -8,60 +8,52 @@ $base_eip_url = array(
 	'header' => 0,
 	'id' => $poll->id
 );
+
 if ($inList)
-{
-	$name = make_link(array('controller' => $router->getController(), 'action' => 'show', 'id' => $poll->id), $name);
-}
+	$name = make_link($poll);
 else if (level(LEVEL_ADMIN))
-{
 	$name = tag('div', array('id' => 'poll_name'), $name);
-}
 
 if (level(LEVEL_ADMIN))
 {
 	jQ(sprintf('
-$("#poll_name").editInPlace(
-	{
-		url: %s
-	});', javascript_val(to_url($base_eip_url + array('col' => 'name')))));
+$("#poll_name").editInPlace({url: %s});', javascript_val(to_url($base_eip_url + array('col' => 'name')))));
 	global $calendar_opts;
 	$types = array('start' => 'min', 'end' => 'max');
 	$js = '';
 	foreach ($types as $type => $type_name)
-	{/*, $type, , $poll->id,
-		,
-		$types[$other], $other,
-		,
-		$other, $calendar_opts)*/
+	{
 		$other = $type == 'start' ? 'end' : 'start';
 		jQ('var date' . $type . ' = $.datepicker.parseDate("yy-mm-dd", "' . $poll->{'date_'.$type} . '")');
+		//hours spent hier : 
+		// ... enough to make me cry :( (at least)
 		$js .= strtr('//HERE I PROVE THAT STRTR IS FAR BEYOND THE SKY. btw, the whole thing proves that strtr() have been created by god. Wait, God created PHP ? That explains so much, and yet so little ...
 		dp%type%%id% = $("#%type%DateDP%id%"),
 		dp%type%%id%Content = $("#%type%Date%id%"),
 		dp%type%%id%Edit = $("<img />", {src: %edit_img%});
 	dp%type%%id%.datepicker(
+	{
+		%other_value%Date: date%other_type%,
+		onSelect: function (dateText, inst)
 		{
-			%other_value%Date: date%other_type%,
-			onSelect: function (dateText, inst)
-				{
-					dp%type%%id%Content.html(dateText).load(%update_url%, {"update_value": dateText}, function (response, status)
-						{
-							date = $.datepicker.parseDate("dd/mm/yy", response);
-							dp%other_type%%id%.datepicker("option", "%type_name%Date", date);
-							//dp%type%.datepicker("option", "%other_type%Date", date);
-						});
-					dp%type%%id%.hide();
-				},
-			%calendar_opts%,
-			showButtonPanel: true,
-		}).hide();
+			dp%type%%id%Content.html(dateText).load(%update_url%, {"update_value": dateText}, function (response, status)
+			{
+				date = $.datepicker.parseDate("dd/mm/yy", response);
+				dp%other_type%%id%.datepicker("option", "%type_name%Date", date);
+				//dp%type%.datepicker("option", "%other_type%Date", date);
+			});
+			dp%type%%id%.hide();
+		},
+		%calendar_opts%,
+		showButtonPanel: true,
+	}).hide();
 	dp%type%%id%.after(dp%type%%id%Edit.click(function ()
-		{
-			if (dp%type%%id%.is(":visible"))
-				dp%type%%id%.hide();
-			else
-				dp%type%%id%.show();
-		}));', array(
+	{
+		if (dp%type%%id%.is(":visible"))
+			dp%type%%id%.hide();
+		else
+			dp%type%%id%.show();
+	}));', array(
 			'%type%' => $type,
 			'%id%' => $poll->id,
 			'%type_name%' => $type_name,
@@ -80,14 +72,14 @@ printf('
 			<div class="content">
 				<div class="infos">
 					<div class="title" id="title%d">
-						%s
+						%s%s%s
 					</div>
 					<div class="autre">
 						<b>%s:</b> <span id="startDate%1$d">%s</span><span id="startDateDP%1$d"></span>. <b>%s:</b> <span id="endDate%1$s">%s</span><span id="endDateDP%1$d"></span>.
 					</div>
 				</div>
-				<div align="center" class="cont">
-					<ul>', $poll->id, level(LEVEL_ADMIN) ? make_link(array('controller' => $router->getController(), 'action' => 'update', 'id' => $poll->id), lang('act._edit')) . $name : $name,
+				<br /><p align="center" class="cont">
+					<ul>', $poll->id, level(LEVEL_ADMIN) ? $poll->getUpdateLink() : '', $name, $poll->isElapsed() ? ' (' . lang('poll.elapsed') . ')' : '',
 	lang('poll.date_start'), date_to_picker($poll->date_start), lang('poll.date_end'), date_to_picker($poll->date_end));
 
 foreach ($poll->Options as $option)
@@ -95,17 +87,16 @@ foreach ($poll->Options as $option)
 	$name = lang($option->name, 'common', '%%key%%'); //here, option name
 	printf('
 						<li>
-							%s<b>%s</b>: %d%% (%d) %s
-						</li>', level(LEVEL_ADMIN) ?
-	  make_link(array('controller' => 'PollOption', 'action' => 'delete', 'id' => $option->id), lang('act.delete')) : '',
-	 $name, $option->getPercent() /*%% => escape % in printf*/, $option->Polleds->count(), $canVote ? '&bull;&nbsp;'.make_link(array('controller' => 'PollOption', 'action' => 'vote', 'id' => $option->id), lang('vote')) : '');
+							%s<b>%s</b>: %d%%<!-- escape %% with double--> (%d) %s
+						</li>', level(LEVEL_ADMIN) ? $option->getDeleteLink() : '',
+	 $name, $option->getPercent(), $option->Polleds->count(), $canVote ? '&bull;&nbsp;' . $option->getVoteLink() : '');
 }
 
 if (level(LEVEL_ADMIN))
-	echo tag('li', make_link(array('controller' => 'PollOption', 'action' => 'update', 'id' => $poll->id), lang('poll.option.new')));
+	echo tag('li', $poll->getCreateOptionLink());
 	
 echo '
 					</ul>
-				</div>
+				</p>
 			</div>
 		</div>';

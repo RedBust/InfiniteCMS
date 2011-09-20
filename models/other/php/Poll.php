@@ -26,6 +26,12 @@ class Poll extends BasePoll
 		}
 		return $this->total;
 	}
+	public function isElapsed()
+	{
+		list($y, $mo, $d) = explode('-', $this->date_end);
+
+		return date_passed(mktime(0, 0, 0, $mo, $d, $y));
+	}
 	public function getName()
 	{
 		return lang($this->_get('name'), 'common', '%%key%%');
@@ -33,6 +39,14 @@ class Poll extends BasePoll
 	public function getRawName()
 	{
 		return $this->_get('name');
+	}
+	public function getUpdateLink()
+	{
+		return make_link(array('controller' => __CLASS__, 'action' => 'update', 'id' => $this->id), lang('act._edit'));
+	}
+	public function getCreateOptionLink()
+	{
+		return make_link(array('controller' => 'PollOption', 'action' => 'update', 'id' => $this->id), lang('poll.option.new'));
 	}
 
 	public function update_attributes($vals)

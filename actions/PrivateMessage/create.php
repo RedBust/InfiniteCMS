@@ -9,9 +9,7 @@ if (!empty($_POST))
 	else
 	{
 		$receivers = explode(',', $receivers);
-		$receiversAv = AccountTable::getInstance() //av = available
-								->findReverseFriends()
-								->fetchArray();
+		$receiversAv = $account->getReverseFriends(); //av = available
 		$receiversIds = array();
 		foreach ($receiversAv as $receiverAv)
 		{
@@ -20,37 +18,33 @@ if (!empty($_POST))
 				$receiversIds[] = $receiverAv['guid'];
 		}
 		$receiversIds[] = $account->guid;
+
+		if ($receiversIds == array($account->guid))
+			$errors[] = sprintf(lang('must_!empty'), 'receivers');
 	}
+
 	$title = $router->postVar('title');
 	if (empty($title))
-	{
 		$errors[] = sprintf(lang('must_!empty'), 'title');
-	}
+
 	$msg = $router->postVar('message');
 	if (empty($msg))
-	{
 		$errors[] = sprintf(lang('must_!empty'), 'content');
-	}
+
 
 	if (empty($errors))
 	{
 		$thread = new PrivateMessageThread();
 		$thread->title = $title;
 
+		$reveiversId = array_unique($receiversIds);
 		foreach ($receiversIds as $id)
 		{
-			if ($id == $account->guid)
-				continue;
-
 			$receiver = new PrivateMessageThreadReceiver;
-			$receiver->next_page = 1;
+			$receiver->next_page = $id == $account->guid ? 0 : 1;
 			$receiver->User = UserTable::getInstance()->fromGuid($id);
 			$thread->Receivers[] = $receiver;
 		}
-		$receiver = new PrivateMessageThreadReceiver;
-		$receiver->next_page = 1;
-		$receiver->User = $account->User;
-		$receiver->save();
 
 		$answer = new PrivateMessageAnswer();
 		$answer->Author = $account->User;
@@ -60,14 +54,14 @@ if (!empty($_POST))
 		$thread->save();
 	}
 }
-if (count($_POST) < 1 || $errors != array())
+if (count($_POST) == 0 || $errors != array())
 {
 	echo make_form(array(
 		array('receivers', lang('pm.receivers') . tag('br')),
 		array('title', lang('title') . tag('br')),
 		array('message', lang('rate.msg') . tag('br'), 'textarea'),
 	));
-	jQ('$("#form_receivers").tokenInput("' . getPath() . 'Account/reverseFriends.json", {theme: "facebook", preventDuplicates: true});');
+	jQ('$(function () { $("#form_receivers").tokenInput("' . getPath() . 'Account/reverseFriends.json", {theme: "facebook", preventDuplicates: true}); });');
 }
 elseif (count($_POST) && $errors == array())
 {

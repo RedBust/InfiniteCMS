@@ -323,6 +323,8 @@ if($c = Cache::start("Account_show_profil_' . $this->guid . '_" . ($connected ? 
 	{
 		global $account, $member, $config;
 		$errors = array();
+		if (isset($values['email']))
+			$values['email'] = strtolower($values['email']);
 
 		if (empty($columns) || $columns === true)
 		{
@@ -362,7 +364,7 @@ if($c = Cache::start("Account_show_profil_' . $this->guid . '_" . ($connected ? 
 		}
 		$check = Query::create()
 				->from(__CLASS__) //why do I select the account instead of a count() ? Because I need infos ...
-				->where('(account = ? OR pseudo = ? OR email = ? or lastip = ?)', array(
+				->where('(account = ? OR pseudo = ? OR LOWER(email) = ? or lastip = ?)', array(
 					$this->account,
 					$this->pseudo,
 					$this->email,
@@ -437,5 +439,36 @@ if($c = Cache::start("Account_show_profil_' . $this->guid . '_" . ($connected ? 
 		}
 		$this->User->main_char = $main_char->guid;
 		return $main_char;
+	}
+
+	public function getReverseFriendsQ() //Q = queryh
+	{
+		return $this->getTable()
+					->createQuery()
+					->whereIn('guid', explode(';', $this->friends))
+						->andWhere('friends LIKE ? OR friends LIKE ? OR friends = ?',
+					 array($this->guid . ';%', '%;' . $this->guid . ';%', $this->guid));
+	}
+	public function getReverseFriends($hydrate = null)
+	{
+		return $this->getReverseFriendsQ()->execute($hydrate);
+	}
+
+	public function getRolesString()
+	{
+		$isAdmin = level(LEVEL_ADMIN);
+
+		$html = '<ul>';
+		foreach ($this->StaffRoles as $role)
+			$html .= tag('li', $role->getName() . ($isAdmin ? $role->getUpdateLink() . $role->getDeleteLink() : ''));
+		if ($isAdmin)
+			$html .= tag('li', $this->getNewStaffRoleLink());
+
+		return $html . '</ul>';
+	}
+
+	public function getNewStaffRoleLink()
+	{
+		return make_link(array('controller' => 'StaffRole', 'action' => 'update', 'account' => $this->guid), lang('StaffRole - create', 'title'));
 	}
 }

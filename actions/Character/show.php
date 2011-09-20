@@ -61,23 +61,23 @@ else
 		}
 	}
 	$stuff = tag_open('div', array(
-				'id' => 'stuff',
-			)) . '>' . make_img('stuff', EXT_PNG, array(
-				'style' => 'position: absolute;',
-			)); //opening of the tag ...
+		'id' => 'stuff',
+	 )) . '>' . make_img('stuff', EXT_PNG, array(
+		'style' => 'position: absolute;',
+	)); //opening of the tag ...
 	foreach ($itemsInfo as $itemInfo)
-	{ //$itemInfo = [instanceof Items, stats]
+	{ //$itemInfo = [instanceof Item, stats]
 		/* @var $item Items */
 		$item = $itemInfo[0];
 
 		$stuff .= tag('div', array(
-					'id' => 'item' . $item->template,
-						'class' => 'showEffects',
-					'title' => str_replace('"', "'", $itemInfo[1]), //HERE is the problem. What if JS is disabled :/ ?
-					'style' => 'position: absolute; ' . $posOffset[$item->pos],
-				), make_img('items/' . $item->template, EXT_PNG, array(
-						'style' => 'width: 50px; height: 50px;',
-					)));
+			'id' => 'item' . $item->template,
+			'class' => 'showEffects',
+			'title' => str_replace('"', "'", $itemInfo[1]), //HERE is the problem. What if JS is disabled :/ ?
+			'style' => 'position: absolute; ' . $posOffset[$item->pos],
+		 ), make_img('items/' . $item->template, EXT_PNG, array(
+			'style' => 'width: 50px; height: 50px;',
+		)));
 	}
 	echo $stuff, str_repeat(tag('br'), 8), '</div>';
 	IG::registerEffectsTooltip(); //hover tooltips with item effects
@@ -113,24 +113,29 @@ $align = array(//HTML attributes
 	'valign' => 'middle',
 );
 //spell list
-echo tag('br'), sprintf(substr(lang('has'), 0, -1), $charac->name, $spellCount, tag('span', array('id' => 'openSpellsTable'), $spellTitle)),
- '<span class="showThis">.</span> <span class="hideThis">:</span>' . tag('br') . tag('br') . '<div id="spellsBox" title="' . ucfirst($spellTitle) . '">
-	<table border="1" style="width: 100%;"><thead>' . tag('tr',
-		tag('td', $align + array('style' => 'width: 42%;'), tag('b', lang('character.spell_name'))) .
-		tag('td', $align + array('style' => 'width: 23%;'), tag('b', lang('character.spell_level'))) .
-		tag('td', $align + array('style' => 'width: 35%;'), tag('b', lang('character.spell_pos')))) . '</thead><tbody style="height: 550px; overflow: auto;">';
+if (count($charac->getSpells()))
+{ //I SEE NO REASON FOR THIS TO HAPPEN. That's why I created this if.
+	echo tag('br'), sprintf(substr(lang('has'), 0, -1), $charac->name, $spellCount, tag('span', array('id' => 'openSpellsTable'), $spellTitle)),
+	 '<span class="showThis">.</span> <span class="hideThis">:</span>' . tag('br') . tag('br') . '<div id="spellsBox" title="' . ucfirst($spellTitle) . '">
+		<table border="1" style="width: 100%;"><thead>' . tag('tr',
+			tag('td', $align + array('style' => 'width: 42%;'), tag('b', lang('character.spell_name'))) .
+			tag('td', $align + array('style' => 'width: 23%;'), tag('b', lang('character.spell_level'))) .
+			tag('td', $align + array('style' => 'width: 35%;'), tag('b', lang('character.spell_pos')))) . '</thead><tbody style="height: 550px; overflow: auto;">';
 
-foreach ($charac->getSpells() as $spell)
-{ //build spell row
-	echo tag('tr', array('data-id' => $spell[0]),
-			tag('td', lang($spell[0], 'spell')) .
-			tag('td', $spell[1]) .
-			tag('td', $charac->getSpellPos($spell[2])));
-}
-echo '
+	foreach ($charac->getSpells() as $spell)
+	{ //build spell row
+		echo tag('tr', array('data-id' => $spell[0]),
+				tag('td', lang($spell[0], 'spell')) .
+				tag('td', $spell[1]) .
+				tag('td', $charac->getSpellPos($spell[2])));
+	}
+	echo '
 		</tbody>
 	</table>
 </div>';
+}
+else
+	echo tag('br');
 
 if (!empty($charac->GuildMember))
 { //show the guild info

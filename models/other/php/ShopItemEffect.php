@@ -12,13 +12,13 @@ class ShopItemEffect extends BaseShopItemEffect
 {
 	public function getValue()
 	{
-		if( $this->isItem() )
-			return $this->getTable()->doFindItemTemplate( $this );
+		if ($this->isItem())
+			return $this->getTable()->doFindItemTemplate($this);
 		return $this->value;
 	}
 	public function setValue($val)
 	{
-		if( $this->isItem() ) //find the item ID
+		if ($this->isItem()) //find the item ID
 		{
 			if( is_numeric( $val ) ) //itemID submitted
 			{
@@ -39,50 +39,26 @@ class ShopItemEffect extends BaseShopItemEffect
 	}
 	public function __toString()
 	{
-		global $types;
-
-		if ($this->type === NULL || $this->type == -1 //should not happen but ...
-			|| (!$this->isItem() && $this->getValue() === 0 ))
+		if ($this->type === NULL || $this->type == -1 || $this->getValue() === 0)
 			return ''; //null effect ?
 
-		$signe = ''; //+ or -
-		$showType = true;
-
-		$val = $this->getValue(); //the "real" value
-		if ($this->isItem())
-		{ /* @var $val ItemTemplate */
-			$showType = false; //don't show the type
-			$color = 'green'; //add
-
-			$val = '</u>' . make_img('items/' . $this->value, EXT_PNG, array(
-				'style' => 'width: 50px; height: 50px;',
-				'class' => 'showEffects',
-				'data-id' => $val instanceof ItemTemplate ? $val->id : '',
-				'title' => $this->getItemStats(),
-			)) . '<span class="hideThis">:</span> <u>';
-		} //end if effect::isItem
+		if ($this->isLiveAction())
+			return LiveActionTable::getInstance()->render($this);
 		else
-		{ //+ = green, - = red
-			$color = $val > 0 ? 'green' : 'red';
-			$signe = $val > 0 ? '+' : '-';
-		}
-
-		if (!isset($types[$this->type]))
-			vdump('unknow type : ' . $this->type);
-		$type = $types[$this->type];
-		if ($type[0] == $signe)
-			$type = substr($type, 1);
-		return tag('span', array('style' => array('color' => $color)), '<b>' . $signe . '</b><u>' . $val . '</u> '
-				. ( $showType ? $type : '<span class="hideThis">' . $type . '</span>' ));
+			return $this->renderEffect();
 	}
 
+	public function isLiveAction()
+	{
+		return $this->getTable()->isLiveAction($this);
+	}
 	public function isItem()
 	{
-		return $this->getTable()->isItem( $this );
+		return $this->getTable()->isItem($this);
 	}
 	public function isMaxStats()
 	{
-		return $this->type == ShopItemEffectTable::TYPE_ITEM_JETS_MAX;
+		return $this->type == LiveActionTable::TYPE_ITEM_JETS_MAX;
 	}
 	public function getItemStats()
 	{
@@ -97,7 +73,48 @@ class ShopItemEffect extends BaseShopItemEffect
 
 	public function getDeleteLink()
 	{
-		global $router;
-		return make_link(array('controller' => $router->getController(), 'action' => 'delete', 'mode' => 'ItemEffect', 'id' => $this->id), lang('act.delete'));
+		return make_link(array('controller' => 'Shop', 'action' => 'delete', 'mode' => 'ItemEffect', 'id' => $this->id), lang('act.delete'));
 	}
+
+	public function giveTo($char)
+	{
+		if ($this->isLiveAction())
+			LiveActionTable::getInstance()->give($char, $this);
+		else
+			$this->processEffect($char);
+	}
+
+	public function processEffect($char)
+	{
+		global $account;
+		switch ($this->type)
+		{
+			case ShopItemEffectTable::TYPE_ADD_PREFIX:
+				$mainChar = $account->getMainChar();
+				$name = $mainChar->name;
+				if ($pos = strpos($name, ']')) //remove actual prefix
+					$name = substr($name, $pos+1);
+				$name = sprintf('[%s]%s', $this->value, $name);
+				$mainChar->name = $name;
+				//$account->save() should be enough.
+			break;
+		}
+	}
+	public function renderEffect()
+	{
+		switch ($this->type)
+		{
+			case ShopItemEffectTable::TYPE_ADD_PREFIX:
+				return lang('character.prefix_name') . ' : ' . tag('i', $this->value);
+			break;
+		}
+	}
+	/**@todo that way ?
+	public function getEffectLangs()
+	{
+		return array(
+			ShopItemEffectTable::TYPE_ADD_PREFIX => 'Adds prefix <i>%s</i>',
+		);
+	}
+	*/
 }

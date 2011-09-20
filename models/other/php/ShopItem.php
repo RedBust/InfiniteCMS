@@ -18,13 +18,13 @@ class ShopItem extends BaseShopItem
 		if ($this->is_lottery)
 		{
 			$effect = $this->Effects[rand(0, $this->Effects->count())];
-			$p->give($effect);
+			$effect->giveTo($p);
 			return $effect;
 		}
 		else
 		{
 			foreach ($this->Effects as $effect)
-				$p->give($effect);
+				$effect->giveTo($p);
 		}
 	}
 
@@ -112,13 +112,13 @@ class ShopItem extends BaseShopItem
 
 					$effect = new ShopItemEffect;
 					$effect->type = $type;
-					if (!$effect->setValue($values['value'][$id]))
-						$errors['effect_' . $id] = sprintf(lang('must_!empty'), $t);
-					else
+					if ($effect->setValue($values['value'][$id]))
 					{
 						$effect->save();
 						$this->Effects->add($effect);
 					}
+					else
+						$errors['effect_' . $id] = sprintf(lang('must_!empty'), $t);
 				}
 			}
 		}

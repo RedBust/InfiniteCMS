@@ -18,4 +18,12 @@ class PollOption extends BasePollOption
 			return 0;
 		return ($this->Polleds->count() / $this->Poll->countPolleds()) * 100;
 	}
+	public function getVoteLink()
+	{
+		return make_link(array('controller' => 'PollOption', 'action' => 'vote', 'id' => $this->id), lang('vote'));
+	}
+	public function getDeleteLink()
+	{
+		return make_link(array('controller' => __CLASS__, 'action' => 'delete', 'id' => $this->id), lang('act.delete'));
+	}
 }

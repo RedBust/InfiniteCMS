@@ -31,6 +31,6 @@ $value = $effect->getValue();
 if ($value instanceof ItemTemplate)
 	$value = lang($value->id, 'item');
 
-$character->give($effect);
+$effect->giveTo($character);
 unset($effect);
-printf(lang('character.given'), $types[$type], $value, $character->name);
+printf(lang('character.given'), $types[$type], $value, make_link($character));

@@ -41,8 +41,9 @@ if ($cache = Cache::start($router->getController() . '_stats', 1))//'+6 hours'))
 	);
 	echo tag('ul', tag('li', tag('b', number_format($counts['accounts'], 0, '.', ' ')) . ' ' . pluralize(lang('acc'), $counts['accounts']) . '.') .
 		tag('li', tag('b', number_format($counts['characters'], 0, '.', ' ')) . ' ' . pluralize(lang('character'), $counts['characters']) . '.') .
-		tag('li', tag('b', number_format($counts['guilds'], 0, '.', ' ')) . ' ' . pluralize(lang('acc.ladder.guild'), $counts['characters']) . '.') .
+		tag('li', tag('b', number_format($counts['guilds'], 0, '.', ' ')) . ' ' . pluralize(lang('acc.ladder.guild'), $counts['guilds']) . '.') .
 		tag('li', tag('b', number_format($counts['items'], 0, '.', ' ')) . ' ' . pluralize(ucfirst(lang('character.item')), $counts['items']) . '.'));
+		//avg number of char / accounts : $counts['characters'] / $counts['accounts'] ... so hard ...
 
 	if ($counts['characters'])
 	{
@@ -80,7 +81,7 @@ if ($cache = Cache::start($router->getController() . '_stats', 1))//'+6 hours'))
 		 tag('li', tag('b', pluralize(lang('character.guilded'), $counts['guilded'], false)) . ': ' . number_format($counts['guilded'], 0, '.', ' ')) .
 		 ( $counts['guilds'] ? tag('li', tag('b', lang('guild.avg_level')) . ': ' . number_format($counts['avgGLevel'], 0, '.', ' ')) : '' ));
 
-		if (count($counts['gender']) > 1)
+		if (count($counts['gender']) > 1) //having such helpers is soo cool
 			echo chart(pluralize(lang('acc.ladder.sex'), 2, false), $counts['gender'], 'gender_.');
 		if (count($counts['breed']) > 1)
 			echo chart(pluralize(lang('acc.ladder.class'), 2, false), $counts['breed'], 'breed.');

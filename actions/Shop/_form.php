@@ -67,7 +67,7 @@ var inputs = $( ".slideMenu[name=\'%s\']" )
 addEffect
 	.click(function ()
 	{
-		if ($("option[value=-1]:selected").length)
+		if (inputs.find("option[value=-1]:selected").length)
 		{
 			alert(' . javascript_val(lang('shop.fill_before_add')) . ');
 			return false;

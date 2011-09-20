@@ -184,25 +184,6 @@ return array(
 	// Cela coûte 3 requêtes, il y a un cache d'une heure. Cela active aussi la page Misc/stats (toutes les stats, cache de 6h)
 	'STATS' => true,
 
-# STAFF
-#Your staff
-#Votre équipe
-	//Staff of the server
-	//L'équipe de votre serveur
-	'staff' => array(
-		//if the user has a an account, put his account ID here, as:
-		//Si l'utilisateur à un compte, mettez ici son ID de compte, par exemple:
-#		45 => 'Staff', //ligne commented / ligne commentée (#)
-		//Note: you can use digit-pseudos (as 7070), you just have to put single-quotes, ex:
-		//Note: vous pouvez utilisez des pseudos en chiffres (comme 7070), vous devez juste
-		// l'entourer d'apostrophes, exemple:
-#		'7070' => 'Toto !', //ligne commented / ligne commentée (#)
-		//Note²: If the user is not found, the name will be affiched as this
-		//Note²: si l'utilisateur n'est pas trouvé, le nom sera affiché tel quel
-		'Moi' => array( 'Fondateur', 'Chef MJ' ),
-		2 => 'Service TeamSpeak',
-	),
-
 # ADVANCED CONFIG
 	//default lang
 	//langue de base

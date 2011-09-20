@@ -9,7 +9,7 @@ Doctrine_Manager::getInstance()->bindComponent('ShopItemEffect', 'other');
  * 
  * @property integer $item_id
  * @property integer $type
- * @property integer $value
+ * @property varchar $value
  * @property ShopItem $Item
  * 
  * @package    InfiniteCMS
@@ -30,9 +30,9 @@ abstract class BaseShopItemEffect extends Record
              'type' => 'integer',
              'length' => '9',
              ));
-        $this->hasColumn('value', 'integer', 9, array(
-             'type' => 'integer',
-             'length' => '9',
+        $this->hasColumn('value', 'varchar', 255, array(
+             'type' => 'varchar',
+             'length' => '255',
              ));
     }
 

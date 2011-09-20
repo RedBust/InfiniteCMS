@@ -11,9 +11,7 @@ if (!$config['ENABLE_REG'])
 }
 
 if ($sent)
-{
 	$errors = $acc->update_attributes($_POST, true);
-}
 if (!$sent || $errors != array())
 {
 	if (!$acc->exists() && !$config['ALLOW_MULTI']
@@ -25,6 +23,4 @@ if (!$sent || $errors != array())
 	partial('_form', 'acc', PARTIAL_CONTROLLER);
 }
 else if ($sent && $errors === array())
-{
 	echo lang('acc.account_created');
-}

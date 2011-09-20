@@ -37,13 +37,6 @@ class Member extends Multiton
 		return isset($_SESSION['guid']);
 	}
 
-	public function disconnect()
-	{
-		$_SESSION['guid'] = NULL;
-		$_SESSION = array();
-		session_destroy();
-	}
-
 	/**
 	 * logs the user
 	 *
@@ -57,6 +50,20 @@ class Member extends Multiton
 			$guid = $_SESSION['guid'];
 
 		return UserTable::getInstance()->fromGuid($guid);
+	}
+	public function disconnect()
+	{
+		$_SESSION['guid'] = NULL;
+		$_SESSION = array();
+		session_destroy();
+	}
+
+	public function getLevel()
+	{
+		global $account;
+		if (level(LEVEL_LOGGED))
+			return $account->level;
+		return LEVEL_GUEST;
 	}
 
 	/*

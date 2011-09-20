@@ -8,7 +8,7 @@ $thread = Query::create()
 						->leftJoin('pmr.Account pmra')
 					->andWhere('pmt.id = ' . intval($id = $router->requestVar('id')))
 				->fetchOne();
-if (!$thread || ($thread && !$thread->Receivers->contains($account->guid) && !level(LEVEL_ADMIN)))
+if ($thread ? (!$thread->Receivers->contains($account->guid) && !level(LEVEL_ADMIN)) : true)
 {
 	echo lang('pm.does_not_exist');
 	return;
@@ -33,26 +33,24 @@ echo make_link('@pm', lang('pm.back')), tag('br'), tag('br'),
  tag('tr', tag('th', lang('infos')) . tag('th', lang('rate.msg')));
 foreach ($answers as $answer)
 {
-	$created = explode(' ', $answer->created_at);
-	$msg = utf8_encode($answer['message']);
+	$msg = utf8_encode($answer->message);
 	if ($answer->Author->Account->level < LEVEL_ADMIN)
 		$msg = html($msg);
 	else
 		$msg = News::format($msg);
 	echo tag('tr', array('style' => array('width' => '20%;')),
-	 tag('td', tag('b', make_link($answer->Author->Account)) . tag('br') . sprintf(lang('_the_at'), $created[0], $created[1])) .
+	 tag('td', tag('b', make_link($answer->Author->Account)) . tag('br') . $answer->getDatesInfo()) .
 	 tag('td', array('style' => array('width' => '80%')), $msg));
 }
 $rcv = $thread->Receivers[$account->guid];
 if ($rcv->next_page != 0 && $rcv->next_page < $pager->getPage() + 1)
-{ //update page IF !already read && !
+{ //update page IF NO topic already read && next page to read < this page
 	$rcv->next_page = $pager->getPage() == $pager->getLastPage() ? 0 : $pager->getPage() + 1;
 	$rcv->save();
 }
-echo '</table>', paginate($layout);
-
-echo tag('div', array('id' => 'pm-answer'), tag('br') .
- tag('h4', tag('b', lang('pm.answer'))) .
- make_form(array(
+echo '</table>', paginate($layout),
+ tag('div', array('id' => 'pm-answer'), tag('br') .
+  tag('h4', tag('b', lang('pm.answer'))) .
+  make_form(array(
 	array('message', lang('rate.msg') . tag('br'), 'textarea')
- ), array('controller' => $router->getController(), 'action' => 'answer', 'id' => $thread->id)));
+  ), array('controller' => $router->getController(), 'action' => 'answer', 'id' => $thread->id)));

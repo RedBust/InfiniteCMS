@@ -1,6 +1,5 @@
 <?php
 $id = $router->requestVar('id', -1);
-$return_back = '<br />' . make_link('@shop', lang('back_to_index'));
 $admin = level( LEVEL_ADMIN );
 
 if (!( $shopItem = Query::create()
@@ -10,9 +9,10 @@ if (!( $shopItem = Query::create()
 			->where('id = ?', $id)
 		->fetchOne() ))
 {
-	printf(lang('shop.item.not_exists'), intval($id), $return_back);
+	printf(lang('shop.item.not_exists'), intval($id));
 	return;
 }
+$return_back = '<br />' . make_link(array('controller' => 'Shop', 'action' => 'index', 'cat' => $shopItem->category_id), lang('back_to_index'));
 
 $char = $account->getMainChar();
 if (!$char)

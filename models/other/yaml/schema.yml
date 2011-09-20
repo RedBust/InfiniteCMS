@@ -78,7 +78,7 @@ ShopItemEffect:
   columns:
     item_id: integer(9)
     type: integer(9)
-    value: integer(9)
+    value: varchar(255)
   relations:
     Item:
       class: ShopItem
@@ -119,6 +119,15 @@ User:
       foreign: poll_option_id
     Account:
       local: guid
+      foreign: guid
+StaffRole:
+  connection: other
+  columns:
+    account_id: int(9)
+    name: varchar(255)
+  relations:
+    Account:
+      local: account_id
       foreign: guid
 
 #Bug:
@@ -464,6 +473,11 @@ Account:
       type: many
       local: guid
       foreign: account
+    StaffRoles:
+      class: StaffRole
+      type: many
+      local: guid
+      foreign: account_id
 GuildMember:
   connection: other
   tableName: guild_members

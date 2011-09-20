@@ -3,9 +3,9 @@ $thread = Query::create()
 				->from('PrivateMessageThread pmt')
 					->leftJoin('pmt.Receivers pmr INDEXBY pmr.user_guid')
 						->leftJoin('pmr.Account pmra')
-					->andWhere('pmt.id = ?', intval($id = $router->requestVar('id')))
+					->andWhere('pmt.id = ?', $id = intval($router->requestVar('id')))
 				->fetchOne();
-if (!$thread || ($thread && !$thread->Receivers->contains($account->guid) && !level(LEVEL_ADMIN)))
+if ($thread ? (!$thread->Receivers->contains($account->guid) && !level(LEVEL_ADMIN)) : true)
 {
 	echo lang('pm.does_not_exist');
 	return;
@@ -19,14 +19,7 @@ if (!empty($msg))
 	$answer->message = $msg;
 	$answer->Author = $account->User;
 	$answer->save();
-	$prev = Query::create()
-				->select('COUNT(pma.id) AS prev')
-				->from('PrivateMessageAnswer pma')
-				->where('pma.id < ?', $answer->id)
-					->andWhere('pma.thread_id = ?', $thread->id)
-				->fetchOneArray();
-	$prev = $prev['prev'];
-	$page = 1 + ($prev - ($prev % $config['PMA_BY_PAGE'])) / $config['PMA_BY_PAGE'];
+	$page = $answer->getPage();
 	
 
 	foreach ($thread->Receivers as $receiver)

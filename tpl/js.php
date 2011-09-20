@@ -1,13 +1,13 @@
 <?php jQ(true) ?>
 <script type="text/javascript">
 <?php if ($config['LOAD_TYPE'] == LOAD_MDIALOG): ?>
-var loader = $( "#loading" );
+var loader = $('#loading');
 loader.dialog( dialogOpt );
 <?php endif ?>
-var errorDiv = $( "#errorDiv" ),
-	error = $( "#error" ),
+var errorDiv = $('#errorDiv'),
+	error = $('#error'),
 	updateSelectorsDisabled = [];
-errorDiv.dialog( dialogOpt );
+errorDiv.dialog(dialogOpt);
 
 <?php if (level(LEVEL_LOGGED)): ?>
 function chooseMainChar(character)
@@ -18,7 +18,7 @@ function chooseMainChar(character)
 				'id' => ''
 			)) ?>" + character;
 }
-var mainCharSelector = $("#selectMainChar").dialog(dialogOpt);
+var mainCharSelector = $('#selectMainChar').dialog(dialogOpt);
 $('#charactersList').accordion({clearStyle: true, collapsible: true, active: false});
 <?php if (defined('IN_PM') && IN_PM): ?>
 //THIS IS CRAPPY @TO DO REMOVE THAT
@@ -31,9 +31,9 @@ $("#pm").dialog(dialogOpt);
 
 function isLocalURI(href)
 {
-	return href.substr( 0, 1 ) == "?"
-		|| href == "./"
-		|| href.substr( 0, 1 ) == "/";
+	return href.substr(0, 1) == '?'
+		|| href == './'
+		|| href.substr(0, 1) == '/';
 }
 var href,
 	url = '<?php echo $_SERVER['REQUEST_URI'] ?>',
@@ -76,7 +76,6 @@ function populateContent(data)
 	if (data[4] != '')
 	{ //may have changed
 		var updateElement = $(data[4]);
-		console.log(updateElement.length);
 		if (updateElement.length)
 			updateElement.html(data[5]);
 		else
@@ -120,7 +119,7 @@ function updateContent(URL)
 		},
 		error: function (error)
 		{
-			loader.html( "An error occured during the page loading. Try to change the 'REWRITE' setting in your config.php file." );
+			loader.html('An error occured during the page loading. Try to change the "REWRITE" setting in your config.php file.');
 			<?php if (DEBUG): ?>
 			loader.html( loader.html() + error );
 			<?php endif ?>
@@ -138,32 +137,32 @@ function followLink(event)
 {
 	var $this = $(this);
 
-	if (typeof event == "string")
+	if (typeof event == 'string')
 		href = event;
 	else
-		href = $this.attr("href");
+		href = $this.attr('href');
 	if (url === href && <?php echo javascript_val(!DEBUG) ?>) //re-load same page ? useless ...
 	{
-		if (typeof event != "string")
+		if (typeof event != 'string')
 			event.preventDefault();
 		return false;
 	}
 	else
 		url = href;
 
-	if ($this.data("unless-selector") !== undefined)
+	if ($this.data('unless-selector') !== undefined)
 	{ //this behavior is a little bit special.
 	 // maybe I should load the URL if !load (first one) OR unlessSelector.url == url
 	 // that would reload it ONLY if we're not doing anything else than watching the link's page
 	 // or add an attribute, as data-reload-when="same-page" (i.e.)
 		var unlessSelector = $($this.data("unless-selector"));
-		if (unlessSelector.length && $.trim(unlessSelector.html()) != "")
+		if (unlessSelector.length && $.trim(unlessSelector.html()) != '')
 		{
-			if (unlessSelector.is(":visible"))
+			if (unlessSelector.is(':visible'))
 				return false;
 
-			if (unlessSelector.hasClass("ui-dialog-content"))
-				unlessSelector.dialog("open");
+			if (unlessSelector.hasClass('ui-dialog-content'))
+				unlessSelector.dialog('open');
 			else
 				unlessSelector.show();
 
@@ -173,7 +172,7 @@ function followLink(event)
 	if (isLocalURI(href))
 	{
 		updateContent(href);
-		if (typeof event != "string")
+		if (typeof event != 'string')
 			event.preventDefault();
 		return false;
 	}
@@ -198,17 +197,18 @@ $(window).bind('popstate', function ()
 }).bind('load', function ()
 {
 	_inLoad = true;
-});//*/
+});
 <?php endif ?>
 var lang = {};
-lang["FORM.MUST_SPECIFY_ps"] = <?php echo javascript_val(lang('acc.login.spec_login')) ?>;
-lang["FORM.MUST_SPECIFY_pa"] = <?php echo javascript_val(lang('acc.login.spec_pass')) ?>;
+lang['FORM.MUST_SPECIFY_ps'] = <?php echo javascript_val(lang('acc.login.spec_login')) ?>;
+lang['FORM.MUST_SPECIFY_pa'] = <?php echo javascript_val(lang('acc.login.spec_pass')) ?>;
 var LoginForm_force = false, //force to submit ?
 	LoginForm_processing = false, //in AJaX request
 
 	form_login = $('#login_form'),
 	field_pseudo = form_login.find('#form_<?php echo Member::CHAMP_PSEUDO ?>'),
 	field_pass = form_login.find('#form_<?php echo Member::CHAMP_PASS ?>');
+/*var last_pseudo = '', last_pass = '';*/
 form_login.submit(function(event)
 {
 	if (LoginForm_force)
@@ -218,17 +218,18 @@ form_login.submit(function(event)
 		event.preventDefault();
 		return false;
 	}
+
 	var cont = true,
-		msg = "";
-	if (field_pseudo.val() == "")
+		msg = '';
+	if (field_pseudo.val() == '')
 	{
 		cont = false;
-		msg += lang["FORM.MUST_SPECIFY_ps"] + "<br />";
+		msg += lang['FORM.MUST_SPECIFY_ps'] + '<br />';
 	}
-	if (field_pass.val() == "")
+	if (field_pass.val() == '')
 	{
 		cont = false;
-		msg += lang["FORM.MUST_SPECIFY_pa"];
+		msg += lang['FORM.MUST_SPECIFY_pa'];
 	}
 	if (!cont)
 	{
@@ -237,9 +238,15 @@ form_login.submit(function(event)
 		event.preventDefault();
 		return false;
 	}
+
+	/*if (field_pseudo.val() == last_pseudo && field_pass.val() == last_pass)
+		return false;
+	last_pseudo = field_pseudo.val();
+	last_pass = field_pass.val();*/
+
 	var errorMessages = {
-		"bad": <?php echo javascript_val(lang('acc.invalid_login_action')) ?>,
-		"ban": <?php echo javascript_val(lang('acc.banned')) ?>
+		'bad': <?php echo javascript_val(lang('acc.invalid_login_action')) ?>,
+		'ban': <?php echo javascript_val(lang('acc.banned')) ?>
 	},
 	t = $(this),
 	pseudo = encodeURIComponent(field_pseudo.val()),
@@ -247,8 +254,8 @@ form_login.submit(function(event)
 	LoginForm_processing = true;
 	$.ajax(
 	{
-		mode: "POST",
-		url: <?php	echo '"' . to_url(array(
+		mode: 'POST',
+		url: <?php echo '"' . to_url(array(
 			'controller' => 'User',
 			'action' => 'login',
 			'check' => '1',
@@ -258,7 +265,7 @@ form_login.submit(function(event)
 		success: function (status)
 		{
 			LoginForm_processing = false; //process ended
-			if( status == "ok" )
+			if (status == 'ok')
 			{ //status is ok, we just submit the form :)
 				LoginForm_force = true;
 				t.submit();
@@ -270,7 +277,7 @@ form_login.submit(function(event)
 				else
 					error.html(status); //something is not going on perfectly ...
 
-				errorDiv.dialog( "open" );
+				errorDiv.dialog('open');
 				event.preventDefault();
 				return false;
 			}
@@ -278,22 +285,22 @@ form_login.submit(function(event)
 		error: function ()
 		{
 			LoginForm_processing = false;
-			alert( "error: unable to join login page" );
+			alert('error: unable to join login page');
 		}
 	} );
 	event.preventDefault();
 	/*
-	//slower but usefull for form with changing fields-number
-	// and this version require all fields in MUST_SPECIFIY_form_[field name]
-	var inputs = $( this ).find( ":input" );
+	//slower but usefull for form with changing fields-id
+	// and this version requires all fields in MUST_SPECIFIY_form_[field ID]
+	var inputs = $( this ).find(':input');
 	var input;
 	$.each( inputs, function(key,value)
 	{
 		input = $( value );
-		if( input.val() == "" )
+		if( input.val() == '' )
 		{
-			error.html( lang["FORM.MUST_SPECIFY_" + input.attr( "id" )] );
-			errorDiv.dialog( \'open\' );
+			error.html( lang['FORM.MUST_SPECIFY_' + input.attr('id')] );
+			errorDiv.dialog('open');
 			event.preventDefault();
 		}
 	} );
@@ -301,12 +308,12 @@ form_login.submit(function(event)
 } );
 
 var t;
-$( ".slideMenu" ).live( "click", function ()
+$('.slideMenu').live('click', function ()
 {
-	t = $( this );
-	t.next().slideToggle();
-	if( t.hasClass( "hideThis" ) )
-		t.slideToggle();
+	$this = $(this);
+	$this.next().slideToggle();
+	if ($this.hasClass('hideThis'))
+		$this.slideToggle();
 } );
 resetMarks();
 </script>
@@ -393,30 +400,29 @@ var tinyMCEOpt =
 	script_url : 'static/tiny_mce/tiny_mce.js',
 
 	// General options
-	theme : "advanced",
-	plugins : "safari,pagebreak,style,layer,table,save,advhr,advimage,advlink,iespell,spellchecker,emotions,iespell,insertdatetime,preview,media,searchreplace,print,contextmenu,paste,directionality,fullscreen,fullpage,noneditable,visualchars,nonbreaking,xhtmlxtras,template,inlinepopups",
-	//"fullpage,save",
-	theme_advanced_buttons3_add : "fullpage",
+	theme : 'advanced',
+	plugins : 'safari,pagebreak,style,layer,table,save,advhr,advimage,advlink,iespell,spellchecker,emotions,iespell,insertdatetime,preview,media,searchreplace,print,contextmenu,paste,directionality,fullscreen,fullpage,noneditable,visualchars,nonbreaking,xhtmlxtras,template,inlinepopups', //'fullpage,save',
+	theme_advanced_buttons3_add : 'fullpage',
 
 	//templates
-	skin : "o2k7",
-	skin_variant : "silver",
+	skin : 'o2k7',
+	skin_variant : 'silver',
 
 	//themes opts
-	theme_advanced_buttons1 : "save,newdocument,|,bold,italic,underline,strikethrough,|,justifyleft,justifycenter,justifyright,justifyfull,|,styleselect,formatselect,fontselect,fontsizeselect",
-	theme_advanced_buttons2 : "cut,copy,paste,pastetext,pasteword,|,search,replace,|,bullist,numlist,|,outdent,indent,blockquote,|,undo,redo,|,link,unlink,anchor,image,cleanup,help,code,|,insertdate,inserttime,preview,|,forecolor,backcolor",
-	theme_advanced_buttons3 : "tablecontrols,|,hr,removeformat,visualaid,|,sub,sup,|,charmap,emotions,iespell,media,advhr,|,print,|,ltr,rtl,|,fullscreen",
-	theme_advanced_buttons4 : "insertlayer,moveforward,movebackward,absolute,|,styleprops,spellchecker,|,cite,abbr,acronym,del,ins,attribs,|,visualchars,nonbreaking,template,pagebreak", //,blockquote,|,insertfile,insertimage",
-	theme_advanced_toolbar_location : "top",
-	theme_advanced_toolbar_align : "left",
-	theme_advanced_statusbar_location : "bottom",
+	theme_advanced_buttons1 : 'save,newdocument,|,bold,italic,underline,strikethrough,|,justifyleft,justifycenter,justifyright,justifyfull,|,styleselect,formatselect,fontselect,fontsizeselect',
+	theme_advanced_buttons2 : 'cut,copy,paste,pastetext,pasteword,|,search,replace,|,bullist,numlist,|,outdent,indent,blockquote,|,undo,redo,|,link,unlink,anchor,image,cleanup,help,code,|,insertdate,inserttime,preview,|,forecolor,backcolor',
+	theme_advanced_buttons3 : 'tablecontrols,|,hr,removeformat,visualaid,|,sub,sup,|,charmap,emotions,iespell,media,advhr,|,print,|,ltr,rtl,|,fullscreen',
+	theme_advanced_buttons4 : 'insertlayer,moveforward,movebackward,absolute,|,styleprops,spellchecker,|,cite,abbr,acronym,del,ins,attribs,|,visualchars,nonbreaking,template,pagebreak', //,blockquote,|,insertfile,insertimage',
+	theme_advanced_toolbar_location : 'top',
+	theme_advanced_toolbar_align : 'left',
+	theme_advanced_statusbar_location : 'bottom',
 	theme_advanced_resizing : true,
 
 	// Drop lists for link/image/media/template dialogs
-	template_external_list_url : "static/lists/template_list.js",
-	external_link_list_url : "static/lists/link_list.js",
-	external_image_list_url : "static/lists/image_list.js",
-	media_external_list_url : "static/lists/media_list.js"
+	template_external_list_url : 'static/lists/template_list.js',
+	external_link_list_url : 'static/lists/link_list.js',
+	external_image_list_url : 'static/lists/image_list.js',
+	media_external_list_url : 'static/lists/media_list.js'
 	
 };
 function explode(delimiter, string, limit)
@@ -483,10 +489,14 @@ function str_replace (search, replace, subject, count) {
 	}
 	return sa ? s : s[0];
 }
+
+
+
+
 function resetMarks()
 {
-	jQuery( ".hideThis" ).hide();
-	jQuery( ".showThis" ).show();
+	jQuery('.hideThis').hide();
+	jQuery('.showThis').show();
 }
 
 var locations = new Array();
@@ -503,33 +513,33 @@ var binds =
 	},
 	ajax_binds: {},
 
+	<?php if ($config['LOAD_TYPE'] != LOAD_NONE): ?>
 	reset: function ()
 	{
-		<?php if ($config['LOAD_TYPE'] != LOAD_NONE): ?>
 		this.ajax_binds = this.base_ajax_binds;
-		<?php endif ?>
 	},
 	add: function (fn, pos)
 	{
-		<?php if ($config['LOAD_TYPE'] != LOAD_NONE): ?>
-		if( !pos || pos == 'before' )
+		if (!pos || pos == 'before')
 			this.ajax_binds['before'].push( fn );
 		else
 			this.ajax_binds[pos].push( fn );
-		<?php endif ?>
 	},
 	process: function (pos)
 	{
-		<?php if ($config['LOAD_TYPE'] != LOAD_NONE): ?>
 		jQuery.each( this.ajax_binds[pos], function (k, v)
 		{
-			if( jQuery.isFunction( v ) )
+			if (jQuery.isFunction(v))
 				v();
 			else
-				eval( v + '()' );
+				eval(v + '()');
 		} );
 		this.ajax_binds[pos] = this.base_ajax_binds[pos];
-		<?php endif ?>
 	}
+	<?php else: ?>
+	reset: function () {}
+	add: function () {}
+	process: function () {}
+	<?php endif ?>
 };
 binds.reset();

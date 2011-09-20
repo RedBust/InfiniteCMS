@@ -11,11 +11,12 @@ CREATE TABLE `private_message_answer` (`id` BIGINT AUTO_INCREMENT, `thread_id` I
 CREATE TABLE `private_message_thread` (`id` BIGINT AUTO_INCREMENT, `title` VARCHAR(255), PRIMARY KEY(`id`)) ENGINE = INNODB;
 CREATE TABLE `private_message_thread_receiver` (`id` BIGINT AUTO_INCREMENT, `thread_id` INT, `user_guid` INT, `next_page` INT DEFAULT 1, INDEX `thread_id_idx` (`thread_id`), INDEX `user_guid_idx` (`user_guid`), PRIMARY KEY(`id`)) ENGINE = INNODB;
 CREATE TABLE `shop_item` (`id` BIGINT AUTO_INCREMENT, `category_id` BIGINT, `name` VARCHAR(255), `cost` BIGINT, `cost_vip` BIGINT, `description` text, `is_vip` TINYINT(1) DEFAULT '0', `is_lottery` TINYINT(1) DEFAULT '0', `is_hidden` TINYINT(1) DEFAULT '0', PRIMARY KEY(`id`)) ENGINE = INNODB;
-CREATE TABLE `shop_item_category` (`id` BIGINT AUTO_INCREMENT, `name` VARCHAR(255), PRIMARY KEY(`id`)) ENGINE = INNODB;
-CREATE TABLE `shop_item_effect` (`id` BIGINT AUTO_INCREMENT, `item_id` BIGINT, `type` BIGINT, `value` BIGINT, INDEX `item_id_idx` (`item_id`), PRIMARY KEY(`id`)) ENGINE = INNODB;
+CREATE TABLE `shop_category` (`id` BIGINT AUTO_INCREMENT, `name` VARCHAR(255), PRIMARY KEY(`id`)) ENGINE = INNODB;
+CREATE TABLE `shop_item_effect` (`id` BIGINT AUTO_INCREMENT, `item_id` BIGINT, `type` BIGINT, `value` VARCHAR(255), INDEX `item_id_idx` (`item_id`), PRIMARY KEY(`id`)) ENGINE = INNODB;
 CREATE TABLE `ticket` (`id` BIGINT AUTO_INCREMENT, `category_id` BIGINT, `state` VARCHAR(255), `name` VARCHAR(255), INDEX `category_id_idx` (`category_id`), PRIMARY KEY(`id`)) ENGINE = INNODB;
 CREATE TABLE `ticket_answer` (`id` BIGINT AUTO_INCREMENT, `ticket_id` BIGINT, `author_id` BIGINT, `content` text, `created_at` DATETIME NOT NULL, `updated_at` DATETIME NOT NULL, INDEX `ticket_id_idx` (`ticket_id`), INDEX `author_id_idx` (`author_id`), PRIMARY KEY(`id`)) ENGINE = INNODB;
 CREATE TABLE `ticket_category` (`id` BIGINT AUTO_INCREMENT, `name` VARCHAR(255), `icon` VARCHAR(40), `description` text, `root_id` BIGINT, `lft` INT, `rgt` INT, `level` SMALLINT, PRIMARY KEY(`id`)) ENGINE = INNODB;
+CREATE TABLE `staff_role` (`id` BIGINT AUTO_INCREMENT, `account_id` BIGINT, `name` VARCHAR(255), INDEX `account_id_idx` (`account_id`), PRIMARY KEY(`id`)) ENGINE = INNODB;
 
 #These are integrity checks.
 DELIMITER //

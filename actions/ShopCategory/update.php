@@ -1,8 +1,6 @@
 <?php
-if (!check_level(LEVEL_ADMIN))
-	return;
-
-if (!$category = ShopCategoryTable::getInstance()->find($c = intval($router->requestVar('id'))))
+$table = ShopCategoryTable::getInstance();
+if (!$category = $table->find($c = intval($router->requestVar('id'))))
 {
 	$category = new ShopCategory;
 	$title = lang($router->getController() . ' - create', 'title');
@@ -21,4 +19,4 @@ if ($sent = ( count($_POST) > 0 ))
 if (!$sent || $errors != array())
 	partial('_form', array('category'), PARTIAL_CONTROLLER);
 elseif ($sent && $errors === array())
-	redirect('@shop');
+	redirect($table);

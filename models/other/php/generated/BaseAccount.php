@@ -26,6 +26,7 @@ Doctrine_Manager::getInstance()->bindComponent('Account', 'other');
  * @property boolean $vip
  * @property User $User
  * @property Doctrine_Collection $Characters
+ * @property Doctrine_Collection $StaffRoles
  * @property Doctrine_Collection $PrivateMessageThreadReceiver
  * 
  * @package    InfiniteCMS
@@ -198,6 +199,10 @@ abstract class BaseAccount extends Record
         $this->hasMany('Character as Characters', array(
              'local' => 'guid',
              'foreign' => 'account'));
+
+        $this->hasMany('StaffRole as StaffRoles', array(
+             'local' => 'guid',
+             'foreign' => 'account_id'));
 
         $this->hasMany('PrivateMessageThreadReceiver', array(
              'local' => 'guid',

@@ -19,7 +19,8 @@ CREATE TABLE `private_message_thread_receiver` (`id` BIGINT AUTO_INCREMENT, `thr
 CREATE TABLE `review` (`id` BIGINT AUTO_INCREMENT, `author_id` BIGINT, `comment` text, `created_at` DATETIME NOT NULL, INDEX `author_id_idx` (`author_id`), PRIMARY KEY(`id`)) ENGINE = INNODB;
 CREATE TABLE `shop_category` (`id` BIGINT AUTO_INCREMENT, `name` VARCHAR(255), PRIMARY KEY(`id`)) ENGINE = INNODB;
 CREATE TABLE `shop_item` (`id` BIGINT AUTO_INCREMENT, `category_id` BIGINT, `name` VARCHAR(255), `cost` BIGINT, `cost_vip` BIGINT, `description` text, `is_vip` TINYINT(1) DEFAULT '0', `is_lottery` TINYINT(1) DEFAULT '0', `is_hidden` TINYINT(1) DEFAULT '0', INDEX `category_id_idx` (`category_id`), PRIMARY KEY(`id`)) ENGINE = INNODB;
-CREATE TABLE `shop_item_effect` (`id` BIGINT AUTO_INCREMENT, `item_id` BIGINT, `type` BIGINT, `value` BIGINT, INDEX `item_id_idx` (`item_id`), PRIMARY KEY(`id`)) ENGINE = INNODB;
+CREATE TABLE `shop_item_effect` (`id` BIGINT AUTO_INCREMENT, `item_id` BIGINT, `type` BIGINT, `value` VARCHAR(255), INDEX `item_id_idx` (`item_id`), PRIMARY KEY(`id`)) ENGINE = INNODB;
+CREATE TABLE `staff_role` (`id` BIGINT AUTO_INCREMENT, `account_id` BIGINT, `name` VARCHAR(255), INDEX `account_id_idx` (`account_id`), PRIMARY KEY(`id`)) ENGINE = INNODB;
 CREATE TABLE `ticket_answer` (`id` BIGINT AUTO_INCREMENT, `ticket_id` BIGINT, `author_id` BIGINT, `content` text, `created_at` DATETIME NOT NULL, `updated_at` DATETIME NOT NULL, INDEX `ticket_id_idx` (`ticket_id`), INDEX `author_id_idx` (`author_id`), PRIMARY KEY(`id`)) ENGINE = INNODB;
 CREATE TABLE `ticket_category` (`id` BIGINT AUTO_INCREMENT, `name` VARCHAR(255), `icon` VARCHAR(40), `description` text, `root_id` BIGINT, `lft` INT, `rgt` INT, `level` SMALLINT, PRIMARY KEY(`id`)) ENGINE = INNODB;
 CREATE TABLE `user` (`id` BIGINT AUTO_INCREMENT, `guid` BIGINT, `lastvote` BIGINT, `points` BIGINT DEFAULT 0, `audiotel` BIGINT DEFAULT 0, `votes` BIGINT DEFAULT 0, `lastip` BIGINT, `culture` VARCHAR(255), `main_char` BIGINT, INDEX `guid_idx` (`guid`), PRIMARY KEY(`id`)) ENGINE = INNODB;
@@ -46,6 +47,7 @@ ALTER TABLE `private_message_thread_receiver` ADD CONSTRAINT `private_message_th
 ALTER TABLE `review` ADD CONSTRAINT `review_author_id_user_id` FOREIGN KEY (`author_id`) REFERENCES `user`(`id`);
 ALTER TABLE `shop_item` ADD CONSTRAINT `shop_item_category_id_shop_category_id` FOREIGN KEY (`category_id`) REFERENCES `shop_category`(`id`);
 ALTER TABLE `shop_item_effect` ADD CONSTRAINT `shop_item_effect_item_id_shop_item_id` FOREIGN KEY (`item_id`) REFERENCES `shop_item`(`id`);
+ALTER TABLE `staff_role` ADD CONSTRAINT `staff_role_account_id_accounts_guid` FOREIGN KEY (`account_id`) REFERENCES `accounts`(`guid`);
 ALTER TABLE `ticket_answer` ADD CONSTRAINT `ticket_answer_ticket_id_ticket_id` FOREIGN KEY (`ticket_id`) REFERENCES `ticket`(`id`);
 ALTER TABLE `ticket_answer` ADD CONSTRAINT `ticket_answer_author_id_user_id` FOREIGN KEY (`author_id`) REFERENCES `user`(`id`);
 ALTER TABLE `user` ADD CONSTRAINT `user_guid_accounts_guid` FOREIGN KEY (`guid`) REFERENCES `accounts`(`guid`);

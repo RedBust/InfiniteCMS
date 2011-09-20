@@ -124,11 +124,6 @@ class Character extends BaseCharacter
 		return $this->items;
 	}
 
-	public function give(ShopItemEffect $item)
-	{
-		LiveActionTable::getInstance()->give($this, $item);
-	}
-
 	public function getSpells()
 	{
 		if ($this->sorts === NULL)
