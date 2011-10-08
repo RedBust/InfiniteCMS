@@ -1,4 +1,7 @@
 <?php
+/** @todo
+ * K The main thing to do here is to remove all those if (DEV) / if (DEBUG) calls. it makes readin harder, for nothing special
+ */
 global $config, $errors, $metas, $types, $account, $router, $member, $guildRights;
 
 /**
@@ -82,6 +85,7 @@ define('LEVEL_MODO', 2.0);
 define('LEVEL_MJ', 3.0);
 define('LEVEL_ADMIN', 4.0);
 
+//@todo move that to JS
 $calendar_opts = '
 					showButtonPanel: true,
 					changeMonth: true,
@@ -100,6 +104,7 @@ $routes = array(//action default : key
 	'sign_in' => array('controller' => 'User', 'action' => 'login'),
 	'vote' => array('controller' => 'User'),
 	'credit' => array('controller' => 'User'),
+	'vip' => array('controller' => 'Account'),
 	'ladder_vote' => array('controller' => 'User'),
 
 	'character.give' => array('controller' => 'Character', 'action' => 'give'),
@@ -131,6 +136,11 @@ $routes = array(//action default : key
 	'events' => array('controller' => 'Event', 'action' => 'index'),
 );
 
+set_include_path(implode(PATH_SEPARATOR, array(
+	ROOT, //see #0.3.2a
+	'lib/class/', //local libs > global libs
+#		get_include_path(),
+)));
 require 'lib/functions' . EXT;
 $config = require 'config' . EXT;
 
@@ -145,8 +155,7 @@ if (!isset($config['SERVER_CORP']))
 	$config['SERVER_CORP'] = '';
 if (!$config['JAVASCRIPT'])
 	$config['LOAD_TYPE'] = LOAD_NONE;
-
-//disable magic_quotes (which is horrible ...) ! @ = no error (magic_quotes: deprecated)
+//disable magic_quotes (horrible feature ...) ! @ = no error (magic_quotes: deprecated)
 if (function_exists('get_magic_quotes_gpc') && @get_magic_quotes_gpc())
 {
 	$_POST = array_map('stripslashes', $_POST);
@@ -173,7 +182,7 @@ if (!DEV)
 	if (!isset($config['langs']))
 		$config['langs'] = array($config['use_lang']);
 	//$langs[$member->getLang()]['title'] is initied when call to lang( ~, 'title )
-	$langs[$member->getLang()]['title']['Misc - server'] = sprintf(lang('Misc - server', 'title'), $config['SERVER_NAME']);
+	//@todo remove that ? I guess I can just use $title vars
 
 	$guildRights = array(2, 4, 8, 16, 32, 64, 128, 256, 512, 4092, 8192, 16384);
 
@@ -203,11 +212,6 @@ $manager->setAttribute(Doctrine_Core::ATTR_MODEL_LOADING,
 $manager->setAttribute(Doctrine_Core::ATTR_QUOTE_IDENTIFIER, true);
 $manager->setAttribute(Doctrine_Core::ATTR_AUTO_FREE_QUERY_OBJECTS, true);
 unset($manager);
-set_include_path(implode(PATH_SEPARATOR, array(
-	ROOT, //see #0.3.2a
-	ROOT . 'lib/class/', //local libs > global libs
-#		get_include_path(),
-)));
 if (DEBUG && !DEV)
 	$mem .= memory_get_usage() . ': Attributes loaded ... - ' . __FILE__ . ':' . __LINE__ . '<br />';
 
@@ -238,15 +242,12 @@ if (!DEV)
 		LiveActionTable::TYPE_CARAC_INTELLIGENCE => lang('shop.stat.intell'),
 	);
 
-	//this is highly experimental, do not use
-	if (!empty($_SESSION['_csrf_token']) && !isset($_REQUEST['update_value']) && $router->isPost())
+	if (!empty($_SESSION['_csrf_token_req']) && $router->isPost())
 	{ //disable _csrf_token if using edit in place (I currently have no other solution :<)
 	 //the way I see that would be having a JS var _csrf_token which eIP would send WITH the actual form
 	 //and this is what I'm gonna do when I'll have free time + motive to edit that script ...
 		$requestToken = $router->postVar('_csrf_token');
-		if ($requestToken === $_SESSION['_csrf_token']) //using === here is VERY SIGNIFICANT
-			unset($_SESSION['_csrf_token']); //remove that token.
-		else
+		if ($requestToken !== session_id()) //using === here is VERY SIGNIFICANT
 		{
 			if (DEBUG)
 				echo 'invalid token<hr />'; //simple notice ...
@@ -256,7 +257,7 @@ if (!DEV)
 	}
 
 	if (DEBUG)
-		$mem .= ($prev_mem = memory_get_usage()) . ': Models loaded ... - ' . __FILE__ . ':' . __LINE__ . '<br />';
+		$mem .= memory_get_usage() . ': Models loaded ... - ' . __FILE__ . ':' . __LINE__ . '<br />';
 
 	if (!empty($_SESSION['guid']))
 	{ //retrieve account

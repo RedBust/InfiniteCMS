@@ -9,7 +9,7 @@ $threads = Query::create() //it'll be heavy (wrote at the very start)
 						->leftJoin('pma.Author pmau') //Private Message Answer's User
 							->leftJoin('pmau.Account pmaua') //Private Message Answer's User's Account
 				->orderBy('pma.created_at DESC')
-				->where('pmt.id IN (SELECT pmtr.thread_id FROM PrivateMessageThreadReceiver pmtr ON pmtr.author_id = ?)', $account->guid)
+				->where('pmt.id IN (SELECT pmtr.thread_id FROM PrivateMessageThreadReceiver pmtr ON pmtr.author_id = ? AND present = 1)', $account->guid)
 				->execute();
 
 echo make_link('@pm.create', lang('PrivateMessage - create', 'title'));
@@ -29,7 +29,9 @@ else
 		foreach ($thread->Receivers as $i => $receiver)
 		{
 			if ($receiver->user_guid != $account->guid)
-				$receivers[] = make_link($receiver->Account);
+			{
+				$receivers[] = make_link($receiver);
+			}
 		}
 		$fAnswer = $thread->Answers->getFirst(); //fAnswer
 		$new = $unreads->contains($thread->id) ? tag('b', tag('u', '!')) . '&nbsp;' : '';

@@ -8,7 +8,8 @@ $thread = Query::create()
 						->leftJoin('pmr.Account pmra')
 					->andWhere('pmt.id = ' . intval($id = $router->requestVar('id')))
 				->fetchOne();
-if ($thread ? (!$thread->Receivers->contains($account->guid) && !level(LEVEL_ADMIN)) : true)
+if ($thread ? (($thread->Receivers->contains($account->guid) ? !$thread->Receivers[$account->guid]->present : true)
+  && !level(LEVEL_ADMIN)) : true)
 {
 	echo lang('pm.does_not_exist');
 	return;
@@ -39,7 +40,7 @@ foreach ($answers as $answer)
 	else
 		$msg = News::format($msg);
 	echo tag('tr', array('style' => array('width' => '20%;')),
-	 tag('td', tag('b', make_link($answer->Author->Account)) . tag('br') . $answer->getDatesInfo()) .
+	 tag('td', tag('b', make_link($thread->Receivers[$answer->Author->guid])) . tag('br') . $answer->getDatesInfo()) .
 	 tag('td', array('style' => array('width' => '80%')), $msg));
 }
 $rcv = $thread->Receivers[$account->guid];

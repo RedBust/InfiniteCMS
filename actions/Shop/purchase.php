@@ -31,7 +31,7 @@ if (!$admin)
 		return;
 	}
 	if ($shopItem->is_hidden
-	 || ($shopItem->is_vip && !$account->vip))
+	 || ($shopItem->is_vip && (empty($config['COST_VIP']) || !$account->vip)))
 	{
 		define('HTTP_CODE', 404);
 		return;

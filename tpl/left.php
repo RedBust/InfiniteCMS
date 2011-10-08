@@ -2,6 +2,7 @@
 //this file is out of layout because you may edit it lots more than you
 // may wanna edit the global layout. This avoids any mistake.
 //Ce fichier est en-dehors du layout pour vous permettre de modifier le menu en étant sûr de ne pas toucher au reste
+$prefix = '~ ';
 if ($config['URL_VOTE'] != -1):
 ?>
 <div class="module1">
@@ -12,21 +13,21 @@ if ($config['URL_VOTE'] != -1):
 	<div class="title slideMenu" style="margin-left: 5px;"><?php echo lang('part.home') ?></div>
 	<ul>
 		<li>
-			<?php echo make_link('@root', '~ ' . lang('News - index', 'title')) ?>
+			<?php echo make_link('@root', $prefix . lang('News - index', 'title')) ?>
 		</li>
 		<li>
-			<?php echo make_link('@join', '~ ' . lang('Account - join', 'title')) ?>
+			<?php echo make_link('@join', $prefix . lang('Account - join', 'title')) ?>
 		<li>
 		<?php if (!$connected && $config['ENABLE_REG']): ?>
 		<li>
-			<?php echo make_link(array('controller' => 'Account', 'action' => 'create'), '~ ' . lang('Account - create', 'title')) ?>
+			<?php echo make_link(array('controller' => 'Account', 'action' => 'create'), $prefix . lang('Account - create', 'title')) ?>
 		</li>
 		<?php endif ?>
 		<li>
-			<?php echo make_link('@staff', '~ ' . lang('StaffRole - index', 'title')) ?>
+			<?php echo make_link('@staff', $prefix . lang('StaffRole - index', 'title')) ?>
 		</li>
 		<li>
-			<?php echo make_link('@tos', '~ ' . lang('menu.rules')) ?>
+			<?php echo make_link('@tos', $prefix . lang('menu.rules')) ?>
 		</li>
 	</ul>
 </div>
@@ -35,15 +36,15 @@ if ($config['URL_VOTE'] != -1):
 	<div class="title slideMenu" style="margin-left: 5px;"><?php echo lang('part.server') ?></div>
 	<ul>
 		<li>
-			<?php echo make_link('@cgu_serv', '~ ' . lang('menu.rules')) ?>
+			<?php echo make_link('@cgu_serv', $prefix . lang('menu.rules')) ?>
 		</li>
 		<?php if ($config['TEAMSPEAK']['opened']): ?>
 		<li>
-			<?php echo make_link(array('controller' => 'Misc', 'action' => 'ts'), '~ ' . lang('Misc - ts', 'title')) ?>
+			<?php echo make_link(array('controller' => 'Misc', 'action' => 'ts'), $prefix . lang('Misc - ts', 'title')) ?>
 		</li>
 		<?php endif ?>
 		<li>
-			<?php echo make_link(array('controller' => 'Misc', 'action' => 'server'), '~ ' . sprintf(lang('menu.infos_comp'), $config['SERVER_NAME'])) ?>
+			<?php echo make_link(array('controller' => 'Misc', 'action' => 'server'), $prefix . sprintf(lang('menu.infos_comp'), $config['SERVER_NAME'])) ?>
 		</li>
 	</ul>
 </div>
@@ -51,38 +52,38 @@ if ($config['URL_VOTE'] != -1):
 	<div class="title slideMenu" style="margin-left: 5px;"><?php echo lang('part.interactif') ?></div>
 	<ul>
 		<li>
-			<?php echo make_link('@ladder', '~ ' . lang('ladder.PvM')) ?>
+			<?php echo make_link('@ladder', $prefix . lang('ladder.PvM')) ?>
 		</li>
 		<?php if ($config['URL_VOTE'] != -1): ?>
 		<li>
-			<?php echo make_link('@ladder_vote', '~ ' . lang('ladder.vote')) ?>
+			<?php echo make_link('@ladder_vote', $prefix . lang('ladder.vote')) ?>
 		</li>
 		<?php
 		endif;
 		if ($config['ENABLE_SHOP']):
 		?>
 		<li>
-			<?php echo make_link('@shop', '~ ' . lang('shop.title')) ?>
+			<?php echo make_link('@shop', $prefix . lang('shop.title')) ?>
 		</li>
 		<?php endif ?>
+		<li>
+			<?php echo make_link('@events', $prefix . lang('Event - index', 'title')) ?>
+		</li>
 	</ul>
 </div>
 <div class="module4">
 	<div class="title slideMenu"><?php echo lang('part.community') ?></div>
 	<ul>
 		<li>
-			<?php echo make_link(getPath(FORUM), '~ ' . lang('menu.board'), array(), array(), false) ?>
+			<?php echo make_link(getPath(FORUM), $prefix . lang('menu.board'), array(), array(), false) ?>
 		</li>
 		<?php if ($config['RATES_BY_PAGE'] != -1): //if GuestBook is on ?>
 		<li>
-			<?php echo make_link('@guestbook', '~ ' . lang('GuestBook - index', 'title')) ?>
+			<?php echo make_link('@guestbook', $prefix . lang('GuestBook - index', 'title')) ?>
 		</li>
 		<?php endif ?>
 		<li>
-			<?php echo make_link('@polls', '~ ' . lang('Poll - index', 'title')) ?>
-		</li>
-		<li>
-			<?php echo make_link('@events', '~ ' . lang('Event - index', 'title')) ?>
+			<?php echo make_link('@polls', $prefix . lang('Poll - index', 'title')) ?>
 		</li>
 	</ul>
 </div>
@@ -91,10 +92,10 @@ if ($config['URL_VOTE'] != -1):
 	<div class="title slideMenu"><?php echo lang('part.admin') ?>  </div>
 		<ul>
 			<li>
-				<?php /*@todo move this to interactiv ?*/ echo make_link('@character.search', lang('acc.find')) ?>
+				<?php /*@todo move this to interactiv ?*/ echo make_link('@character.search', $prefix . lang('acc.find')) ?>
 			</li>
 			<li>
-				<?php echo make_link('@mass_mail', lang('Misc - mass_mail', 'title')) ?>
+				<?php echo make_link('@mass_mail', $prefix . lang('Misc - mass_mail', 'title')) ?>
 			</li>
 		</ul>
 </div>

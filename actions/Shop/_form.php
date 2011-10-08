@@ -12,11 +12,11 @@ $loc = FROM_INCLUDE ? to_url(array(
 $fields = array(
 	array('name', lang('name') . '<br />', NULL, $item->name),
 	array('cost', $preNl . sprintf(lang('shop.cost'), $config['POINTS_CREDIT'], $config['POINTS_VOTE'], $config['POINTS_CREDIT_VIP'], $config['POINTS_VOTE_VIP']) . '<br />', NULL, $item->cost),
-	array('cost_vip', $preNl . lang('cost_vip') . '<br />', NULL, $item->cost_vip),
+	( empty($config['COST_VIP']) ? '' : array('cost_vip', $preNl . lang('cost_vip') . '<br />', NULL, $item->cost_vip) ),
 	array('category_id', $preNl . lang('category') . '<br />', 'record', array('type' => 'one', 'model' => 'ShopCategory'), $item->category_id),
 	array('description', $preNl . lang('content') . '<br />', 'textarea', $item->description),
 	tag('div', array('id' => 'options'), 
-	 input('is_vip', lang('shop.is_vip'), 'checkbox', $item->is_vip) .
+	 ( empty($config['COST_VIP']) ? '' : input('is_vip', lang('shop.is_vip'), 'checkbox', $item->is_vip) ) .
 	 input('is_lottery', lang('shop.is_lottery'), 'checkbox', $item->is_lottery) .
 	 input('is_hidden', lang('shop.is_hidden'), 'checkbox', $item->is_hidden) . tag('br')
 	 ),
@@ -48,6 +48,7 @@ jQ(sprintf('
 $("#options").buttonset();
 var cost_couple = $("#form_couple_cost"),
 	cost_on = false;
+%s
 $("#form_is_vip").change(function ()
 { //cost_on = workaround
 	cost_on = !cost_on;
@@ -56,6 +57,7 @@ $("#form_is_vip").change(function ()
 	else
 		cost_couple.show();
 });
+//*/
 
 var idEffect = %d,
 	addEffect = $("<span />", { "id": "addEffect" })
@@ -91,8 +93,9 @@ binds.add(function ()
 		delete idEffect;
 		delete addEffect;
 		delete inputs;
-	});', $id, javascript_string(lang('effects'), "'"),
-				javascript_val($lang_act), javascript_val($lang_val)));
+	});', empty($config['COST_VIP']) ? '/*' : '',
+	$id, javascript_string(lang('effects'), "'"),
+	javascript_val($lang_act), javascript_val($lang_val)));
 $code = ( FROM_INCLUDE ? '' : tag('h1', lang('shop.new')) . '<br />' ) . make_form($fields, $loc);
 
 if (FROM_INCLUDE)

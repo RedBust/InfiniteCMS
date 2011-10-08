@@ -37,10 +37,13 @@ class ShopItem extends BaseShopItem
 	 */
 	public function update_attributes(array $values, $columns = NULL)
 	{
-		global $types;
+		global $types, $config;
+
 		$errors = array();
 		if( $columns === NULL ) //WHERE vip & hidden ? for VIP-destined draw.
-			$columns = array('description', 'name', 'cost', 'category_id', 'cost_vip', 'is_vip', 'is_lottery', 'is_hidden');
+			$columns = array('description', 'name', 'cost', 'category_id', 'cost_vip', 'is_lottery', 'is_hidden');
+		if (!empty($config['COST_VIP']))
+			$columns[] = 'is_vip';
 		if( is_string( $columns ) )
 			$columns = explode( ';', $columns );
 		$prev = $this->exists() ? $this->toArray() : array();
@@ -69,7 +72,7 @@ class ShopItem extends BaseShopItem
 		}
 		if (!$this->relatedExists('Category'))
 			$errors[] = sprintf(lang('must_!empty'), lang('category'));
-		if ($this->cost < $this->cost_vip)
+		if (!empty($config['COST_VIP']) && $this->cost < $this->cost_vip)
 		{
 			if (empty($prev['cost_vip']))
 				$this->cost_vip = $this->cost - 1; //shouldn't eq:0
@@ -173,12 +176,12 @@ class ShopItem extends BaseShopItem
 	}
 	public function getTypesInfo()
 	{
-		global $router;
+		global $router, $config;;
 		if ($router->getController() != 'Shop')
 			return ''; //this is a hack, I know ._.
 
 		$types = array();
-		if ($this->is_vip)
+		if ($this->is_vip && !empty($config['COST_VIP']))
 			$types[] = lang('shop.is_vip');
 		if ($this->is_lottery)
 			$types[] = lang('shop.is_lottery');
@@ -189,7 +192,8 @@ class ShopItem extends BaseShopItem
 	}
 	public function getCost()
 	{
-		if (level(LEVEL_VIP))
+		global $config;
+		if (level(LEVEL_VIP) && !empty($config['COST_VIP']))
 			return $this->cost_vip;
 		return $this->cost;
 	}
@@ -199,14 +203,16 @@ class ShopItem extends BaseShopItem
 	}
 	public function getCostInfo()
 	{
+		global $config;
+
 		$cost = '';
 		$id = $this->getDataId();
 
-		if (level(LEVEL_VIP))
+		if (level(LEVEL_VIP) && !empty($config['COST_VIP']))
 		{
 			$cost .= tag('b', lang('cost_vip') . ' : ') . pluralize(lang('point'), $this->cost_vip, true, tag('span', $id + array('class' => 'f_cost_vip'), '%%content%%'));
 		}
-		if (!$this->is_vip)
+		if (empty($config['COST_VIP']) || !$this->is_vip)
 		{
 			if (level(LEVEL_ADMIN))
 				$cost .= tag('br');

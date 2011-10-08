@@ -9,6 +9,7 @@ Doctrine_Manager::getInstance()->bindComponent('PrivateMessageThreadReceiver', '
  * 
  * @property int $thread_id
  * @property int $user_guid
+ * @property bool $present
  * @property int $next_page
  * @property PrivateMessageThread $Thread
  * @property User $User
@@ -29,6 +30,10 @@ abstract class BasePrivateMessageThreadReceiver extends Record
              ));
         $this->hasColumn('user_guid', 'int', null, array(
              'type' => 'int',
+             ));
+        $this->hasColumn('present', 'bool', null, array(
+             'type' => 'bool',
+             'default' => true,
              ));
         $this->hasColumn('next_page', 'int', null, array(
              'type' => 'int',

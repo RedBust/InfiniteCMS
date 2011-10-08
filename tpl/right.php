@@ -12,7 +12,9 @@
 							 make_link(new Account, lang('menu.acc.edit')) . tag('br') .
 							 make_link('@sign_off', lang('menu.logout'), array(), array(), false) . tag( 'br' ) .
 							 ( $config['URL_VOTE'] != -1 ? make_link('@vote', lang('menu.vote'), array(), array(), false) . tag( 'br' ) : '' ) .
-							 ( $config['PASS']['enable'] ? make_link('@credit', lang('menu.credit')) : '' );
+							 ( $config['PASS']['enable'] ? make_link('@credit', lang('menu.credit')) : '' ) .
+							 ( level(LEVEL_VIP) || empty($config['COST_VIP']) || $account->User->points < $config['COST_VIP'] ? '' :
+							  make_link('@vip', lang('Account - vip', 'title')) . ' (' . $config['COST_VIP'] . ')' );
 						else:
 							$pseudo = $router->postVar( Member::CHAMP_PSEUDO );
 							echo tag('form', array('method' => 'POST', 'action' => replace_url('@sign_in'), 'id' => 'login_form'),

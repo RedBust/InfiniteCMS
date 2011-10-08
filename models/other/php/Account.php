@@ -79,7 +79,7 @@ binds.add(function (undef)
 			}
 			if ($cache instanceof Cache)
 					$cache->put('<?php global $router, $connected, $account;
-if($c = Cache::start("Account_show_profil_' . $this->guid . '_" . ($connected ? $account->guid : -1), strtotime("+3 hours")))
+if($c = Cache::start("Account_show_' . $this->guid . '_" . ($connected ? $account->guid : -1) . "_profile", strtotime("+3 hours")))
 {
 	global $accountId;
 	$accountId = ' . $this->guid . ';
@@ -135,25 +135,30 @@ if($c = Cache::start("Account_show_profil_' . $this->guid . '_" . ($connected ? 
 	}
 	public function isVIP()
 	{
+		global $config;
 		if (level(LEVEL_ADMIN))
 			return true;
-		return $this->vip;
+		return empty($config['COST_VIP']) ? false : $this->vip;
 	}
 
 	public function canParticipate($event)
 	{
-		if (!$this->Characters->count())
+		if (!$this->getMainChar())
 			return false;
 
+		return !$this->currentlyParticipate($event);
+	}
+	public function currentlyParticipate($event)
+	{
 		if ($event instanceof Event || is_array($event))
 			$event = $event['id'];
 
 		foreach ($this->Characters as $character)
 		{
 			if ($character->Events->contains($event))
-				return false;
+				return true;
 		}
-		return true;
+		return false;
 	}
 	public function canSetWinner(Event $e)
 	{
@@ -164,9 +169,7 @@ if($c = Cache::start("Account_show_profil_' . $this->guid . '_" . ($connected ? 
 
 		if (!$mainChar = $this->getMainChar())
 			return false;
-		if (!$mainChar->isGM($e->guild_id))
-			return false;
-		return $mainChar->GuildMember->guild == $e->guild_id;
+		return $mainChar->isGM($e->guild_id);
 	}
 
 	/**
@@ -263,6 +266,10 @@ if($c = Cache::start("Account_show_profil_' . $this->guid . '_" . ($connected ? 
 		$inv->lastip = ip2long($member->getIp());
 		$inv->lastconnectiondate = new Doctrine_Expression('NOW()');
 	}
+	public function preSave(Doctrine_Event $event)
+	{
+		Cache::destroyPrefix('Account_show_' . $this->guid);
+	}
 
 	public function getColumns()
 	{
@@ -273,13 +280,15 @@ if($c = Cache::start("Account_show_profil_' . $this->guid . '_" . ($connected ? 
 			$columns[] = 'email';
 		}
 		if (level(LEVEL_ADMIN))
-			$columns = array_merge($columns, array('level'));
+			$columns[] = 'level';
 
 		return $columns;
 	}
 
 	public function setLevel($level)
 	{
+		global $config;
+
 		$level = floatval($level);
 		if ($level == LEVEL_BANNED) //just put "banned", don't modify the level. But ... "LEVEL_BANNED" is not in the ranks list !
 		{
@@ -291,8 +300,13 @@ if($c = Cache::start("Account_show_profil_' . $this->guid . '_" . ($connected ? 
 
 		if ($level == LEVEL_VIP)
 		{
-			$this->vip = 1; //@todo reset level to LOGGED ?
-			return;
+			if (empty($config['COST_VIP']))
+				$level = LEVEL_LOGGED;
+			else
+			{
+				$this->vip = 1; //@todo reset level to LOGGED ?
+				return;
+			}
 		}
 		else if ($level == LEVEL_LOGGED && $this->vip)
 			$this->vip = 0; //no continue.
@@ -327,22 +341,23 @@ if($c = Cache::start("Account_show_profil_' . $this->guid . '_" . ($connected ? 
 			$values['email'] = strtolower($values['email']);
 
 		if (empty($columns) || $columns === true)
-		{
-			//no, no, it's not getTable()->getColumnNames
-			$columns = $this->getColumns();
+		{ 
+			$columns = $this->getColumns(); //no, no, it's not getTable()->getColumnNames
 		}
+		if (is_string($columns))
+			$columns = explode(';', $columns);
 		if (level(LEVEL_ADMIN))
 			$values['banned'] = isset($values['banned']);
-		if (is_string($columns))
-		{
-			$columns = explode(';', $columns);
-		}
+
+		if (!empty($values['email']))
+			$values['email'] = strtolower($values['email']);
+
 		foreach ($columns as $t)
 		{
 			$t[0] = is_string($t[0]) ? strtolower($t[0]) : intval($t[0]);
 			if (!isset($values[$t]))
 			{
-				if ($t === 'banned')
+				if ($t === 'banned')  //WTF????
 					$this->banned = 0;
 				else
 					$errors[] = sprintf(lang('must_!empty'), $t);
@@ -364,9 +379,9 @@ if($c = Cache::start("Account_show_profil_' . $this->guid . '_" . ($connected ? 
 		}
 		$check = Query::create()
 				->from(__CLASS__) //why do I select the account instead of a count() ? Because I need infos ...
-				->where('(account = ? OR pseudo = ? OR LOWER(email) = ? or lastip = ?)', array(
-					$this->account,
-					$this->pseudo,
+				->where('(LOWER(account) = ? OR LOWER(pseudo) = ? OR LOWER(email) = ? or lastip = ?)', array(
+					strtolower($this->account),
+					strtolower($this->pseudo),
 					$this->email,
 					$this->lastip,
 				));
@@ -405,7 +420,7 @@ if($c = Cache::start("Account_show_profil_' . $this->guid . '_" . ($connected ? 
 		 || strpos($this->reponse, $this->pseudo) !== false
 		 || strpos($this->reponse, $this->account) !== false
 		 || strpos($this->reponse, $this->pass) !== false)
-		{ //:'). In fact : if [pseudo, account, pass].any in [pseudo, account, pass, question, reponse] then fail
+		{ //:'). In fact : if [pseudo, account, pass].any in([pseudo, account, pass, question, reponse]) then fail
 			$errors['unsafe_dup'] = lang('acc.register.unsafe_dup'); //duplication
 		}
 		if ($errors === array())
@@ -441,7 +456,7 @@ if($c = Cache::start("Account_show_profil_' . $this->guid . '_" . ($connected ? 
 		return $main_char;
 	}
 
-	public function getReverseFriendsQ() //Q = queryh
+	public function getReverseFriendsQ() //Q = query
 	{
 		return $this->getTable()
 					->createQuery()

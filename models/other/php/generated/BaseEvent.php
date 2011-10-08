@@ -10,6 +10,7 @@ Doctrine_Manager::getInstance()->bindComponent('Event', 'other');
  * @property int $guild_id
  * @property int $winner_id
  * @property int $reward_id
+ * @property bool $is_tombola
  * @property varchar $name
  * @property datetime $period
  * @property int $capacity
@@ -39,6 +40,9 @@ abstract class BaseEvent extends Record
         $this->hasColumn('reward_id', 'int', 9, array(
              'type' => 'int',
              'length' => '9',
+             ));
+        $this->hasColumn('is_tombola', 'bool', null, array(
+             'type' => 'bool',
              ));
         $this->hasColumn('name', 'varchar', 255, array(
              'type' => 'varchar',

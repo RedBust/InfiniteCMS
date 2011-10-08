@@ -82,8 +82,10 @@ class User
 			$this->pmUnreads = Query::create()
 									->from('PrivateMessageThread pmt INDEXBY pmt.id')
 										->leftJoin('pmt.Receivers pmr INDEXBY pmr.user_guid')
-									->where('pmt.id IN (SELECT pmtr.thread_id FROM PrivateMessageThreadReceiver pmtr WHERE pmtr.user_guid = ? AND pmtr.next_page != 0)',
-										 $this->guid)
+									->where('pmt.id IN
+									 (SELECT pmtr.thread_id FROM PrivateMessageThreadReceiver pmtr
+									  WHERE pmtr.user_guid = ? AND pmtr.next_page != 0 AND pmtr.present = 1)',
+										 $this->guid) //the last is needed, else if you left with one PM unread you'll still see the "unread" message but you won't be able to unread it (coz you've left)
 									->execute();
 		}
 		return $this->pmUnreads;

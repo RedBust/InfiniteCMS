@@ -292,6 +292,9 @@ PrivateMessageThreadReceiver:
   columns:
     thread_id: int
     user_guid: int
+    present:
+      type: bool
+      default: true
     next_page:
       type: int
       default: 1
@@ -313,6 +316,7 @@ Event:
     guild_id: int(9)
     winner_id: int(9)
     reward_id: int(9)
+    is_tombola: bool
     name: varchar(255) #i.e. "goodbye server /rofl"
     period: datetime
     capacity:

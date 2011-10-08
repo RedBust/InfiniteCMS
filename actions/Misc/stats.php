@@ -76,10 +76,10 @@ if ($cache = Cache::start($router->getController() . '_stats', 1))//'+6 hours'))
 		if ($counts['guilds'])
 			$counts['avgGLevel'] = $counts['gLevel'] / $counts['guilds'];
 		$counts['avgKamas'] = $counts['kamas'] / $counts['characters'];
-		echo tag('ul', tag('li', tag('b', lang('character.avg_level')) . ': ' . number_format($counts['avgCLevel'], 0, '.', ' ')) .
-		 tag('li', tag('b', lang('character.avg_kamas')) . ': ' . number_format($counts['avgKamas'], 0, '.', ' ')) .
-		 tag('li', tag('b', pluralize(lang('character.guilded'), $counts['guilded'], false)) . ': ' . number_format($counts['guilded'], 0, '.', ' ')) .
-		 ( $counts['guilds'] ? tag('li', tag('b', lang('guild.avg_level')) . ': ' . number_format($counts['avgGLevel'], 0, '.', ' ')) : '' ));
+		echo tag('ul', ( $counts['characters'] > 1 ? tag('li', tag('b', lang('character.avg_level')) . ': ' . number_format($counts['avgCLevel'], 0, '.', ' ')) : '' ) .
+		 ( $counts['characters'] > 1 ? tag('li', tag('b', lang('character.avg_kamas')) . ': ' . number_format($counts['avgKamas'], 0, '.', ' ')) : '' ).
+		 ( $counts['guilded'] ? tag('li', tag('b', pluralize(lang('character.guilded'), $counts['guilded'], false)) . ': ' . number_format($counts['guilded'], 0, '.', ' ')) : '' ) .
+		 ( $counts['guilds'] > 1 ? tag('li', tag('b', lang('guild.avg_level')) . ': ' . number_format($counts['avgGLevel'], 0, '.', ' ')) : '' ));
 
 		if (count($counts['gender']) > 1) //having such helpers is soo cool
 			echo chart(pluralize(lang('acc.ladder.sex'), 2, false), $counts['gender'], 'gender_.');

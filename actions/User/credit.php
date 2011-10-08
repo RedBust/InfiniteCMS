@@ -56,7 +56,7 @@ if ($isSubmitted)
 	if ($isValidCode)
 	{
 		//add points & count
-		$account->User['points'] += $config['POINTS_CREDIT' . (level(LEVEL_VIP) ? '_VIP' : '')];
+		$account->User['points'] += $config['POINTS_CREDIT' . (level(LEVEL_VIP) && !empty($config['COST_VIP']) ? '_VIP' : '')];
 		$account->User['audiotel'] = intval($account->User['audiotel']) + 1;
 		echo lang('acc.credit.credited');
 	}

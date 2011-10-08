@@ -19,7 +19,7 @@ class Comment extends BaseComment
 	}
 	public function getCensorLink()
 	{
-		return make_link(array('controller' => $router->getController(), 'action' => 'comment', 'mode' => 'censor', 'id' => $this->id), lang('censor'), array(), array(), false);
+		return make_link(array('controller' => __CLASS__, 'action' => 'comment', 'mode' => 'censor', 'id' => $this->id), lang('censor'), array(), array(), false);
 	}
 
 	public function __toString()

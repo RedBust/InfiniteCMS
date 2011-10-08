@@ -13,6 +13,7 @@ return array(
 	'Account - create' => 'Inscription',
 	'Account - update' => 'Gestion de compte',
 	'Account - show' => 'Informations sur un compte',
+	'Account - vip' => 'Devenir VIP',
 	'Account - list' => 'Liste des comptes',								#admin
 
 	'User - ladder_vote' => 'Classement vote',
@@ -25,7 +26,7 @@ return array(
 	'Misc - tos' => 'Conditions générales d\'utilisation',
 	'Misc - tos_serv' => 'Conditions d\'utilisations du serveur',
 	'Misc - ts' => 'Informations sur TeamSpeak',
-	'Misc - server' => 'Informations sur %s', //%s = server name
+	'Misc - server' => 'Informations sur {server.name}',
 	'Misc - stats' => 'Statistiques',
 	'Misc - mass_mail' => 'E-mail de masse',								#admin
 

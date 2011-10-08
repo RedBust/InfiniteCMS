@@ -3,6 +3,7 @@ $table = StaffRoleTable::getInstance();
 $staffMembers = Query::create()
 				->from('Account a')
 					->leftJoin('a.StaffRoles sr')
+				->where('a.level > 0')
 				->execute();
 
 $hasStaff = false;

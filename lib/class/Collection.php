@@ -63,7 +63,6 @@ class Collection extends Doctrine_Collection
 	 *
 	 * @param int $startAt start position
 	 * @param String $char sought character's name
-	 * @return boolean Is this collection contains key ? (isEmpty)
 	 */
 	public function ladderDisplay($startAt = 0, $char = '')
 	{

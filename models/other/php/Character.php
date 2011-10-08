@@ -29,6 +29,11 @@ class Character extends BaseCharacter
 		tag('b', lang('acc.ladder.sex') . ': ') . $this->getGender() . tag('br') .
 		tag('b', lang('level') . ': ') . $this->level . tag('br');
 	}
+	public function asEventParticipant($w)
+	{
+		return tag('span', array('class' => $this->isMine() ? 'myChar' : 'aChar'),
+		 ($w == $this->guid ? make_img('icons/medal_gold_1', EXT_PNG, lang('winner')) : '') . make_link($this));
+	}
 	public function getName()
 	{
 		if ($this->Account->getMainChar()->guid == $this->guid)

@@ -10,21 +10,37 @@
 abstract class IG
 {
 	protected static $statsMin = array(),
-	$statsMax = array(),
-	$reverseTable = array(
-		'99' => '7d',
-		'9c' => '7c',
-		'9d' => '76',
-		'9b' => '7e',
-		'98' => '7b',
-		'9a' => '77',
-	);
+					$statsMax = array(),
+					$reverseTable = array(
+						'99' => '7d',
+						'9c' => '7c',
+						'9d' => '76',
+						'9b' => '7e',
+						'98' => '7b',
+						'9a' => '77',
+					),
+					$breeds = array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12),
+					$genders = array(0, 1);
 
+	static public function getBreeds()
+	{
+		$breeds = array();
+		foreach (self::$breeds as $id)
+			$breeds[$id] = self::getBreed($id);
+		return $breeds;
+	}
 	static public function getBreed($id)
 	{
 		return lang('breed.' . $id);
 	}
 
+	static public function getGenders()
+	{
+		$genders = array();
+		foreach (self::$genders as $id)
+			$genders[$id] = self::getGender($id);
+		return $genders;
+	}
 	static public function getGender($id)
 	{
 		return lang('gender.' . $id);

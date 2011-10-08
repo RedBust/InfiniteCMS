@@ -32,6 +32,8 @@ if ($char && (!$event->relatedExists('Guild')
   || ($event->relatedExists('Guild') && $char->relatedExists('GuildMember') && $char->GuildMember->relatedExists('Guild') && $event->Guild->id == $char->GuildMember->Guild->id)))
 {
 	$event->link('Participants', array($char->guid));
+	if ($event->is_tombola && $event->isFull()) //LET'S GO
+		$event->doTombola();
 	$event->save();
 	redirect($event->getUrl());
 }

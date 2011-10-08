@@ -12,5 +12,11 @@
  */
 class PrivateMessageThreadReceiver extends BasePrivateMessageThreadReceiver
 {
-
+	public function getLink()
+	{
+		if ($this->present)
+			return make_link($this->Account);
+		else
+			return make_link($this->Account, tag('strike', array('title' => lang('has_left')), $this->Account->getName()));
+	}
 }

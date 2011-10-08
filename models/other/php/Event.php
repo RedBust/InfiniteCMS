@@ -12,31 +12,53 @@
  */
 class Event extends BaseEvent
 {
-	protected $elapsed = null;
+	protected $datePassed = null;
 
 	public function canJoin()
 	{
-		return !$this->isFull() && !$this->isElapsed();
+		if ($this->isFull() || $this->relatedExists('Winner'))
+			return false;
+		return !$this->isElapsed();
 	}
 	public function isFull()
 	{
-		return $this->capacity == -1 ? false : $this->Participants->count() == $this->capacity;
-	}
-	public function refreshElapsed()
-	{
-		$this->elapsed = null;
+		 if ($this->capacity == -1)
+			return false;
+		return $this->Participants->count() == $this->capacity;
 	}
 	public function isElapsed()
 	{
-		if (null === $this->elapsed)
+		return $this->isPeriodPassed();
+	}
+	public function isWinnable()
+	{
+		if (!$this->Participants->count())
+			return false;
+		if ($this->is_tombola)
+			return true;
+		return $this->isElapsed();
+	}
+	public function refreshPeriodPassed()
+	{
+		$this->datePassed = null;
+	}
+	public function isPeriodPassed()
+	{
+		if (null === $this->datePassed)
 		{
 			list($date, $time) = explode(' ', $this->period);
 			list($y, $mo, $d) = explode('-', $date);
 			list($h, $mi, $s) = explode(':', $time);
 
-			$this->elapsed = date_passed(mktime($h, $mi, $s, $mo, $d, $y));
+			$this->datePassed = date_passed(mktime($h, $mi, $s, $mo, $d, $y));
 		}
-		return $this->elapsed;
+		return $this->datePassed;
+	}
+	public function isFinished()
+	{
+		if ($this->isFull() || $this->relatedExists('Winner'))
+			return true;
+		return $this->isPeriodPassed();
 	}
 	public function getYear()
 	{
@@ -63,7 +85,10 @@ class Event extends BaseEvent
 	{
 		return array('controller' => 'Event', 'action' => 'index', 'year' => substr($this->period, 0, 4), 'month' => substr($this->period, 5, 2));
 	}
-
+	public function getParticipateURL($can)
+	{
+		return to_url(array('controller' => 'EventParticipant', 'action' => $can ? 'join' : 'part', 'id' => $this->id));
+	}
 	public function getGuildLink()
 	{
 		if (!$this->relatedExists('Guild'))
@@ -75,18 +100,61 @@ class Event extends BaseEvent
 	{
 		global $account;
 
-		$canParticipate = level(LEVEL_LOGGED) && $this->canJoin() ? $account->canParticipate($this->id) : false;
-		$participate_url = to_url(array('controller' => 'EventParticipant', 'action' => $canParticipate ? 'join' : 'part', 'id' => $this->id));
+		$canParticipate = level(LEVEL_LOGGED) && $this->canJoin() ? $account->canParticipate($this) : false;
 
 		if ($this->Participants->count())
+			$participants = $this->getParticipantsString();
+		else
+			$participants = $this->isFinished() ? '' : lang('participants.any');
+
+		echo tag('div', array('id' => 'event-' . $this->id, 'class' => 'showThis'),
+		 $this->getParticipateLink($canParticipate) . $this->getRewardString() . $participants);
+		jQ('registerEvent(' . $this->id . ')');
+
+		return $this->toListItem($canParticipate);
+	}
+	public function toListItem($can)
+	{
+		global $account;
+		return tag('b', $this->getHour() . 'h' . $this->getMinute() . $this->getGuildLink() . ': ') . $this->name .
+		 ( js_link('showEvent(' . $this->id . ')', make_img('icons/group', EXT_PNG, lang('participants')), '#', array('class' => 'showThis'))) .
+		 ( level(LEVEL_LOGGED) && $account->getMainChar() ? make_link($this->getParticipateURL($can), 
+		   make_img('icons/group_' . ($can ? 'add' : 'delete'), EXT_PNG, lang('event.join')),
+		   null, array('class' => 'hideThis')) : '');
+	}
+	public function getParticipantsString()
+	{
+		$participants = array();
+		foreach ($this->Participants as $character)
+			$participants[] = $character->asEventParticipant($this->getWinnerId());
+		return tag('h3', lang('participant' . ( count($participants) > 1 ? 's' : '' )) .
+		 ( $this->capacity == -1 || $this->capacity == 1 ? '' : ' (' . count($participants) . '/' . $this->capacity . ')' ) .
+		 ' : ') . $this->getWinnerString() . implode(', ', $participants);
+	}
+	public function getWinnerString()
+	{
+		global $account;
+		$winnerId = $this->getWinnerId();
+		if ($winnerId === -1 && !$this->isElapsed() && !$this->relatedExists('Winner') && level(LEVEL_LOGGED) && $account->canSetWinner($this))
+			return $this->getWinnerPrompt();
+		else
+			return '';
+	}
+	public function getWinnerPrompt() //getwinner form ? but that wouldn't be correct with tombola :(
+	{
+		if ($this->is_tombola)
 		{
-			$participants = array();
-			$winnerId = $this->relatedExists('Winner') && $this->isElapsed() ? $this->Winner->guid : -1;
-			if ($winnerId === -1 && $this->isElapsed() && level(LEVEL_LOGGED) && $account->canSetWinner($this))
-			{
-				$winner = make_form(array(array('char', lang('winner'))), array('controller' => 'Event', 'action' => 'win', 'id' => $this->id), array('submit_hideThis' => true));
-				if ($this->Participants->count() > 0)
-					jQ('
+			if ($this->capacity == -1)
+				return make_link(array('controller' => 'Event', 'action' => 'win', 'id' => $this->id), lang('event.pick_winner')) . tag('br'); //@todo "pick a winner"
+			else
+				return '';
+		}
+		else
+		{
+			if ($this->Participants->count() == 0)
+				return '';
+
+				jQ('
 var form_char = $("#form_char").autocomplete(
 {
 	source: ' . json_encode($this->Participants->toValueArray('name')) . ',
@@ -96,47 +164,43 @@ var form_char = $("#form_char").autocomplete(
 		this.form.submit();
 	}
 });');
-			}
-			else
-				$winner = '';
-
-			foreach ($this->Participants as $character)
-			{
-				$participants[] = tag('span', array('class' => $character->isMine() ? 'myChar' : 'aChar'),
-				 ($winnerId == $character->guid ? make_img('icons/medal_gold_1', EXT_PNG, lang('winner')) : '') . make_link($character));
-			}
-			$participants = tag('h3', lang('participant' . ( count($participants) > 1 ? 's' : '' )) .
-			 ( $this->capacity == -1 ? '' : '(' . count($participants) . '/' . $this->capacity . ')' ) .
-			 ' : ') . $winner . implode(', ', $participants);
+			return make_form(array(array('char', lang('winner'))), array('controller' => 'Event', 'action' => 'win', 'id' => $this->id), array('submit_hideThis' => true));
 		}
-		else
-			$participants = $this->isElapsed() ? '' : lang('participants.any');
+	}
+	public function getWinnerId($default = -1)
+	{
+		return $this->relatedExists('Winner') ? $this->Winner->guid : $default;
+	}
+	public function getParticipateLink($can)
+	{
+		if (!level(LEVEL_LOGGED))
+			return '';
 
-		if ($this->isElapsed())
-			$participate_link = tag('i', lang('event.elapsed')) . tag('br');
-		else
-		{
-			if (level(LEVEL_LOGGED))
-			{
-				$participate_link = make_img('icons/group_' . ($canParticipate ? 'add' : 'delete'), EXT_PNG) .
-				 tag('b', make_link($participate_url, lang('event.' . ($canParticipate ? 'join' . ($this->Participants->count() ? '' : '_first') : 'part')), array(), array(), false)) . tag('br');
-			}
-			else
-				$participate_link = '';
-		}
-
+		if ($this->isFinished())
+			return '';
+		return make_img('icons/group_' . ($can ? 'add' : 'delete'), EXT_PNG) .
+		 tag('b', make_link($this->getParticipateURL($can), lang('event.' . ($can ? 'join' . ($this->Participants->count() ? '' : '_first') : 'part')), array(), array(), false)) . tag('br');
+	}
+	public function getRewardString()
+	{
+		$reward = '';
 		if ($this->relatedExists('Reward'))
-			$reward = tag('br') . tag('fieldset', tag('legend', tag('b', lang('reward'))) . $this->Reward) . tag('br');
-		else
-			$reward = '';
+			$reward .= tag('br') . tag('fieldset', tag('legend', tag('b', lang('reward'))) . $this->Reward) . tag('br');
+		if ($this->isFinished())
+			$reward .= tag('i', lang('event.elapsed')) . tag('br');
+		return $reward;
+	}
 
-		echo tag('div', array('id' => 'event-' . $this->id, 'class' => 'showThis'), $participate_link . $reward . $participants);
-		jQ('registerEvent(' . $this->id . ')');
+	public function setWinner(Character $winner)
+	{
+		if ($this->relatedExists('Reward'))
+			$this->Reward->giveTo($winner);
 
-		return tag('b', $this->getHour() . 'h' . $this->getMinute() . $this->getGuildLink() . ': ') . $this->name .
-		 ($this->isElapsed() && !$this->Participants->count() ? '' : js_link('showEvent(' . $this->id . ')', make_img('icons/group', EXT_PNG, lang('participants')), '#', array('class' => 'showThis'))) .
-		 (level(LEVEL_LOGGED) && $account->getMainChar() && $this->canJoin() ? make_link($participate_url, 
-		   make_img('icons/group_' . ($canParticipate ? 'add' : 'delete'), EXT_PNG, lang('event.join')),
-		   null, array('class' => 'hideThis')) : '');
+		$this->Winner = $winner;
+	}
+	public function doTombola()
+	{
+		$winner = $this->Participants[rand(0, $this->Participants->count()-1)];
+		$this->setWinner($winner);
 	}
 }

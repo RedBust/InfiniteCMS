@@ -11,7 +11,6 @@ $hasArg = isset( $_SERVER['argv'][1] );
 if (!$hasArg || ( $hasArg && $_SERVER['argv'][1] == '--generate-models' ) )
 {
 	require 'lib/bootstrap' . EXT;
-	set_include_path( get_include_path() . EX_INCLUDE_PATH );
 
 	$options = array(
 		'generateTableClasses' => true,

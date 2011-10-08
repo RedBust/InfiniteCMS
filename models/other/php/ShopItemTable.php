@@ -10,18 +10,30 @@
  */
 class ShopItemTable extends RecordTable
 {
+	protected $numericCols = array('cost', 'value', 'category_id'),
+		$extFilters = array('name', 'cost', 'cost2', 'cat', 'is_lottery', 'is_hidden'), //extended
+		$simpleFilters = array('name', 'cat', 'cost', 'cost2', 'is_lottery');
 	public function getNumericCols()
 	{
-		return array('cost', 'cost_vip', 'value', 'category_id');
+		global $config;
+		if (empty($config['COST_VIP']))
+			return $this->numericCols;
+		else
+			return array_merge($this->numericCols, array('cost_vip'));
 	}
 	public function getAllFilters()
 	{
-		return array('name', 'cost', 'cost2', 'cat', 'is_lottery', 'is_vip', 'is_hidden');
+		global $config;
+		if (empty($config['COST_VIP']))
+			return $this->extFilters;
+		else
+			return array_merge($this->extFilters, array('is_vip'));
 	}
 	public function getFilters()
 	{
-		$filters = array('name', 'cat', 'cost', 'cost2', 'is_lottery');
-		if (level(LEVEL_VIP))
+		global $config;
+		$filters = $this->simpleFilters;
+		if (level(LEVEL_VIP) && !empty($config['COST_VIP']))
 			$filters[] = 'is_vip';
 		if (level(LEVEL_ADMIN))
 			$filters[] = 'is_hidden';
@@ -60,7 +72,7 @@ class ShopItemTable extends RecordTable
 			 array('cat', '&nbsp;' . lang('category'), 'record', array('empty' => true, 'type' => 'one', 'model' => 'ShopCategory'), $search_val['cat']),
 			 array('e_cost', NULL, 'checkbox', '1', array(), false),
 			 array('cost', '&nbsp;' .
-			  sprintf(lang('shop.cost_simple'), $config['POINTS_CREDIT' . (level(LEVEL_VIP) ? '_VIP' : '')], $config['POINTS_VOTE' . (level(LEVEL_VIP) ? '_VIP' : '')]) . ', ' .
+			  sprintf(lang('shop.cost_simple'), $config['POINTS_CREDIT' . (level(LEVEL_VIP) && !empty($config['COST_VIP']) ? '_VIP' : '')], $config['POINTS_VOTE' . (level(LEVEL_VIP) ? '_VIP' : '')]) . ', ' .
 			  lang('between') . '&nbsp;',
 			  NULL, intval($search_val['cost']), array(), false),
 			 array('cost2', '&nbsp;' . lang('and') . '&nbsp;', NULL, intval($search_val['cost2'])),

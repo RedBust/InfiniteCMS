@@ -18,7 +18,7 @@ class UserTable extends RecordTable
 		if (isset($users[$guid]))
 			return $users[$guid];
 
-		if (!$u = $this->find($guid))
+		if (!$u = $this->findOneByGuid($guid))
 		{
 			$u = new User;
 			$u->guid = $guid;

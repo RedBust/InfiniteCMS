@@ -15,9 +15,9 @@ if (level(LEVEL_LOGGED))
 	else
 	{
 		$account->User->lastVote = time();
-		$account->User->points += $config['POINTS_VOTE' . (level(LEVEL_VIP) ? '_VIP' : '')];
+		$account->User->points += $config['POINTS_VOTE' . (level(LEVEL_VIP) && !empty($config['COST_VIP']) ? '_VIP' : '')];
 		$account->User->votes += 1;
-		echo sprintf(lang('acc.vote.won'), $config['POINTS_VOTE' . (level(LEVEL_VIP) ? '_VIP' : '')]);
+		echo sprintf(lang('acc.vote.won'), $config['POINTS_VOTE' . (level(LEVEL_VIP) && !empty($config['COST_VIP']) ? '_VIP' : '')]);
 	}
 	echo '<br /><br />';
 }

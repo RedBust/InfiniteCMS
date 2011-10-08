@@ -70,7 +70,7 @@ ul, li { list-style: none;}
 	#right .module1 ul li { margin-bottom:-7px; }
 	#right .module1 ul li a { font-size:12px; color:#414141; text-decoration:none;  margin-left:10px; width:150px; margin-top:5px;   }
 	#right .module1  .text{ background:url(../images/tex.jpg) no-repeat; width:127px; height:39px; border:0px; margin-top:15px; margin-left:25px; font-size:13px; padding:4px;  }
-	#right .module1  .pwd{ background:url(pssw.jpg) no-repeat; width:127px; height:39px; border:0px; margin-top:0px; margin-left:25px; font-size:13px; padding:4px; }
+	#right .module1  .pwd{ background:url(../images/pssw.jpg) no-repeat; width:127px; height:39px; border:0px; margin-top:0px; margin-left:25px; font-size:13px; padding:4px; }
 	#right .module1 .ok { background:url(../images/ok.jpg) no-repeat; width:51px; height:26px; border:0px; margin-top:10px; margin-left:60px;}
 	#right .module1 .ok:hover{ background:url(../images/okh.jpg) no-repeat; }
 	

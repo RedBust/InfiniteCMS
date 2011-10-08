@@ -1,5 +1,4 @@
 <?php
-
 /**
  * InfiniteCMS
  *
@@ -60,15 +59,13 @@ $output = (bool) $router->requestVar('output', 1);
 $headers = $output ? ( !$isSpecialExt && $router->requestVar('header', 1) == 1 ) : false;
 meta('Content-Type', 'text/html; charset=UTF-8'); //@todo move this
 $mem .= memory_get_usage() . ': Avant controller+action<br />';
-
 try
 {
 	ob_start();
 	$file_include = str_replace(DS . $infos['action'], DS . '_include', $router->getPath());
 	if (file_exists($file_include) && substr($file_include, -1) != DS)
 		require_once $file_include;
-	$error = tag('br') . tag('p',
-					tag('h1', array('align' => 'center', 'style' => 'color: red;'), lang('error.404')));
+	$error = tag('br') . tag('p', tag('h1', array('align' => 'center', 'style' => 'color: red;'), lang('error.404')));
 	if ($connected ? !$account->banned : true)
 	{ //we can access to the page (/actions/Module/_include.php) and the accunt is not banned
 		if ((defined('HTTP_CODE') && HTTP_CODE != 200) || defined('LEVEL_FALLBACK')
@@ -99,8 +96,6 @@ try
 			&& ( HTTP_CODE == 404 && HTTP_CODE != 301 ))
 		|| defined('LEVEL_FALLBACK')) #301 auth
 		$title = sprintf('(%s)', lang('unknow'));
-#	else
-#		jQ('tinymce_include();'); //wrong place. I know. Fuck you. (2nd AFAIR)
 
 	if ($output)
 	{
@@ -108,8 +103,7 @@ try
 			header('Content-type: text/html; charset=UTF-8'); //UTF-8 is our MASTER §
 		if ($headers)
 		{
-			$title = strtr($config['TITLE'], array(
-				'{page}' => $title,
+			$title = strtr(str_replace('{page}', $title, $config['TITLE']), array(
 				'{server.name}' => $config['SERVER_NAME'],
 				'{server.corp}' => $config['SERVER_CORP'],
 			));

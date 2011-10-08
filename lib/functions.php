@@ -103,15 +103,7 @@ if (!function_exists('lcfirst'))
  */
 function load($t)
 {
-	static $modified = false;
-	if (!$modified)
-	{
-		define('EX_INCLUDE_PATH', get_include_path());
-		set_include_path(get_include_path() . PATH_SEPARATOR . 'lib/class/');
-		$modified = true;
-	}
-	$t = str_replace(array('\\', '_',), DS, $t) . EXT;
-	return require $t;
+	return require str_replace(array('\\', '_',), DS, $t) . EXT;
 }
 
 spl_autoload_register('load');
@@ -1212,7 +1204,7 @@ function input($name, $label, $type = NULL, $value = '', $add = array())
 			/*
 			 * hours spent trying to understand why I have to nest this $(function() { ... });
 			 *  in the jQ() one :
-			 *  ACTUALLY MORE THAN 5 HOURS
+			 *  ACTUALLY MORE THAN 5 HOURS (really more.)
 			 * This bug exists from the very start of the CMS, I tried to resolve it for hours and hours,
 			 *  and I just figured out that this silly solution is working.
 			 * You may also try to only put this JS at the very end (like jQ('tinymce blah'); echo jQ();),
@@ -1617,12 +1609,8 @@ function make_form($columns, $loc = '#', $opts = array())
 
 function input_csrf_token()
 {
-	if (!defined('CSRF_TOKEN'))
-	{ //_csrf_token shouldn't be already defined
-		define('CSRF_TOKEN', $_SESSION['_csrf_token'] = md5(rand(0, 999)));
-	}
-
-	return input('_csrf_token', NULL, 'hidden', CSRF_TOKEN);
+	$_SESSION['_csrf_token_req'] = true;
+	return input('_csrf_token', NULL, 'hidden', session_id());
 }
 
 /**

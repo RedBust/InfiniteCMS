@@ -4,6 +4,8 @@ ban ips
 link to account's profile from character's profileBox (=> unless current_page?)
 consider Event as VIP-only if Reward.is_vip ?
 1.3(?):
+ Added multiple options to ladder : ASC/DESC ordering, changing column, gender and breed search.
+ Fixed an misplaced image (in css/, wtf)
  There is now ShopItemEffect with NO LiveAction. The one created for example is Character prefix. It's not currently enabled.
  Add ONE elapsed poll on Poll/index for ! admin?, to show the last elapsed poll results
  Added ShopCategory, all the shop items MUST BE in categories, using jQ.UI.Tabs + AJaX tab loading (totally noJS compatible).
@@ -17,8 +19,10 @@ consider Event as VIP-only if Reward.is_vip ?
  Added a simple CSRF check, only on POST form. This is not yet fully tested, so you may have bugs, but this is a good step.
   This currently forbids for F5-ing in a (pre-submitted, else it won't be a POST req.) form.
   The other way would be to add a check_csrf_token() just before record->update_attributes
- Fixed THE TinyMCE bug. Ok, I won't touch that crap anymore.
+ Fixed THE TinyMCE bug. Ok, I won't touch that crap anymore
+ Added IG::getBreeds and IG::getGenders
  Fixed Shop#delete redirects to a bad URL
+ Added $prefix in tpl/left to change that setting easily
  Added ability to select a reward (ShopItem) and to select a winner in an Event (with jQ.UI.AutoComplete).
   The prize will be given via LiveAction. The ShopItem should'nt be VIP (or should it make the Event for VIP only ?)
  Refactored tons of models code (splitted lots of big code)
@@ -30,7 +34,7 @@ consider Event as VIP-only if Reward.is_vip ?
   - special items in shop
   - special prices for items
   - different number of points gained with vote/code
-  There's CURRENTLY no way (other than DB edit) to be VIP. It'll be fixed (soon).
+ Added ability to buy VIP rank. VIP rank can be disabled by setting COST_VIP to 0.
  Changed the way account's characters are handled :
   Now, you have a "main char" when you first log-in (with Characters.count > 0) which will perform all the actions
   You can change it via a link (if Characters.count > 1), with User/main page (unless js?).
@@ -73,11 +77,11 @@ consider Event as VIP-only if Reward.is_vip ?
   The "box" view marks all pm, starting with "!!" if someone already replied to the PM, the title + the receivers (you excluded)
   The pm view is a board thread-view like. You have username (profile dialog) + created timestamp, message. Paginated.
   When you answer, you're redirected and a notification is created for each receiver IF the receiver don't have already a notif for this thread.
-  When you come to the CMS while having new PM, you get the link "[x] new PM(s)". X is a direct link to the FIRST message he have to read.
-   ie : You create a thread. You're at page 1
-   Someone answers. Page 1, still
-   ... Answering by many people like that, without you coming, to page 3.
-   You come. You see "_1_ new pm". You click on the _1_ link, you'll get to the page 1, not to the page 3.
+  You can leave a thread, you won't receive any notifications plus the thread won't show up in your inbox (currently no link, it'll be used for notifs)
+  When you come to the CMS while having new PM, you get the link "[x] new PM(s)". X is a direct link to the FIRST message you have to read.
+   ie : You create a thread. You're at page 1. Someone answers. Page 1, still
+   ... The thread is answered by many people - without you checking these page - until it reaches page 3.
+   You come back (with 3 pages to read). You see "_1_ new pm". You click on the _1_ link, you'll get to the page 1, not to the page 3.
   At each AJaX page refresh, the PM counter is refreshed.
  Search character in ladder
  Totally rewrote almost every relations in the CMS. The database "base" have been deleted, and everything is now in the ancestra_other database.

@@ -54,6 +54,7 @@ if (!empty($_POST))
 		$thread->save();
 	}
 }
+
 if (count($_POST) == 0 || $errors != array())
 {
 	echo make_form(array(
@@ -63,7 +64,7 @@ if (count($_POST) == 0 || $errors != array())
 	));
 	jQ('$(function () { $("#form_receivers").tokenInput("' . getPath() . 'Account/reverseFriends.json", {theme: "facebook", preventDuplicates: true}); });');
 }
-elseif (count($_POST) && $errors == array())
+else if (count($_POST) && $errors == array())
 {
 	redirect(array('controller' => $router->getController(), 'action' => 'show', 'id' => $thread->id));
 }

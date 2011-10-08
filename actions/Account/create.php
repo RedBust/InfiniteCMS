@@ -1,7 +1,4 @@
 <?php
-$sent = count($_POST);
-$acc = new Account;
-
 if (!check_level(LEVEL_GUEST)) //yeah, level guest is required. SO WAT ?
 	return;
 if (!$config['ENABLE_REG'])
@@ -10,17 +7,17 @@ if (!$config['ENABLE_REG'])
 	return;
 }
 
-if ($sent)
+$acc = new Account;
+if (count($_POST))
 	$errors = $acc->update_attributes($_POST, true);
-if (!$sent || $errors != array())
+if (!count($_POST) || $errors != array())
 {
-	if (!$acc->exists() && !$config['ALLOW_MULTI']
-			&& $acc->getTable()->findOneByLastip(ip2long($member->getIp())))
+	if (!$config['ALLOW_MULTI'] && $acc->getTable()->findOneByLastip(ip2long($member->getIp())))
 	{
 		echo lang('acc.register.error.already_created_acc');
 		return;
 	}
 	partial('_form', 'acc', PARTIAL_CONTROLLER);
 }
-else if ($sent && $errors === array())
+else if (count($_POST) && $errors === array())
 	echo lang('acc.account_created');

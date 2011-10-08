@@ -79,10 +79,14 @@ class Member extends Multiton
 	}
 	public static function adjustLevel($lvl, $vip)
 	{
+		global $config;
 		if ($lvl > LEVEL_ADMIN)
 			return LEVEL_ADMIN;
-		if ($lvl == LEVEL_LOGGED && $vip)
+		if ($lvl == LEVEL_LOGGED && ($vip && !empty($config['COST_VIP'])))
 			return LEVEL_VIP;
+		if ($lvl == LEVEL_VIP && empty($config['COST_VIP']))
+			return LEVEL_LOGGED;
+
 		return $lvl;
 	}
 

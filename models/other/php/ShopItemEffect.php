@@ -20,16 +20,16 @@ class ShopItemEffect extends BaseShopItemEffect
 	{
 		if ($this->isItem()) //find the item ID
 		{
-			if( is_numeric( $val ) ) //itemID submitted
+			if (is_numeric($val)) //itemID submitted
 			{
-				if( lang( $val, 'item', NULL ) === NULL )
+				if(lang($val, 'item', NULL) === NULL)
 					return false; //item does not exists
 			}
 			else
 			{
-				if( ( $val = array_search( $val, lang( NULL, 'item' ) ) ) === false )
+				if (( $val = array_search($val, lang(NULL, 'item'))) === false )
 				{
-					if( ( $val = array_search( html( $val ), lang( NULL, 'item' ) ) ) === false )
+					if (( $val = array_search(html($val), lang(NULL, 'item')) ) === false )
 						return false; //item does not exists
 				}
 			}
@@ -100,6 +100,19 @@ class ShopItemEffect extends BaseShopItemEffect
 			break;
 		}
 	}
+	/**@todo that way ?
+	$effectLangs = array(
+		ShopItemEffectTable::TYPE_ADD_PREFIX => 'Adds prefix <i>%s</i>',
+	);
+	//*or ...
+	public function renderEffect()
+	{
+		return strtr(lang('shop.effect.' . $this->type), array(
+			'%value%' => $this->getValue(),
+			'%val%' => $this->value,
+		));
+	}
+	*/
 	public function renderEffect()
 	{
 		switch ($this->type)
@@ -109,12 +122,4 @@ class ShopItemEffect extends BaseShopItemEffect
 			break;
 		}
 	}
-	/**@todo that way ?
-	public function getEffectLangs()
-	{
-		return array(
-			ShopItemEffectTable::TYPE_ADD_PREFIX => 'Adds prefix <i>%s</i>',
-		);
-	}
-	*/
 }

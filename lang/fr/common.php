@@ -63,6 +63,8 @@ return array(
 	'datetime' => 'Date et heure',
 	'category' => 'Catégorie',
 	'move_to' => 'Déplacer vers',
+	'capacity' => 'Capacité',
+	'has_left' => 'A quitté',
 
 	'must_!empty' => 'Le champ "%s" ne doit pas &ecirc;tre vide', //%s = name of input
 	'incorrect_date' => '"%s" : date incorrecte',
@@ -231,8 +233,8 @@ Votre personnage principal est le personnage qui recevra vos commandes boutique,
 	'acc.in_ur_friends' => '<b>%s</b> est un de vos amis.', //%s = account pseudo
 	'acc.in_ur_friends_&' => '<b>%s</b> est un de vos amis et vous a dans ses amis.', //%s = account pseudo
 	'acc.in_ur_friends_!' => '<b>%s</b> vous a dans ses amis.', //%s = account pseudo
-
-	'acc.register_disabled' => 'L\'inscription a éé désactivé',
+	'acc.vip!' => 'Votre compte a bien été mis au rang <b>VIP</b> !',
+	'acc.register_disabled' => 'L\'inscription est désactivée.',
 	'acc.already_connected' => 'Vous &ecirc;tes déjà connecté. ',
 	'acc.now_connected' => 'Vous &ecirc;tes maintenant connecté ! ',
 	'acc.delogged' => 'Vous avez bien été déconnecté. ',
@@ -242,6 +244,8 @@ Votre personnage principal est le personnage qui recevra vos commandes boutique,
 	'acc.edited' => 'Compte modifié !',
 	'acc.edit' => 'Modifier le compte de %s',
 	'acc.edit_infos' => 'Modifier les informations de %s',
+	'acc.vote.already' => 'Vous avez déjà voté, vous ne gagnerez pas de point.',
+	'acc.vote.won' => 'Vous gagnez <b>%d</b> point !', //%d = Points earned
 	'acc.friend' => 'Ami',
 	'acc.join' => '<h1>Téléchargement</h1>
 <b>Vous n\'avez pas le client DOFUS en 1.29 ?</b><br />
@@ -256,15 +260,21 @@ Et téléchargez directement la configuration <a href="%config%">ici</a> et inst
 <h1>Inscription</h1>
 Vous pouvez vous inscrire %register%.{/register}{log}-->{/log}', //{log} = if logged. {/log} = end if logged. %register% => "here"
 	'acc.no_guild' => 'Pas de guilde',
-	'guild.mean_level' => 'Niveau moyen de la guilde: ',
-	'guild.avg_level' => 'Niveau moyen des guildes',
 	'acc.ladder.pos' => 'Position',
 	'acc.ladder.guild' => 'Guilde',
-	'acc.ladder.class' => 'Race',
+	'acc.ladder.class' => 'Race', //using class cause it's the column name
+	'acc.ladder.xp' => 'Expérience',
+	'acc.ladder.level' => 'Niveau',
+	'acc.ladder.honor' => 'Honneur',
+	'acc.ladder.deshonor' => 'Déshonneur',
 	'acc.ladder.sex' => 'Genre',
 	'acc.ladder.no_character' => 'Pas de personnage',
-	'acc.vote.already' => 'Vous avez déjà voté, vous ne gagnerez pas de point.',
-	'acc.vote.won' => 'Vous gagnez <b>%d</b> point !', //%d = Points earned
+	'ladder.order_mode' => 'Triage',
+	'ladder.order_by' => 'Colonne de tri',
+	'ladder.order_mode.ASC' => 'Ascendant',
+	'ladder.order_mode.DESC' => 'Descendant',
+	'guild.mean_level' => 'Niveau moyen de la guilde : ',
+	'guild.avg_level' => 'Niveau moyen des guildes',
 
 
 	'user.points_stats' => 'Points / Statistiques',
@@ -449,7 +459,7 @@ Vous pouvez vous inscrire %register%.{/register}{log}-->{/log}', //{log} = if lo
 	'pm.any' => 'Vous n\'avez aucun message privé.',
 	'pm.info' => '<b>%s</b>, avec %s. ',
 	'pm.last_answer_by_on' => 'Dernier message de %s, le %s.',
-	'pm.does_not_exist' => 'Cette conversation n\'existe pas, ou vous n\'y participez pas.',
+	'pm.does_not_exist' => 'Cette conversation n\'existe pas, ou vous n\'y participez pas ou plus.',
 	'pm.back' => 'Revenir à la boîte de réception',
 	'pm.answer' => 'Répondre',
 	'pm.arrived' => '<a href="%s" class="pm-count">%s</a> Nouveau message privé.',
@@ -469,7 +479,10 @@ Vous pouvez vous inscrire %register%.{/register}{log}-->{/log}', //{log} = if lo
 	'event.elapsed' => 'Cet évènement est passé.',
 	'event.!elapsed' => 'Cet évènement n\'est pas encore passé.',
 	'event.full' => 'Cet évènement ne peut accueillir plus de participants.',
+	'event.capacity_explain' => 'le nombre de personnes qui peuvent participer à l\'évènement.<br /><b>-1</b> pour ne pas limiter.<br /><b>0</b> pour ne pas admettre de participant.<br /><u>NOTE:</u> un évènement en mode "Tombola" ne peut avoir une capacité de 0 participant',
 	'event.already_won' => 'Cet évènement a déjà un vainqueur.',
+	'event.tombola.explain' => 'Mode tombola (<i>on ne peut s\'inscrire qu\'après la date passée.<br />Si "capacité" est à <b>-1</b> : vous devrez cliquer sur le bouton "tirer un vainqueur".<br />Sinon, lorsque le nombre de participants atteindra la limite, un d\'eux sera tiré au hasard et recevra le lot</i>)',
+	'event.pick_winner' => 'Tirer un vainqueur',
 	'reward' => 'Récompense',
 	'winner' => 'Vainqueur',
 );

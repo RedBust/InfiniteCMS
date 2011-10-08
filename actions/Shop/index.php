@@ -58,7 +58,7 @@ if (count($categories))
 
 			if ($type == 'cat')
 				$type = 'category_id';
-			if ($type == 'cost' && level(LEVEL_VIP))
+			if ($type == 'cost' && (level(LEVEL_VIP) && !empty($config['COST_VIP'])))
 				$type = 'cost_vip';
 
 			$allItemsDql->andWhere(sprintf('%s %s ?', $type, $sign), $value);

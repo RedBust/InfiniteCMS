@@ -9,7 +9,7 @@ return array(
 	'SERVER_EMAIL' => 'contact@monserver.com',
 	//you can delete the key below if your server has not corporation
 	// (by adding a sharp before the line, #'SERVER_CORP' => ...)
-	//vous pouvez supprimer cette traduction si votre serveur n'a pas d'entreprise
+	//vous pouvez supprimer cette entrée si votre serveur n'appartient pas à une entreprise
 	// (en ajoutant un dièse avant la ligne, #'SERVER_CORP' => ...)
 	'SERVER_CORP' => 'MyServerCorporation',
 
@@ -17,7 +17,32 @@ return array(
 	// {server.name}, {server.corp}
 	//Titre de la page. Variables utilisables : {title} (titre normal, comme "Index")
 	// {server.name}, {server.corp}
-	'TITLE' => '{page} • {server.name}',
+	'TITLE' => '{page} &bull; {server.name}',
+
+
+	//Is the shop enabled ?
+	//La boutique est-elle activée ?
+	'ENABLE_SHOP' => true,
+	//Points given for a vote
+	//Points donnés pour un vote
+	'POINTS_VOTE' => 1,
+	//Points given for one pass
+	//Points donnés pour un pass
+	'POINTS_CREDIT' => 100,
+	//Points given for a vote from a VIP
+	//Points donnés pour un vote PAR UN VIP
+	'POINTS_VOTE_VIP' => 4,
+	//Points given for one pass from a VIP
+	//Points donnés pour un pass PAR UN VIP
+	'POINTS_CREDIT_VIP' => 140,
+	//Points to become VIP. To disable VIP mode, set to 0
+	//Points à payer pour être VIP. Pour désactiver le mode VIP, mettez 0
+	'COST_VIP' => 5,
+
+	//Used for "server online?"
+	//Utilisé pour "serveur en ligne ?"
+	'IP_SERV' => 'localhost',
+	'PORT_SERV' => 444,
 
 	//Downloads link (Misc/join)
 	//Liens de téléchargement (Misc/join)
@@ -43,13 +68,13 @@ return array(
 	'URL_VOTE' => -1,
 
 	//URL of board (if it's an external url, the url _MUST_ begin with http://)
-	// (if you got no board, put # before the line: #'BOARD_URL' => ...)
+	// (if you don't have a board, put # before the line: #'BOARD_URL' => ...)
 	//Adresse du forum (si c'est une adresse externe, elle _DOIT_ commencer avec http://)
 	// (si vous n'avez pas de forum, ajoutez # au début de la ligne : #'BOARD_URL' => ...)
 	'BOARD_URL' => './forum/',
 
 # DB CONFIGURATION
-#You won't modify that unless you did some "tricks" on your DB.
+#You won't modify that unless you did some "tricks" to your DB.
 #Vous ne devriez pas avoir à modifier ça, sauf si vous avez touché à votre DB
 	//TYPE of DB Server (as mysql, mssql)
 	//TYPE du serveur BDD (comme mysql/mssql ... J'ai crée ce CMS de manière
@@ -80,7 +105,11 @@ return array(
 		'enable' => true,
 
 		//different possible type: webo, star (case sensitive)
+		//IT MUST BE FORMATTED THIS WAY : (without sharp (#) at the line start)
+#		'type' => 'star',
 		//différent types possibles: webo, star (sensible à la casse !)
+		// LE FORMAT DOIT ÊTRE LE SUIVANT : (sans dièse (#) au début de la ligne)
+#		'type' => 'star',
 		'type' => 'webo / star',
 
 		//If it's webopass ('webo' in type)
@@ -95,27 +124,6 @@ return array(
 		//Else: not implemented yet
 		//Sinon: pas encore disponible
 	),
-
-	//Is the shop enabled ?
-	//La boutique est-elle activée ?
-	'ENABLE_SHOP' => true,
-	//Points given for a vote
-	//Points donnés pour un vote
-	'POINTS_VOTE' => 1,
-	//Points given for one pass
-	//Points donnés pour un pass
-	'POINTS_CREDIT' => 100,
-	//Points given for a vote from a VIP
-	//Points donnés pour un vote PAR UN VIP
-	'POINTS_VOTE_VIP' => 4,
-	//Points given for one pass from a VIP
-	//Points donnés pour un pass PAR UN VIP
-	'POINTS_CREDIT_VIP' => 140,
-
-	//Used for "server online?"
-	//Utilisé pour "serveur en ligne ?"
-	'IP_SERV' => 'localhost',
-	'PORT_SERV' => 444,
 
 # TEAMSPEAK
 	'TEAMSPEAK' => array(
@@ -173,10 +181,10 @@ return array(
 	'ITEM_LINES_BY_PAGE' => 2,
 	//Number of character by page on ladder
 	//Nombre de personnages par page dans les ladders
-	'LADDER_LIMIT' => 15,
+	'LADDER_LIMIT' => 10,
 	//Show admins on ladder ?
 	//Afficher les admins sur le ladder ?
-	'LADDER_ADMIN' => false,
+	'LADDER_ADMIN' => true,
 
 	//STATS: Show (or not) "Accounts created", "Characters created" and "accounts logged on"
 	// It costs 3 SQL Queries (1h cache). It enables also the Misc/stats page (showing all stats, 6h cache)
