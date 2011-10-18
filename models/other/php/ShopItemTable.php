@@ -79,4 +79,23 @@ class ShopItemTable extends RecordTable
 			 $options
 			));
 	}
+
+	static public function getType($type)
+	{
+		global $types;
+		foreach ($types as $t => $k)
+		{
+			if (is_array($k))
+			{
+				foreach ($k as $i => $v)
+				{
+					if ($i == $type)
+						return $v;
+				}
+			}
+			else if ($t == $type)
+				return $k;
+		}
+		return NULL;
+	}
 }

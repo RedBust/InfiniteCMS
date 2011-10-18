@@ -1225,37 +1225,63 @@ function input($name, $label, $type = NULL, $value = '', $add = array())
 				$value['displayMethod'] = NULL;
 			if (!isset($value['column']) && empty($value['displayMethod']))
 				$value['column'] = 'name';
-			if (method_exists($value['model'], $dMethod = 'get'.Doctrine_Inflector::classify($value['column']))
-			 && ($value['displayMethod'] === NULL || $value['displayMethod'] === true))
-				$value['displayMethod'] = $dMethod;
 
-			$t = Doctrine_Core::getTable($value['model']);
-			$identifier = $t->getIdentifier();
-
-			if (isset($value['query']))
-				$records = $value['query']->execute();
-			else
-				$records = $t->findAll();
-
-			$exclude = isset($value['exclude']) ? (array) $value['exclude'] : array();
-
-			if (empty($value['displayMethod']))
-				$value = $records->toValueArray($value['column']);
-			else
+			if (empty($value['parent']))
 			{
-				$method = $value['displayMethod'];
-				$value = array();
-				foreach ($records as $record)
-					$value[$record[$identifier]] = $record->$method();
+				if (method_exists($value['model'], $dMethod = 'get'.Doctrine_Inflector::classify($value['column']))
+				 && ($value['displayMethod'] === NULL || $value['displayMethod'] === true))
+					$value['displayMethod'] = $dMethod;
+				$t = Doctrine_Core::getTable($value['model']);
+				$identifier = $t->getIdentifier();
+
+				if (isset($value['query']))
+					$records = $value['query']->execute();
+				else
+					$records = $t->findAll();
+
+				$exclude = isset($value['exclude']) ? (array) $value['exclude'] : array();
+
+				if (empty($value['displayMethod']))
+					$value = $records->toValueArray($value['column']);
+				else
+				{
+					$method = $value['displayMethod'];
+					$value = array();
+					foreach ($records as $record)
+						$value[$record[$identifier]] = $record->$method();
+				}
+
+				if ($addEmpty)
+					$value['-1'] = lang('empty');
+
+				if (count($exclude))
+				{
+					foreach ($exclude as $exc)
+						unset($value[$exc]);
+				}
 			}
-
-			if ($addEmpty)
-				$value['-1'] = lang('empty');
-
-			if (count($exclude))
+			else
 			{
-				foreach ($exclude as $exc)
-					unset($value[$exc]);
+				$t = Doctrine_Core::getTable($value['parent']);
+				$pRecords = $t->createQuery('p')
+							->leftJoin('p.' . $value['model'] . ' c')
+							->execute();
+				if ($pRecords->count())
+				{
+					$records = array();
+					if (method_exists(get_class($pRecords[0]), $pCol = 'get'.Doctrine_Inflector::classify($value['pColumn'])))
+						$value['pDisplayMethod'] = $pCol;
+					foreach ($pRecords as $pRecord)
+					{
+						$val = array();
+						foreach ($pRecord[$value['model']] as $cRecord)
+							$val[$cRecord[$cRecord->getTable()->getIdentifier()]] = empty($value['displayMethod']) ? $cRecord[$value['column']] : $cRecord->{$value['displayMethod']}();
+						$records[empty($value['pDisplayMethod']) ? $pRecord[$value['pColumn']] : $pRecord->{$value['pDisplayMethod']}()] = $val; 
+					}
+					$value = $records;
+				}
+				else
+					$value = array();
 			}
 		}
 
@@ -1408,6 +1434,7 @@ function input_select_options($value, $selected = NULL)
 	$in_optgroup = false;
 	$optgroup_label = $cache = $actual = $options = '';
 
+	/*
 	foreach ($value as $val => $title)
 	{
 		if ($val < -1) //allowing -1 as blank :p
@@ -1439,6 +1466,25 @@ function input_select_options($value, $selected = NULL)
 		$options .= tag('optgroup', array('label' => $optgroup_label), $cache);
 		$cache = '';
 	}
+	//*/
+	//*
+	foreach ($value as $val => $title)
+	{
+		if (is_string($val) && is_array($title))
+		{
+			$optgroup = '';
+			foreach ($title as $opt => $name)
+				$optgroup .= tag('option', array('value' => str_replace('\\', '', $opt)) +
+				 ($opt == $selected ? array('selected' => 'selected') : array()), $name);
+			$options .= tag('optgroup', array('label' => $val), $optgroup);
+		}
+		else
+		{
+			$options .= tag('option', array('value' => str_replace('\\', '', $val)) +
+				 ($val == $selected ? array('selected' => 'selected') : array()), $title);
+		}
+	}
+	//*/
 	return $options;
 }
 
@@ -1607,10 +1653,23 @@ function make_form($columns, $loc = '#', $opts = array())
 	return $opts['append_form_tag'] ? tag('form', array('method' => $opts['method'], 'action' => $loc, 'id' => 'form'), $str) : $str;
 }
 
-function input_csrf_token()
+function input_csrf_token($on = true)
 {
 	$_SESSION['_csrf_token_req'] = true;
 	return input('_csrf_token', NULL, 'hidden', session_id());
+/*
+	if ($on)
+	{
+		if (defined('SKIP_CSRF_TOKEN') && SKIP_CSRF_TOKEN)
+			return '';
+
+		__actual_code();
+	}
+	else
+	{
+		unset($_SESSION['_csrf_token_req']);
+		define('SKIP_CSRF_TOKEN', true);
+	}*/
 }
 
 /**

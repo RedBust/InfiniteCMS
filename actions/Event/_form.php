@@ -5,7 +5,7 @@ echo make_form(array(
 	array('period', tag('br') . lang('datetime') . tag('br'), 'datetime', $event->period, array('__restrict' => '@today+;')),
 	( level(LEVEL_ADMIN) ? array('is_tombola', tag('br') . lang('event.tombola.explain') . tag('br'), 'checkbox', $event->is_tombola) : NULL ),
 	( level(LEVEL_ADMIN) && $guildId != -1 ? array('is_guild', tag('br') . lang('event.is_guild') . tag('br'), 'checkbox', $event->relatedExists('Guild')) : NULL ),
-	( level(LEVEL_ADMIN) ? array('reward', tag('br') . lang('reward') . tag('br'), 'record', array('type' => 'one', 'model' => 'ShopItem', 'empty' => true), $event->reward_id) : NULL ),
+	( level(LEVEL_ADMIN) ? array('reward', tag('br') . lang('reward') . tag('br'), 'record', array('type' => 'one', 'model' => 'Items', 'empty' => true, 'parent' => 'ShopCategory', 'pColumn' => 'name'), $event->reward_id) : NULL ),
 ));
 
 

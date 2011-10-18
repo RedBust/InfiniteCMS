@@ -77,7 +77,7 @@ class LiveActionTable extends RecordTable
 
 		if (!in_array($effect->type, $this->getTypes()))
 			exit('unknow type : ' . $effect->type);
-		$type = $types[$effect->type];
+		$type = ShopItemTable::getInstance()->getType($effect->type);
 		if ($type[0] == $sign) //remove +
 			$type = substr($type, 1);
 		return tag('span', array('style' => array('color' => $color)), '<b>' . $sign . '</b><u>' . $val . '</u> ' .

@@ -17,7 +17,7 @@ class ShopItem extends BaseShopItem
 
 		if ($this->is_lottery)
 		{
-			$effect = $this->Effects[rand(0, $this->Effects->count())];
+			$effect = $this->Effects[rand(0, $this->Effects->count()-1)];
 			$effect->giveTo($p);
 			return $effect;
 		}
@@ -65,7 +65,7 @@ class ShopItem extends BaseShopItem
 				}
 
 				if (in_array($t, $this->getTable()->getNumericCols()) && strval(intval($values[$t])) !== $values[$t])
-					$errors[$t] = sprintf(lang( 'must_numeric'), $t);
+					$errors[$t] = sprintf(lang('must_numeric'), $t);
 				else
 					$this->$t = $values[$t];
 			}
@@ -93,8 +93,8 @@ class ShopItem extends BaseShopItem
 			{
 				if (empty($values['value'][$id]))
 					continue;
-				else if( !isset( $types[$type] ) && $type != -1 )
-					$errors['type'] = sprintf( lang( 'must_numeric' ), 'type (' . $id . ')' );
+				else if( !$this->getTable()->getType($type) && $type != -1 )
+					$errors[] = sprintf(lang('must_numeric'), 'type (' . $id . ')' );
 				else if( $this->Effects->contains($id) )
 				{
 					if( $type === NULL || $type == -1 )

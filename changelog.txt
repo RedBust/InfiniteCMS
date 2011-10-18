@@ -23,8 +23,9 @@ consider Event as VIP-only if Reward.is_vip ?
  Added IG::getBreeds and IG::getGenders
  Fixed Shop#delete redirects to a bad URL
  Added $prefix in tpl/left to change that setting easily
- Added ability to select a reward (ShopItem) and to select a winner in an Event (with jQ.UI.AutoComplete).
+ Added ability to select a reward (ShopItem) and to select a winner in an Event (with jQ.UI.AutoComplete)
   The prize will be given via LiveAction. The ShopItem should'nt be VIP (or should it make the Event for VIP only ?)
+  In the form, the rewards are ordered this way: [category => category.Items, cat => [cat.Items[0], cat.Items[1]], ...]
  Refactored tons of models code (splitted lots of big code)
  There's now "type" in Shop Items :
   - Lottery: it only gives ONE of the effects (still need to explain what is it when hovering "lottery")
