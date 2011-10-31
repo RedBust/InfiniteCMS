@@ -2,13 +2,19 @@
 if (!check_level(LEVEL_LOGGED))
 	return;
 
-$reverseF = $account->getReverseFriendsQ();
+$reverseFriends = $account->getReverseFriends();
+$list = array();
 if (isset($_GET['q']))
-	$reverseF->having('LOWER(pseudo) LIKE ?', str_replace('%', '', strtolower($_GET['q'])) . '%');
-$reverseF = $reverseF->fetchArray();
-
+{
+	$q = strtolower($_GET['q']);
+	foreach ($reverseFriends as $friend)
+	{
+		if (strpos(strtolower($friend->pseudo), $q) !== false)
+			$list[] = $friend; 
+	}
+}
 $returns = array();
-foreach ($reverseF as $friend)
+foreach ($list as $friend)
 { //can't use toValueArray koz id => guid
 	$returns[] = array('id' => $friend['guid'], 'name' => $friend['pseudo']);
 }

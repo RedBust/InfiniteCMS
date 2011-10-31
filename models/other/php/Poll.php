@@ -53,10 +53,13 @@ class Poll extends BasePoll
 	{
 		$errors = array();
 
-		if (!empty($vals['name']))
-			$this->name = $vals['name'];
-		else if ($this->exists() ? empty($vals['name']) : true)
-			$errors['name'] = sprintf(lang('must_!empty'), lang('name'));
+		if (isset($vals['name']) || !$this->exists())
+		{
+			if (!empty($vals['name']))
+				$this->name = $vals['name'];
+			else
+				$errors['name'] = sprintf(lang('must_!empty'), lang('name'));
+		}
 
 		$pre_dates = $dateTimes = array();
 		foreach (array('start', 'end') as $date_type)

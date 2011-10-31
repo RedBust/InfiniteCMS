@@ -375,7 +375,7 @@ if (level(LEVEL_ADMIN))
 	apply_' . $type . '();';
 	jQ($js);
 }
-echo javascript_tag('jQuery/core', 'jQuery/editInPlace-2.3', 'jQuery/dropShadow', 'jQuery/timers', 'jQuery/tipTip', 'jQuery/SWFObject', 'jQuery/highCharts', 'jQuery/tokenInput',
+echo javascript_tag('jQuery/core', 'jQuery/editInPlace', 'jQuery/dropShadow', 'jQuery/timers', 'jQuery/tipTip', 'jQuery/SWFObject', 'jQuery/highCharts', 'jQuery/tokenInput',
  'jQuery/UI/core', 'jQuery/UI/timepicker',
  '../tiny_mce/tiny_mce', '../tiny_mce/jQuery.tiny_mce');
 ?><script type="text/javascript">
@@ -425,6 +425,8 @@ var tinyMCEOpt =
 	media_external_list_url : 'static/lists/media_list.js'
 	
 };
+var csrf_token = '<?php echo session_id() ?>';
+
 function explode(delimiter, string, limit)
 {	//(thanks to phpJS for this function)
 	//Why I use this, and not the native String.split ? because 'limit' param is not delimiting when stop,

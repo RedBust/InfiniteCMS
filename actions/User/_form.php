@@ -1,5 +1,4 @@
 <?php
-$nl = tag('br');
 echo make_form(array(
 	lang('user.points_stats') => array(
 		array('points', lang('user.points') . $nl, NULL, $c->points),

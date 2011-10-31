@@ -485,6 +485,9 @@ $.extend(InlineEditor.prototype, {
 			+ ((this.settings.params) ? '&' + this.settings.params : '')
 			+ '&' + this.settings.original_html + '=' + encodeURIComponent(this.originalValue) /* DEPRECATED in 2.2.0 */
 			+ '&' + this.settings.original_value + '=' + encodeURIComponent(this.originalValue);
+		if (csrf_token)
+			data += '&_csrf_token=' + csrf_token;
+
 
 		this.enableOrDisableAnimationCallbacks(true, false);
 		this.didStartSaving();

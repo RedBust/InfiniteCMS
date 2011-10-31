@@ -102,45 +102,46 @@ return array(
 	'PASS' => array(
 		//Is the pass enabled ?
 		//Le système de créditage est-il actif ?
-		'enable' => true,
+		'ENABLE' => true,
 
 		//different possible type: webo, star (case sensitive)
 		//IT MUST BE FORMATTED THIS WAY : (without sharp (#) at the line start)
-#		'type' => 'star',
+#		'TYPE' => 'star',
 		//différent types possibles: webo, star (sensible à la casse !)
 		// LE FORMAT DOIT ÊTRE LE SUIVANT : (sans dièse (#) au début de la ligne)
-#		'type' => 'star',
-		'type' => 'webo / star',
+#		'TYPE' => 'star / webo',
+		'TYPE' => 'star',
 
 		//If it's webopass ('webo' in type)
 		//Si c'est webopass ('webo' dans type)
-		'cc' => 'ID Webopass CC',
-		'document' => 'ID Webopass document',
+		'CC' => 'ID Webopass CC',
+		'DOCUMENT' => 'ID Webopass document',
 
 		//If it's starpass ('star' in type)
 		//Si c'est starpass ('star' dans type)
-		'idd' => 0,
+		'IDD' => 55162,
 
 		//Else: not implemented yet
 		//Sinon: pas encore disponible
 	),
 
 # TEAMSPEAK
+//Okay I'm gonna remove that, TS sucks x(
 	'TEAMSPEAK' => array(
 		//Is the TS server is opened?
 		//Le serveur TS est-il ouvert ?
-		'opened' => true,
+		'ENABLE' => false,
 		//TS server address
 		//Adresse du serveur TS
-		'server' => 'mon serveur',
+		'SERVER' => 'mon serveur',
 		//Port of the TS Server
 		//Port du serveur TS
-		'port' => 'mon port',
+		'PORT' => 'mon port',
 		//Password, comment this line if your TS serv don't need a pass
 		// (by adding a sharp before the line, #'pass' => ...)
 		//Mot de passe, commentez cette ligne si votre serveur TS n'en a pas
 		// (en ajoutant un dièse avant la ligne, #'pass' => ...)
-		'pass' => 'mon mot de passe',
+		'PASS' => 'mon mot de passe',
 	),
 
 # SETTINGS

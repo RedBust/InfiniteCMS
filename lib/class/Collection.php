@@ -64,8 +64,10 @@ class Collection extends Doctrine_Collection
 	 * @param int $startAt start position
 	 * @param String $char sought character's name
 	 */
-	public function ladderDisplay($startAt = 0, $char = '')
+	public function ladderDisplay($startAt = 0, Contest $contest = NULL, $char = '')
 	{
+		global $account;
+
 		if ($this->isEmpty())
 			return false;
 		$td = '<td valign="center" align="center">';
@@ -76,26 +78,54 @@ class Collection extends Doctrine_Collection
 				$td . tag('b', lang('level')) . '</td>' .
 				$td . tag('b', lang('acc.ladder.guild')) . '</td>' .
 				$td . tag('b', lang('acc.ladder.class')) . '</td>' .
-				( level(LEVEL_MJ) ?
-						$td . tag('b', lang('pseudo')) : '' ));
-		$td = '<td valign="center">';
-		foreach ($this as $perso)
+				( $contest ? $td . tag('b', lang('votes')) . '</td>' : '' ) .
+				( level(LEVEL_MJ) ? $td . tag('b', lang('pseudo')) . '</td>' : '' ));
+		$align = array('align' => 'center');
+
+		if ($contest && level(LEVEL_LOGGED))
+			$canJudge = $account->canJudge($contest);
+		else
+			$canJudge = false;
+
+		$lastVotes = NULL;
+		$i = $startAt;
+		foreach ($this as $record)
 		{
+			if ($contest)
+			{
+				if ($record->votes != $lastVotes)
+					++$i;
+				$lastVotes = $record->votes;
+				$perso = $record->Character;
+			}
+			else
+			{
+				++$i;
+				$perso = $record;
+			}
+
 			/* @var $perso Character */
 			if ($perso->relatedExists('GuildMember') && $perso->GuildMember->rank !== NULL)
 				$g = make_link($perso->GuildMember->Guild);
 			else
 				$g = tag('i', lang('acc.no_guild'));
-			$align = array('align' => 'center');
+
 			if ($char == $perso['name'])
 				$opt = array('id' => 'selected-char');
 			else
 				$opt = array();
-			echo tag('tr', $opt, tag('td', $align, ++$startAt) .
+
+			if ($canJudge && !$account->Characters->contains($perso->guid))
+				$vote = '&bull;' . $record->getVoteLink();
+			else
+				$vote = '';
+
+			echo tag('tr', $opt, tag('td', $align, $i) .
 					tag('td', $align, make_link($perso)) .
 					tag('td', $align, $perso['level']) .
 					tag('td', $align, $g) .
 					tag('td', $align, make_img('classes/' . strtolower(substr($perso->getBreed(), 0, 3)) . '_' . $perso['sexe'], EXT_PNG)) .
+					( $contest ? tag('td', $align, intval($record->votes) . $vote)  : '' ) .
 					( level(LEVEL_MJ) ? tag('td', $align, make_link($perso->Account)) : ''));
 		}
 		echo '
@@ -336,5 +366,24 @@ function showChar(id)
 			/* @var $perso Character */
 			self::charLoad($perso);
 		}
+	}
+
+	public function process()
+	{
+		if ($this->isEmpty())
+			return array();
+
+		//armury:
+		$itemsInfo = array(); //stock all stats of equiped items
+		$pos = array_keys($this->getTable()->getPosOffset());
+		foreach ($this as $item)
+		{ //put in a array all items equiped, by the pos.
+			/* @var $item Item */
+			if (in_array($item->pos, $pos))
+			{
+				$itemsInfo[$item->pos] = array($item, IG::parseStats($item->stats));
+			}
+		}
+		return $itemsInfo;
 	}
 }

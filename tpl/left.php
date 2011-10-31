@@ -38,7 +38,7 @@ if ($config['URL_VOTE'] != -1):
 		<li>
 			<?php echo make_link('@cgu_serv', $prefix . lang('menu.rules')) ?>
 		</li>
-		<?php if ($config['TEAMSPEAK']['opened']): ?>
+		<?php if ($config['TEAMSPEAK']['ENABLE']): ?>
 		<li>
 			<?php echo make_link(array('controller' => 'Misc', 'action' => 'ts'), $prefix . lang('Misc - ts', 'title')) ?>
 		</li>
@@ -49,7 +49,7 @@ if ($config['URL_VOTE'] != -1):
 	</ul>
 </div>
 <div class="module4">
-	<div class="title slideMenu" style="margin-left: 5px;"><?php echo lang('part.interactif') ?></div>
+	<div class="title slideMenu" style="margin-left: 5px;"><?php echo lang('part.interactif') /*this relies on DB info*/ ?></div>
 	<ul>
 		<li>
 			<?php echo make_link('@ladder', $prefix . lang('ladder.PvM')) ?>
@@ -69,15 +69,21 @@ if ($config['URL_VOTE'] != -1):
 		<li>
 			<?php echo make_link('@events', $prefix . lang('Event - index', 'title')) ?>
 		</li>
+		<li>
+			<?php echo make_link('@contests', $prefix . lang('Contest - index', 'title'))  ?>
+		</li>
 	</ul>
 </div>
 <div class="module4">
-	<div class="title slideMenu"><?php echo lang('part.community') ?></div>
+	<div class="title slideMenu"><?php echo lang('part.community') /*this relies on extra info*/ ?></div>
 	<ul>
+		<?php if (defined('FORUM')): ?>
 		<li>
 			<?php echo make_link(getPath(FORUM), $prefix . lang('menu.board'), array(), array(), false) ?>
 		</li>
-		<?php if ($config['RATES_BY_PAGE'] != -1): //if GuestBook is on ?>
+		<?php
+		endif;
+		if ($config['RATES_BY_PAGE'] != -1): //if GuestBook is on ?>
 		<li>
 			<?php echo make_link('@guestbook', $prefix . lang('GuestBook - index', 'title')) ?>
 		</li>

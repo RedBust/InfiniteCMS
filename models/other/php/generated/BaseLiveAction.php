@@ -25,37 +25,20 @@ abstract class BaseLiveAction extends Record
         $this->setTableName('live_action');
         $this->hasColumn('id', 'integer', 4, array(
              'type' => 'integer',
-             'fixed' => 0,
-             'unsigned' => false,
              'primary' => true,
              'autoincrement' => true,
              'length' => '4',
              ));
         $this->hasColumn('playerid', 'integer', 4, array(
              'type' => 'integer',
-             'fixed' => 0,
-             'unsigned' => false,
-             'primary' => false,
-             'notnull' => true,
-             'autoincrement' => false,
              'length' => '4',
              ));
         $this->hasColumn('action', 'integer', 4, array(
              'type' => 'integer',
-             'fixed' => 0,
-             'unsigned' => false,
-             'primary' => false,
-             'notnull' => true,
-             'autoincrement' => false,
              'length' => '4',
              ));
         $this->hasColumn('nombre', 'integer', 4, array(
              'type' => 'integer',
-             'fixed' => 0,
-             'unsigned' => false,
-             'primary' => false,
-             'notnull' => true,
-             'autoincrement' => false,
              'length' => '4',
              ));
     }

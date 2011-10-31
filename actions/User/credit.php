@@ -2,7 +2,7 @@
 if (!check_level(LEVEL_LOGGED))
 	return;
 
-if (!$config['PASS']['enable'])
+if (!$config['PASS']['ENABLE'])
 {
 	echo lang('acc.credit.disabled');
 	return;
@@ -11,29 +11,29 @@ if (!$config['PASS']['enable'])
 //page?
 $isSubmitted = false;
 //I have to move that part ... But, where ?!
-switch ($config['PASS']['type'])
+switch ($config['PASS']['TYPE'])
 {
 	case 'webo':
 		$isSubmitted = $router->requestVar('code') != NULL;
-		break;
+	break;
 	case 'star':
 		$isSubmitted = $router->requestVar('code1') != NULL;
 		break;
 	default:
-		throw new Exception(sprintf('Invalid paymode %s !', $config['PASS']['type']));
+		throw new Exception(sprintf('Invalid paymode %s !', $config['PASS']['TYPE']));
 }
 
 $inputAttr = array();
 if ($isSubmitted)
 {
 	//code validation
-	switch ($config['PASS']['type'])
+	switch ($config['PASS']['TYPE'])
 	{
 		case 'webo':
 			$url = 'http://payer.webopass.fr/valider_code.php' .
 					 to_url(array(
-						'cc' => $config['PASS']['cc'],
-						'document' => $config['PASS']['document'],
+						'cc' => $config['PASS']['CC'],
+						'document' => $config['PASS']['DOCUMENT'],
 						'requete' => 1,
 						'code' => urlencode($router->postVar('code', '')),
 						'no_saisie_code' => 1,
@@ -42,12 +42,12 @@ if ($isSubmitted)
 			$isValidCode = $result && trim($result[0]) === 'OUI';
 		break;
 		case 'star':
-			$values = $router->postVars('idp', 'code1', 'DATAS');
+			$code = $router->postVar('code1');
+			$idp = $router->postVar('idp');
 			$result = @file_get_contents('http://script.starpass.fr/check_php.php' . to_url(array(
 								//idp;ids;idd
-								'ident' => sprintf('%s;;%s', $values['idp'], $config['PASS']['idd']),
-								'codes' => $values['code1'],
-								'DATAS' => $values['DATAS'],
+								'ident' => sprintf('%s;;%s', $idp, $config['PASS']['IDD']),
+								'codes' => $code,
 							), false, false));
 			//Starpass uses here a totally useless (for me) "explode" ...
 			// I just need "validCode?", not alot of informations ... And it's better.
@@ -68,7 +68,7 @@ else
 {
 	echo tag('h1', ucfirst(lang('acc.credit.add')));
 	//code submit
-	switch ($config['PASS']['type'])
+	switch ($config['PASS']['TYPE'])
 	{
 		case 'webo':
 			//script totally re-coded ... I hate code repetition
@@ -106,7 +106,7 @@ else
 								%3$s
 							</font>
 						</a>
-					</td>', $config['PASS']['cc'], $config['PASS']['document'], $pays);
+					</td>', $config['PASS']['CC'], $config['PASS']['DOCUMENT'], $pays);
 			}
 			$txt .= <<<WEBO
 				</tr>
@@ -127,7 +127,7 @@ else
 	</tr>
 </table>
 WEBO;
-			printf($txt, $config['PASS']['cc'], $config['PASS']['document'],
+			printf($txt, $config['PASS']['CC'], $config['PASS']['DOCUMENT'],
 					lang('acc.credit.more_info_credit'));
 			echo tag('br') .
 			make_form(array(
@@ -136,7 +136,21 @@ WEBO;
 			 ));
 		break;
 		case 'star':
-			echo '<div style="width:380px;height:250px;font-family:Arial;font-size:11px;background-image:url(http://script.starpass.fr/images/fenetre_fond_basse.jpg);"><div style="text-align:right;padding:4px;"><a href="http://www.starpass.fr/" style="color:white;font-size:10px;text-decoration:none;">StarPass.fr - Micro paiement s&eacute;curis&eacute;</a></div><div style="margin-top:61px;margin-left:15px;color:#26637c;font-weight:bold;">Pour obtenir vos codes d\'acc&egrave;s,</div><div style="margin-left:45px;color:#ff8416;font-weight:bold;font-size:13px;">veuillez cliquer sur le drapeau de votre pays</div><div style="margin-top:16px;margin-left:40px;color:white;"><span style="font-weight:bold;">&eacute;tape 1 :</span> Votre pays - Your country</div><div style="text-align:center;margin-top:7px;"><a href="http://script.starpass.fr/numero_pays_v3.php?pays=fr&amp;id_document=' . $config['PASS']['idd'] . '" onclick="window.open(this.href,\'StarPass\',\'width=400,height=300,scrollbars=yes,resizable=yes\');return false;"><img src="http://script.starpass.fr/images/drapeaux/france.png" style="border:0px none;" alt="Micro paiement France" title="Micro paiement France" height="33" width="30"/></a> <form method="POST" action="' . replace_url('@credit') . '" style="display:inline;"><div style="margin-left:9px;margin-top:18px;color:white;"><span style="font-weight:bold;">&eacute;tape 2 : </span>Veuillez entrer votre code - Please enter your code</div><div style="text-align:center;"><input type="hidden" name="idd" value="' . $config['PASS']['idd'] . '"/><input type="hidden" name="idp" value="82"/><input type="hidden" name="DATAS" value=""/><input type="text" name="code1" value="code1" maxlength="8" size="4" onfocus="if (this.value.search(/code/i) >= 0) this.value=\'\';"/>' . input_csrf_token() . '<input type="submit" name="valider_code" value="OK"/></div></form></div></div>';
+			echo tag('div', array('id' => 'starpass_' . $config['PASS']['IDD']), '');
+			$script = file_get_contents(make_url('http://script.starpass.fr/script.php', array(
+				'idd' => $config['PASS']['IDD'],
+				'verif_en_php' => 1,
+				'last' => 1,
+				'theme' => 'default_blue_small',
+				'datas' => '',
+			), false));
+			$form_pos = strpos($script, $form = '<form id="skcode_validation_' . $config['PASS']['IDD'] . '" method="post"');
+			//let's find the end of the form tag (with action="")
+			$form_end = substr($script, $form_pos + strlen($form), strpos(substr($script, $form_pos + strlen($form)), '>')+1);
+			//and replace it with our action + add _csrf_token field
+			$script = str_replace($form_end, $c = ' action="' . replace_url('@credit') . '">' . input_csrf_token(), $script);
+			jQ($script);
+			//echo '<div style="width:380px;height:250px;font-family:Arial;font-size:11px;background-image:url(http://script.starpass.fr/images/fenetre_fond_basse.jpg);"><div style="text-align:right;padding:4px;"><a href="http://www.starpass.fr/" style="color:white;font-size:10px;text-decoration:none;">StarPass.fr - Micro paiement s&eacute;curis&eacute;</a></div><div style="margin-top:61px;margin-left:15px;color:#26637c;font-weight:bold;">Pour obtenir vos codes d\'acc&egrave;s,</div><div style="margin-left:45px;color:#ff8416;font-weight:bold;font-size:13px;">veuillez cliquer sur le drapeau de votre pays</div><div style="margin-top:16px;margin-left:40px;color:white;"><span style="font-weight:bold;">&eacute;tape 1 :</span> Votre pays - Your country</div><div style="text-align:center;margin-top:7px;"><a href="http://script.starpass.fr/numero_pays_v3.php?pays=fr&amp;id_document=' . $config['PASS']['idd'] . '" onclick="window.open(this.href,\'StarPass\',\'width=400,height=300,scrollbars=yes,resizable=yes\');return false;"><img src="http://script.starpass.fr/images/drapeaux/france.png" style="border:0px none;" alt="Micro paiement France" title="Micro paiement France" height="33" width="30"/></a> <form method="POST" action="' . replace_url('@credit') . '" style="display:inline;"><div style="margin-left:9px;margin-top:18px;color:white;"><span style="font-weight:bold;">&eacute;tape 2 : </span>Veuillez entrer votre code - Please enter your code</div><div style="text-align:center;"><input type="hidden" name="idd" value="' . $config['PASS']['idd'] . '"/><input type="hidden" name="idp" value="' . $config['PASS']['idp'] . '"/><input type="text" name="code" value="code" maxlength="8" size="4" onfocus="if (this.value.search(/code/i) >= 0) this.value=\'\';"/>' . input_csrf_token() . '<input type="submit" name="valider_code" value="OK"/></div></form></div></div>';
 		break;
 	}
 }

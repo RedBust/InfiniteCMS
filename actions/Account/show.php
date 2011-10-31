@@ -8,15 +8,11 @@ else
 	$accountId = $router->requestVar('id', -1);
 }
 
-if (!( $acc = AccountTable::getInstance()->createQuery('a')
+$router->codeUnless(404, $acc = AccountTable::getInstance()->createQuery('a')
 				->leftJoin('a.User u')
 				->leftJoin('a.Characters c')
 				->where('a.guid = ?', $accountId)
-		->fetchOne() ))
-{ //@todo better error handling with $fromInclude ?
-	echo lang('acc.does_not_exists');
-	return;
-}
+		->fetchOne());
 /* @var $acc Account */
 $nl = tag('br');
 if (!empty($acc->lastconnectiondate))

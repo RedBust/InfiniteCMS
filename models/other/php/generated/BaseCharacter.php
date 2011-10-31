@@ -51,6 +51,7 @@ Doctrine_Manager::getInstance()->bindComponent('Character', 'other');
  * @property Doctrine_Collection $LiveActions
  * @property Mount $Mount
  * @property Doctrine_Collection $Events
+ * @property Doctrine_Collection $ContestParticipations
  * 
  * @package    InfiniteCMS
  * @subpackage Models
@@ -64,372 +65,179 @@ abstract class BaseCharacter extends Record
         $this->setTableName('personnages');
         $this->hasColumn('guid', 'integer', 4, array(
              'type' => 'integer',
-             'fixed' => 0,
-             'unsigned' => false,
              'primary' => true,
-             'autoincrement' => false,
              'length' => '4',
              ));
         $this->hasColumn('name', 'string', 30, array(
              'type' => 'string',
-             'fixed' => 0,
-             'unsigned' => false,
-             'primary' => false,
-             'notnull' => true,
-             'autoincrement' => false,
              'length' => '30',
              ));
         $this->hasColumn('sexe', 'integer', 1, array(
              'type' => 'integer',
-             'fixed' => 0,
-             'unsigned' => false,
-             'primary' => false,
-             'notnull' => true,
-             'autoincrement' => false,
              'length' => '1',
              ));
         $this->hasColumn('class', 'integer', 2, array(
              'type' => 'integer',
-             'fixed' => 0,
-             'unsigned' => false,
-             'primary' => false,
-             'notnull' => true,
-             'autoincrement' => false,
              'length' => '2',
              ));
         $this->hasColumn('color1', 'integer', 4, array(
              'type' => 'integer',
-             'fixed' => 0,
-             'unsigned' => false,
-             'primary' => false,
-             'notnull' => true,
-             'autoincrement' => false,
              'length' => '4',
              ));
         $this->hasColumn('color2', 'integer', 4, array(
              'type' => 'integer',
-             'fixed' => 0,
-             'unsigned' => false,
-             'primary' => false,
-             'notnull' => true,
-             'autoincrement' => false,
              'length' => '4',
              ));
         $this->hasColumn('color3', 'integer', 4, array(
              'type' => 'integer',
-             'fixed' => 0,
-             'unsigned' => false,
-             'primary' => false,
-             'notnull' => true,
-             'autoincrement' => false,
              'length' => '4',
              ));
         $this->hasColumn('kamas', 'integer', 4, array(
              'type' => 'integer',
-             'fixed' => 0,
-             'unsigned' => false,
-             'primary' => false,
-             'notnull' => true,
-             'autoincrement' => false,
              'length' => '4',
              ));
         $this->hasColumn('spellboost', 'integer', 4, array(
              'type' => 'integer',
-             'fixed' => 0,
-             'unsigned' => false,
-             'primary' => false,
-             'notnull' => true,
-             'autoincrement' => false,
              'length' => '4',
              ));
         $this->hasColumn('capital', 'integer', 4, array(
              'type' => 'integer',
-             'fixed' => 0,
-             'unsigned' => false,
-             'primary' => false,
-             'notnull' => true,
-             'autoincrement' => false,
              'length' => '4',
              ));
         $this->hasColumn('energy', 'integer', 4, array(
              'type' => 'integer',
-             'fixed' => 0,
-             'unsigned' => false,
-             'primary' => false,
              'default' => '10000',
-             'notnull' => true,
-             'autoincrement' => false,
              'length' => '4',
              ));
         $this->hasColumn('level', 'integer', 4, array(
              'type' => 'integer',
-             'fixed' => 0,
-             'unsigned' => false,
-             'primary' => false,
-             'notnull' => true,
-             'autoincrement' => false,
              'length' => '4',
              ));
         $this->hasColumn('xp', 'integer', 8, array(
              'type' => 'integer',
-             'fixed' => 0,
-             'unsigned' => false,
-             'primary' => false,
              'default' => '0',
-             'notnull' => true,
-             'autoincrement' => false,
              'length' => '8',
              ));
         $this->hasColumn('size', 'integer', 4, array(
              'type' => 'integer',
-             'fixed' => 0,
-             'unsigned' => false,
-             'primary' => false,
-             'notnull' => true,
-             'autoincrement' => false,
              'length' => '4',
              ));
         $this->hasColumn('gfx', 'integer', 4, array(
              'type' => 'integer',
-             'fixed' => 0,
-             'unsigned' => false,
-             'primary' => false,
-             'notnull' => true,
-             'autoincrement' => false,
              'length' => '4',
              ));
         $this->hasColumn('alignement', 'integer', 4, array(
              'type' => 'integer',
-             'fixed' => 0,
-             'unsigned' => false,
-             'primary' => false,
              'default' => '0',
-             'notnull' => true,
-             'autoincrement' => false,
              'length' => '4',
              ));
         $this->hasColumn('honor', 'integer', 4, array(
              'type' => 'integer',
-             'fixed' => 0,
-             'unsigned' => false,
-             'primary' => false,
              'default' => '0',
-             'notnull' => true,
-             'autoincrement' => false,
              'length' => '4',
              ));
         $this->hasColumn('deshonor', 'integer', 4, array(
              'type' => 'integer',
-             'fixed' => 0,
-             'unsigned' => false,
-             'primary' => false,
              'default' => '0',
-             'notnull' => true,
-             'autoincrement' => false,
              'length' => '4',
              ));
         $this->hasColumn('alvl', 'integer', 4, array(
              'type' => 'integer',
-             'fixed' => 0,
-             'unsigned' => false,
-             'primary' => false,
              'default' => '1',
-             'notnull' => true,
-             'autoincrement' => false,
              'length' => '4',
              ));
         $this->hasColumn('account', 'integer', 4, array(
              'type' => 'integer',
-             'fixed' => 0,
-             'unsigned' => false,
-             'primary' => false,
-             'notnull' => true,
-             'autoincrement' => false,
              'length' => '4',
              ));
         $this->hasColumn('vitalite', 'integer', 4, array(
              'type' => 'integer',
-             'fixed' => 0,
-             'unsigned' => false,
-             'primary' => false,
-             'notnull' => false,
-             'autoincrement' => false,
              'length' => '4',
              ));
         $this->hasColumn('force', 'integer', 4, array(
              'type' => 'integer',
-             'fixed' => 0,
-             'unsigned' => false,
-             'primary' => false,
              'default' => '0',
-             'notnull' => true,
-             'autoincrement' => false,
              'length' => '4',
              ));
         $this->hasColumn('sagesse', 'integer', 4, array(
              'type' => 'integer',
-             'fixed' => 0,
-             'unsigned' => false,
-             'primary' => false,
              'default' => '0',
-             'notnull' => true,
-             'autoincrement' => false,
              'length' => '4',
              ));
         $this->hasColumn('intelligence', 'integer', 4, array(
              'type' => 'integer',
-             'fixed' => 0,
-             'unsigned' => false,
-             'primary' => false,
              'default' => '0',
-             'notnull' => true,
-             'autoincrement' => false,
              'length' => '4',
              ));
         $this->hasColumn('chance', 'integer', 4, array(
              'type' => 'integer',
-             'fixed' => 0,
-             'unsigned' => false,
-             'primary' => false,
              'default' => '0',
-             'notnull' => true,
-             'autoincrement' => false,
              'length' => '4',
              ));
         $this->hasColumn('agilite', 'integer', 4, array(
              'type' => 'integer',
-             'fixed' => 0,
-             'unsigned' => false,
-             'primary' => false,
              'default' => '0',
-             'notnull' => true,
-             'autoincrement' => false,
              'length' => '4',
              ));
         $this->hasColumn('seespell', 'integer', 1, array(
              'type' => 'integer',
-             'fixed' => 0,
-             'unsigned' => false,
-             'primary' => false,
              'default' => '0',
-             'notnull' => true,
-             'autoincrement' => false,
              'length' => '1',
              ));
         $this->hasColumn('seefriend', 'integer', 1, array(
              'type' => 'integer',
-             'fixed' => 0,
-             'unsigned' => false,
-             'primary' => false,
              'default' => '1',
-             'notnull' => true,
-             'autoincrement' => false,
              'length' => '1',
              ));
         $this->hasColumn('canaux', 'string', 15, array(
              'type' => 'string',
-             'fixed' => 0,
-             'unsigned' => false,
-             'primary' => false,
              'default' => '*#%!pi$:?',
-             'notnull' => true,
-             'autoincrement' => false,
              'length' => '15',
              ));
         $this->hasColumn('map', 'integer', 4, array(
              'type' => 'integer',
-             'fixed' => 0,
-             'unsigned' => false,
-             'primary' => false,
              'default' => '8479',
-             'notnull' => true,
-             'autoincrement' => false,
              'length' => '4',
              ));
         $this->hasColumn('cell', 'integer', 4, array(
              'type' => 'integer',
-             'fixed' => 0,
-             'unsigned' => false,
-             'primary' => false,
-             'notnull' => true,
-             'autoincrement' => false,
              'length' => '4',
              ));
         $this->hasColumn('pdvper', 'integer', 4, array(
              'type' => 'integer',
-             'fixed' => 0,
-             'unsigned' => false,
-             'primary' => false,
              'default' => '100',
-             'notnull' => true,
-             'autoincrement' => false,
              'length' => '4',
              ));
         $this->hasColumn('spells', 'string', null, array(
              'type' => 'string',
-             'fixed' => 0,
-             'unsigned' => false,
-             'primary' => false,
-             'notnull' => true,
-             'autoincrement' => false,
              'length' => '',
              ));
         $this->hasColumn('objets', 'string', null, array(
              'type' => 'string',
-             'fixed' => 0,
-             'unsigned' => false,
-             'primary' => false,
-             'notnull' => true,
-             'autoincrement' => false,
              'length' => '',
              ));
         $this->hasColumn('savepos', 'string', 20, array(
              'type' => 'string',
-             'fixed' => 0,
-             'unsigned' => false,
-             'primary' => false,
              'default' => '10298,314',
-             'notnull' => true,
-             'autoincrement' => false,
              'length' => '20',
              ));
         $this->hasColumn('zaaps', 'string', 250, array(
              'type' => 'string',
-             'fixed' => 0,
-             'unsigned' => false,
-             'primary' => false,
              'default' => '',
-             'notnull' => true,
-             'autoincrement' => false,
              'length' => '250',
              ));
         $this->hasColumn('jobs', 'string', null, array(
              'type' => 'string',
-             'fixed' => 0,
-             'unsigned' => false,
-             'primary' => false,
-             'notnull' => true,
-             'autoincrement' => false,
              'length' => '',
              ));
         $this->hasColumn('mountxpgive', 'integer', 4, array(
              'type' => 'integer',
-             'fixed' => 0,
-             'unsigned' => false,
-             'primary' => false,
              'default' => '0',
-             'notnull' => true,
-             'autoincrement' => false,
              'length' => '4',
              ));
         $this->hasColumn('mount', 'integer', 4, array(
              'type' => 'integer',
-             'fixed' => 0,
-             'unsigned' => false,
-             'primary' => false,
              'default' => '-1',
-             'notnull' => true,
-             'autoincrement' => false,
              'length' => '4',
              ));
     }
@@ -457,5 +265,9 @@ abstract class BaseCharacter extends Record
              'refClass' => 'EventParticipant',
              'local' => 'character_id',
              'foreign' => 'event_id'));
+
+        $this->hasMany('ContestParticipant as ContestParticipations', array(
+             'local' => 'guid',
+             'foreign' => 'character_id'));
     }
 }

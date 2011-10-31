@@ -6,16 +6,12 @@ $c = -1;
 foreach ($table->getColumnNames() as $col) //Guild/show/name/...
 	if (( $c = $router->requestVar($col) ) !== NULL)
 		break;
-if (!$guild = $table->createQuery('g')
+$router->codeUnless(404, $guild = $table->createQuery('g')
 				->where('g.' . $col . ' = ?', $c)
 					->leftJoin('g.Members gm')
 						->leftJoin('gm.Character p')
 				->orderBy('gm.rank ASC')
-				->fetchOne())
-{
-	define('HTTP_CODE', 404);
-	return;
-}
+				->fetchOne());
 /* @var $guild Guild */
 
 $title = sprintf($title, $guild->name);

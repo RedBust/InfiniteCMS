@@ -4,6 +4,14 @@ ban ips
 link to account's profile from character's profileBox (=> unless current_page?)
 consider Event as VIP-only if Reward.is_vip ?
 1.3(?):
+ Fixed the friends splitting (now you can see all the friends you have, not only one)
+ Splitted Character/show using jQuery.UI.Tabs
+ Added jobs in Character/show with icon and level, first line : recolt jobs. Second : craft. Third : etheral. Etheral jobs will appear just under the normal job
+ Added a complete contest system, with fake pagination (no solution here), using the ladder system
+  You can set a reward
+  You can add jury / define a "min gmlevel" to be jury
+  Each jury can vote one time, participants are sorted (unless using Ladder sorting) by these votes. 2 ppl having same votes => same rank
+  You can close the contest (no link ATM), the reward'll be given to the first(s)
  Added multiple options to ladder : ASC/DESC ordering, changing column, gender and breed search.
  Fixed an misplaced image (in css/, wtf)
  There is now ShopItemEffect with NO LiveAction. The one created for example is Character prefix. It's not currently enabled.

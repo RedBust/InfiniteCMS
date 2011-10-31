@@ -2,10 +2,10 @@
 if (!check_level(LEVEL_ADMIN))
 	return;
 
-$news = Query::create()
+$router->codeUnless(404, $news = Query::create()
 				->from('News')
 				->where('id = ?', $id = $router->requestVar('id', -1))
-				->fetchOne();
+				->fetchOne());
 $back_to_index = ' ' . make_link('@root', lang('back_to_index'));
 
 if (!$news)

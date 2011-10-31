@@ -29,7 +29,41 @@ class Character extends BaseCharacter
 		tag('b', lang('acc.ladder.sex') . ': ') . $this->getGender() . tag('br') .
 		tag('b', lang('level') . ': ') . $this->level . tag('br');
 	}
-	public function asEventParticipant($w)
+	public function getStats()
+	{
+		$tableStats = ''; //HTML Code
+		$stats = array(
+			array('vitality', 'vitalite', '7d'),
+			array('wisdom', 'sagesse', '7c'),
+			array('strength', 'force', '76'),
+			array('agility', 'agilite', '77'),
+			array('chance', NULL, '7b'),
+			array('intell', 'intelligence', '7e'),
+		);
+		$s = array();
+		foreach ($stats as $stat)
+		{
+			$name = $stat[0]; //english name
+			$value = $this[$stat[1] === NULL ? $name : $stat[1]];
+			$base_value = IG::statFromCode($value);
+			$add_value = IG::getStat($stat[2]);
+			$s[] = array($name, $value, $base_value, $add_value);
+		}
+		return $s;
+	}
+	public function getStatsHTMLTable()
+	{
+		$tableStats = '';
+		foreach ($this->getStats() as $stat)
+		{
+			$add = empty($stat[3]) ? '' : ' (' . IG::statFromCode($stat[3]) . ')';
+			$base_value = empty($stat[2]) ? '<span style="color: orange;">0</span>' : $stat[2];
+			$tableStats .= tag('tr', tag('td', tag('b', lang('shop.stat.' . $stat[0]))) .
+			 tag('td', '&nbsp;&nbsp;' . $base_value . $add));
+		}
+		return tag('table', array('style' => 'margin-left: 10px;'), $tableStats);
+	}
+	public function toEventParticipant($w)
 	{
 		return tag('span', array('class' => $this->isMine() ? 'myChar' : 'aChar'),
 		 ($w == $this->guid ? make_img('icons/medal_gold_1', EXT_PNG, lang('winner')) : '') . make_link($this));
@@ -177,6 +211,56 @@ class Character extends BaseCharacter
 			$spells += $sort[2];
 		}
 		return $spellLevels / $this->getSpellCount();
+	}
+
+	public function getJobs()
+	{
+		$jobs = array(0 => array(), 1 => array(), 2 => array());
+		foreach (explode(';', $this->jobs) as $job)
+		{
+			if (empty($job))
+				continue;
+
+			$job = explode(',', $job);
+			$job[2] = IG::getLevel($job[1], 'job');
+
+			if (IG::isRecoltJob($job[0]))
+				$s = 0;
+			else if (IG::hasEtheralJob($job[0]))
+			{
+				if ($this->hasJob($eth = IG::getEtheralJob($job[0])))
+					$jobs[2][] = array($eth, $ex = $this->getJobExp($eth), IG::getLevel($ex, 'job'));
+				else
+					$jobs[2][] = '';
+
+				$s = 1;
+			}
+			else
+				continue;
+
+			$jobs[$s][] = $job;
+		}
+		return $jobs;
+	}
+	public function getJobExp($id)
+	{
+		foreach (explode(';', $this->jobs) as $job)
+		{
+			$j = explode(',', $job);
+			if ($j[0] == $id)
+				return $j[1];
+		}
+		return NULL;
+	}
+	public function hasJob($id)
+	{
+		foreach (explode(';', $this->jobs) as $job)
+		{
+			$j = explode(',', $job);
+			if ($j[0] == $id)
+				return true;
+		}
+		return false;
 	}
 
 	/**

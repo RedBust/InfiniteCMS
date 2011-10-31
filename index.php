@@ -77,10 +77,16 @@ try
 		}
 		else
 		{ //normally load the page
-			jQ(false, 'cache'); //enter cache mode
-			require_once $router->getPath();
-			jQ(false, 'main'); //go back to main mode
-			jQ(jQ(NULL, 'cache')); //add remaining cache JS into main
+			try
+			{
+				jQ(false, 'cache'); //enter cache mode
+				require_once $router->getPath();
+				jQ(false, 'main'); //go back to main mode
+				jQ(jQ(NULL, 'cache')); //add remaining cache JS into main
+			} catch (Router_CodeException $ce)
+			{
+				define('HTTP_CODE', $ce->getHttpCode());
+			}
 		}
 	}
 

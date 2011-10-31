@@ -4,19 +4,15 @@ if (!check_level(LEVEL_ADMIN))
 
 if (NULL !== ( $subject = $router->requestVar('subject') ) && NULL !== ( $body = $router->requestVar('body') ))
 {
-	$accountsQ = Query::create()
+	$accounts = Query::create()
 							->select('email')
 								->from('Account')
 								#->where('level > ?', $gmRequired)
-								;
-	$accounts = $accountsQ->fetchArray();
-	$accountsQ->free();
+								->fetchArray();
 
 	$recipients = array();
 	foreach ($accounts as $account)
-	{
 		$recipients[] = $account['email'];
-	}
 	mail(implode(', ', $recipients), $subject, $content);
 }
 else

@@ -55,7 +55,7 @@ if (!empty($_POST))
 	}
 }
 
-if (count($_POST) == 0 || $errors != array())
+if (empty($_POST) || !empty($errors))
 {
 	echo make_form(array(
 		array('receivers', lang('pm.receivers') . tag('br')),
@@ -64,7 +64,5 @@ if (count($_POST) == 0 || $errors != array())
 	));
 	jQ('$(function () { $("#form_receivers").tokenInput("' . getPath() . 'Account/reverseFriends.json", {theme: "facebook", preventDuplicates: true}); });');
 }
-else if (count($_POST) && $errors == array())
-{
+else if (!empty($_POST) && empty($errors))
 	redirect(array('controller' => $router->getController(), 'action' => 'show', 'id' => $thread->id));
-}

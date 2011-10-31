@@ -7,11 +7,7 @@ if ($account->canParticipate($id = intval($router->requestVar('id', -1))))
 	return;
 }
 
-if (!$event = EventTable::getInstance()->find($id))
-{
-	echo lang('event.does_not_exist');
-	return;	
-}
+$router->codeUnless(404, $event = EventTable::getInstance()->find($id));
 if ($event->isElapsed())
 {
 	echo lang('event.elapsed');

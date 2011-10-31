@@ -59,7 +59,7 @@ class ShopItem extends BaseShopItem
 			}
 			else
 			{
-				if (substr($t, 0, 3) == 'is_' )
+				if (substr($t, 0, 3) == 'is_')
 				{
 					$values[$t] = isset($values[$t]) && ( $values[$t] == 'on' || $values[$t] == '1' );
 				}
@@ -85,24 +85,24 @@ class ShopItem extends BaseShopItem
 			}	
 			$errors[] = lang('shop.cost_vip_lower');
 		}
-		if (!empty( $values['type'] ) && !empty( $values['value'] ) )
+		if (!empty($values['type']) && !empty($values['value']))
 		{
 			$table = ShopItemEffectTable::getInstance();
 			/* @var $table ShopItemEffectTable */
-			foreach( $values['type'] as $id => $type )
+			foreach ($values['type'] as $id => $type)
 			{
 				if (empty($values['value'][$id]))
 					continue;
-				else if( !$this->getTable()->getType($type) && $type != -1 )
+				else if(!$this->getTable()->getType($type) && $type != -1)
 					$errors[] = sprintf(lang('must_numeric'), 'type (' . $id . ')' );
-				else if( $this->Effects->contains($id) )
+				else if ($this->Effects->contains($id))
 				{
-					if( $type === NULL || $type == -1 )
+					if ($type === NULL || $type == -1)
 						$this->Effects[$id]->delete(); //remove the effect
 					else
 					{
 						$this->Effects[$id]->type = $type;
-						if( isset( $values['value'][$id] ) && $this->Effects[$id]->setValue( $values['value'][$id] ) )
+						if (isset($values['value'][$id]) && $this->Effects[$id]->setValue($values['value'][$id]))
 							$this->Effects[$id]->save();
 						else
 							$errors['effect_' . $id] = sprintf(lang('must_!empty'), $t);

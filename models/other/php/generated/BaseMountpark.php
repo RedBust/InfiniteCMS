@@ -26,58 +26,29 @@ abstract class BaseMountPark extends Record
         $this->setTableName('mountpark_data');
         $this->hasColumn('mapid', 'integer', 4, array(
              'type' => 'integer',
-             'fixed' => 0,
-             'unsigned' => false,
              'primary' => true,
-             'autoincrement' => false,
              'length' => '4',
              ));
         $this->hasColumn('size', 'integer', 4, array(
              'type' => 'integer',
-             'fixed' => 0,
-             'unsigned' => false,
-             'primary' => false,
-             'notnull' => true,
-             'autoincrement' => false,
              'length' => '4',
              ));
         $this->hasColumn('owner', 'integer', 4, array(
              'type' => 'integer',
-             'fixed' => 0,
-             'unsigned' => false,
-             'primary' => false,
-             'notnull' => true,
-             'autoincrement' => false,
              'length' => '4',
              ));
         $this->hasColumn('guild', 'integer', 4, array(
              'type' => 'integer',
-             'fixed' => 0,
-             'unsigned' => false,
-             'primary' => false,
              'default' => '-1',
-             'notnull' => true,
-             'autoincrement' => false,
              'length' => '4',
              ));
         $this->hasColumn('price', 'integer', 4, array(
              'type' => 'integer',
-             'fixed' => 0,
-             'unsigned' => false,
-             'primary' => false,
              'default' => '0',
-             'notnull' => true,
-             'autoincrement' => false,
              'length' => '4',
              ));
         $this->hasColumn('data', 'string', null, array(
              'type' => 'string',
-             'fixed' => 0,
-             'unsigned' => false,
-             'primary' => false,
-             'notnull' => true,
-             'autoincrement' => false,
-             'length' => '',
              ));
     }
 

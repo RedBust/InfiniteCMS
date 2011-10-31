@@ -26,8 +26,6 @@ else
 			echo tag('li', $char->getInfoBox());
 		}
 		echo '</ul>';
-
-		/* */
 	}
 	else
 		echo tag('h3', lang('no_result'));

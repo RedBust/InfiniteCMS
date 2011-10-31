@@ -39,7 +39,7 @@ if ($reviews->count())
 		 sprintf(lang('created'), $review['created_at']),
 		 $review['comment']);
 	}
-	echo paginate($layout);
+	echo paginateLayout($layout);
 }
 else
 	echo lang('rate.any');

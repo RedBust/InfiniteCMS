@@ -17,8 +17,8 @@ Doctrine_Manager::getInstance()->bindComponent('Account', 'other');
  * @property string $question
  * @property string $reponse
  * @property string $pseudo
- * @property integer $banned
- * @property integer $reload_needed
+ * @property bool $banned
+ * @property bool $reload_needed
  * @property integer $bankkamas
  * @property string $bank
  * @property string $friends
@@ -41,142 +41,66 @@ abstract class BaseAccount extends Record
         $this->setTableName('accounts');
         $this->hasColumn('guid', 'integer', 4, array(
              'type' => 'integer',
-             'fixed' => 0,
-             'unsigned' => false,
              'primary' => true,
              'autoincrement' => true,
              'length' => '4',
              ));
         $this->hasColumn('account', 'string', 30, array(
              'type' => 'string',
-             'fixed' => 0,
-             'unsigned' => false,
-             'primary' => false,
-             'notnull' => true,
-             'autoincrement' => false,
              'length' => '30',
              ));
         $this->hasColumn('pass', 'string', 50, array(
              'type' => 'string',
-             'fixed' => 0,
-             'unsigned' => false,
-             'primary' => false,
-             'notnull' => true,
-             'autoincrement' => false,
              'length' => '50',
              ));
         $this->hasColumn('level', 'integer', 4, array(
              'type' => 'integer',
-             'fixed' => 0,
-             'unsigned' => false,
-             'primary' => false,
              'default' => '0',
-             'notnull' => true,
-             'autoincrement' => false,
              'length' => '4',
              ));
         $this->hasColumn('email', 'string', 100, array(
              'type' => 'string',
-             'fixed' => 0,
-             'unsigned' => false,
-             'primary' => false,
-             'notnull' => true,
-             'autoincrement' => false,
              'length' => '100',
              ));
         $this->hasColumn('lastip', 'string', 15, array(
              'type' => 'string',
-             'fixed' => 0,
-             'unsigned' => false,
-             'primary' => false,
-             'notnull' => true,
-             'autoincrement' => false,
              'length' => '15',
              ));
         $this->hasColumn('lastconnectiondate', 'string', 100, array(
              'type' => 'string',
-             'fixed' => 0,
-             'unsigned' => false,
-             'primary' => false,
-             'notnull' => true,
-             'autoincrement' => false,
              'length' => '100',
              ));
         $this->hasColumn('question', 'string', 100, array(
              'type' => 'string',
-             'fixed' => 0,
-             'unsigned' => false,
-             'primary' => false,
              'default' => 'DELETE?',
-             'notnull' => true,
-             'autoincrement' => false,
              'length' => '100',
              ));
         $this->hasColumn('reponse', 'string', 100, array(
              'type' => 'string',
-             'fixed' => 0,
-             'unsigned' => false,
-             'primary' => false,
              'default' => 'DELETE',
-             'notnull' => true,
-             'autoincrement' => false,
              'length' => '100',
              ));
         $this->hasColumn('pseudo', 'string', 30, array(
              'type' => 'string',
-             'fixed' => 0,
-             'unsigned' => false,
-             'primary' => false,
-             'notnull' => true,
-             'autoincrement' => false,
              'length' => '30',
              ));
-        $this->hasColumn('banned', 'integer', 1, array(
-             'type' => 'integer',
-             'fixed' => 0,
-             'unsigned' => false,
-             'primary' => false,
-             'default' => '0',
-             'notnull' => true,
-             'autoincrement' => false,
-             'length' => '1',
+        $this->hasColumn('banned', 'bool', null, array(
+             'type' => 'bool',
              ));
-        $this->hasColumn('reload_needed', 'integer', 1, array(
-             'type' => 'integer',
-             'fixed' => 0,
-             'unsigned' => false,
-             'primary' => false,
-             'default' => '1',
-             'notnull' => true,
-             'autoincrement' => false,
-             'length' => '1',
+        $this->hasColumn('reload_needed', 'bool', null, array(
+             'type' => 'bool',
              ));
         $this->hasColumn('bankkamas', 'integer', 4, array(
              'type' => 'integer',
-             'fixed' => 0,
-             'unsigned' => false,
-             'primary' => false,
              'default' => '0',
-             'notnull' => true,
-             'autoincrement' => false,
              'length' => '4',
              ));
         $this->hasColumn('bank', 'string', null, array(
              'type' => 'string',
-             'fixed' => 0,
-             'unsigned' => false,
-             'primary' => false,
-             'notnull' => true,
-             'autoincrement' => false,
              'length' => '',
              ));
         $this->hasColumn('friends', 'string', null, array(
              'type' => 'string',
-             'fixed' => 0,
-             'unsigned' => false,
-             'primary' => false,
-             'notnull' => true,
-             'autoincrement' => false,
              'length' => '',
              ));
         $this->hasColumn('logged', 'boolean', null, array(
@@ -206,6 +130,6 @@ abstract class BaseAccount extends Record
 
         $this->hasMany('PrivateMessageThreadReceiver', array(
              'local' => 'guid',
-             'foreign' => 'user_guid'));
+             'foreign' => 'account_id'));
     }
 }

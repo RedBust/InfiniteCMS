@@ -126,7 +126,6 @@ $routes = array(//action default : key
 	'character.search' => array('controller' => 'Character', 'action' => 'search'),
 
 	'polls' => array('controller' => 'Poll', 'action' => 'index'),
-	'poll.new' => array('controller' => 'Poll', 'action' => 'update'),
 
 	'ticket_category.new' => array('controller' => 'TicketCategory', 'action' => 'update'),
 
@@ -134,6 +133,8 @@ $routes = array(//action default : key
 	'pm.create' => array('controller' => 'PrivateMessage', 'action' => 'create'),
 
 	'events' => array('controller' => 'Event', 'action' => 'index'),
+
+	'contests' => array('controller' => 'Contest', 'action' => 'index'),
 );
 
 set_include_path(implode(PATH_SEPARATOR, array(
@@ -246,9 +247,7 @@ if (!DEV)
 	);
 
 	if (!empty($_SESSION['_csrf_token_req']) && $router->isPost())
-	{ //disable _csrf_token if using edit in place (I currently have no other solution :<)
-	 //the way I see that would be having a JS var _csrf_token which eIP would send WITH the actual form
-	 //and this is what I'm gonna do when I'll have free time + motive to edit that script ...
+	{
 		$requestToken = $router->postVar('_csrf_token');
 		if ($requestToken !== session_id()) //using === here is VERY SIGNIFICANT
 		{
@@ -267,7 +266,9 @@ if (!DEV)
 		$accountQ = Query::create()
 						->from('Account a')
 							->leftJoin('a.Characters c INDEXBY guid')
-								->leftJoin('c.Events e INDEXBY e.id')
+								->leftJoin('c.Events e INDEXBY id')
+								->leftJoin('c.ContestParticipations cp INDEXBY contest_id')
+									->leftJoin('cp.Contest co')
 							->leftJoin('a.User u')
 								->leftJoin('u.PollOptions po')
 									->leftJoin('po.Poll p')
@@ -275,7 +276,7 @@ if (!DEV)
 						->where('guid = ?', $_SESSION['guid']);
 		$account = $accountQ->fetchOne();
 		unset($accountQ);
-#		exit('Memory used by ONE Query from Account WHERE guid = ? fetchOne WITHOUT ANY JOIN + Query object free\'d + unset\'d : ' . ( memory_get_usage() - $prev_mem));
+#		exit('Memory used by ONE Query : FROM Account WHERE guid = ? fetchOne WITHOUT ANY JOIN + Query object free\'d + unset\'d : ' . ( memory_get_usage() - $prev_mem));
 #		for those asking : the result is 4 221 424 (1 try only, it's not an average)
 		if ($account)
 		{
@@ -288,7 +289,7 @@ if (!DEV)
 			unset($_SESSION['guid']);
 
 		if (DEBUG)
-			$mem .= memory_get_usage() . ': Acc loaded ... - ' . __FILE__ . ':' . __LINE__ . '<br />';
+			$mem .= memory_get_usage() . ': Acc loaded - ' . __FILE__ . ':' . __LINE__ . '<br />';
 	}
 }
 /* @var $account Account */

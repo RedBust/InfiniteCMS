@@ -27,49 +27,24 @@ abstract class BaseGuild extends Record
         $this->setTableName('guilds');
         $this->hasColumn('id', 'integer', 4, array(
              'type' => 'integer',
-             'fixed' => 0,
-             'unsigned' => false,
-             'primary' => false,
-             'notnull' => true,
-             'autoincrement' => false,
              'length' => '4',
              ));
         $this->hasColumn('name', 'string', 50, array(
              'type' => 'string',
-             'fixed' => 0,
-             'unsigned' => false,
-             'primary' => false,
-             'notnull' => true,
-             'autoincrement' => false,
              'length' => '50',
              ));
         $this->hasColumn('emblem', 'string', 20, array(
              'type' => 'string',
-             'fixed' => 0,
-             'unsigned' => false,
-             'primary' => false,
-             'notnull' => true,
-             'autoincrement' => false,
              'length' => '20',
              ));
         $this->hasColumn('lvl', 'integer', 4, array(
              'type' => 'integer',
-             'fixed' => 0,
-             'unsigned' => false,
-             'primary' => false,
              'default' => '1',
-             'notnull' => true,
-             'autoincrement' => false,
              'length' => '4',
              ));
         $this->hasColumn('xp', 'integer', 8, array(
              'type' => 'integer',
-             'fixed' => 0,
-             'unsigned' => false,
-             'primary' => false,
              'default' => '0',
-             'notnull' => true,
-             'autoincrement' => false,
              'length' => '8',
              ));
     }

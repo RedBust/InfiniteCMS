@@ -13,6 +13,7 @@ return array(
 		'b2' => 'Soins',
 		'b6' => 'Créatures invocables',
 		'ae' => 'Initiative',
+		'6e' => 'Vie', //2 different things
 		'7d' => 'Vitalité',
 		'7c' => 'Sagesse',
 		'76' => 'Force',

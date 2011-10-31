@@ -1,41 +1,37 @@
-<?php
-if (!$config['TEAMSPEAK']['opened'])
-{
-	echo lang('ts.not_exists');
-	return;
-}
-?><table>
+<?php $router->codeUnless(404, $config['TEAMSPEAK']['ENABLE']) ?><table>
 	<tr>
 		<td>
 			<b><?php echo lang('host') ?>:</b>
 		</td>
 		<td>
-			<i><?php echo $config['TEAMSPEAK']['server'] ?></i>
+			<i><?php echo $config['TEAMSPEAK']['SERVER'] ?></i>
 		</td>
 	</tr>
+	<?php if (!empty($config['TEAMSPEAK']['PORT'])): ?>
 	<tr>
 		<td>
-			<b><?php echo lang('port') ?>:</b>
+			<b><?php echo lang('PORT') ?>:</b>
 		</td>
 		<td>
-			<i><?php echo $config['TEAMSPEAK']['port'] ?></i>
+			<i><?php echo $config['TEAMSPEAK']['PORT'] ?></i>
 		</td>
 	</tr>
+	<?php endif ?>
 	<tr>
 		<td>
 			<b><?php echo lang('total') ?>:</b>
 		</td>
 		<td>
-			<i><?php echo $config['TEAMSPEAK']['server'] . ':' . $config['TEAMSPEAK']['port'] ?></i>
+			<i><?php echo $config['TEAMSPEAK']['SERVER'] . ':' . $config['TEAMSPEAK']['PORT'] ?></i>
 		</td>
 	</tr>
-	<?php if (!empty($config['TEAMSPEAK']['pass'])): ?>
+	<?php if (!empty($config['TEAMSPEAK']['PASS'])): ?>
 	<tr>
 		<td>
 			<b><?php echo lang('acc.register.password') ?>:</b>
 		</td>
 		<td>
-			<i><?php echo $config['TEAMSPEAK']['pass'] ?></i>
+			<i><?php echo $config['TEAMSPEAK']['PASS'] ?></i>
 		</td>
 	</tr>
 	<?php endif ?>

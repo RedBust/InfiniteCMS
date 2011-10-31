@@ -20,7 +20,125 @@ abstract class IG
 						'9a' => '77',
 					),
 					$breeds = array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12),
-					$genders = array(0, 1);
+					$genders = array(0, 1),
+					$etheralJobs = array(44, 45, 46, 47, 48, 49, 50, 62, 63, 64),
+					$etheralFor = array(15 => 62, 16 => 63, 27 => 64, 17 => 43, 11 => 44, 14 => 45, 20 => 46, 31 => 47, 13 => 48, 18 => 49, 19 => 50),
+					$recoltJobs = array(2, 24, 26, 28, 36, 41),
+
+					$expFloors = array(
+						'job' => array(
+							0,
+							50,
+							140,
+							271,
+							441,
+							653,
+							905,
+							1199,
+							1543,
+							1911,
+							2330,
+							2792,
+							3297,
+							3840,
+							4439,
+							5078,
+							5762,
+							6493,
+							7280,
+							8097,
+							8980,
+							9898,
+							10875,
+							11903,
+							12985,
+							14122,
+							15315,
+							16564,
+							17873,
+							19242,
+							20672,
+							22166,
+							23726,
+							25353,
+							27048,
+							28815,
+							30656,
+							32572,
+							34566,
+							36641,
+							38800,
+							41044,
+							43378,
+							45804,
+							48325,
+							50946,
+							53669,
+							56498,
+							59437,
+							62491,
+							65664,
+							68960,
+							72385,
+							75943,
+							79640,
+							83482,
+							87475,
+							91624,
+							95937,
+							100421,
+							105082,
+							109930,
+							114971,
+							120215,
+							125671,
+							131348,
+							137256,
+							143407,
+							149811,
+							156481,
+							163429,
+							170669,
+							178214,
+							186080,
+							194283,
+							202839,
+							211765,
+							221082,
+							230808,
+							240964,
+							251574,
+							262660,
+							274248,
+							286364,
+							299037,
+							312297,
+							326175,
+							340705,
+							355924,
+							371870,
+							388582,
+							406106,
+							424486,
+							443772,
+							464016,
+							485274,
+							507604,
+							531071,
+							555541,
+							581687,
+						),
+					);
+
+	static public function getLevel($exp, $type)
+	{
+		foreach (self::$expFloors[$type] as $i => $floor)
+		{
+			if ($exp < $floor)
+				return $i; //O.K. since it starts at 0
+		}
+		return 100;
+	}
 
 	static public function getBreeds()
 	{
@@ -46,6 +164,23 @@ abstract class IG
 		return lang('gender.' . $id);
 	}
 
+	static public function isEtheralJob($id)
+	{
+		return in_array($id, self::$etheralJobs);
+	}
+	static public function getEtheralJob($id)
+	{
+		return self::$etheralFor[$id];
+	}
+	static public function hasEtheralJob($id)
+	{
+		return isset(self::$etheralFor[$id]);
+	}
+	static public function isRecoltJob($id)
+	{
+		return in_array($id, self::$recoltJobs);
+	}
+
 	static public function getStat($id, $type = 'max')
 	{
 		$stat = self::${'stats' . ucfirst($type)};
@@ -64,13 +199,17 @@ abstract class IG
 
 		$html = '';
 		foreach ($stats as $stat)
-			$html .= self::parseStat($stat, $isMax) . '<br />';
+			$html .= ($s = self::parseStat($stat, $isMax)) == '' ? '' : $s . '<br />';
 		return $html;
 	}
 
 	static public function parseStat($stat, $isMax)
 	{
 		$stat = explode('#', $stat); #id#from#to#?#dice(XdY+Z)
+
+		if ($stat[1] == '0' && $stat[2] == '0')
+			return '';
+
 		$rawType = strtolower($stat[0]);
 		$factor = 1; //for reverse
 		if (isset(self::$reverseTable[$rawType]))

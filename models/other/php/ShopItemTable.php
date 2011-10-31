@@ -55,7 +55,7 @@ class ShopItemTable extends RecordTable
 		if ($search_val['cat'] === '')
 			$search_val['cat'] = -1;
 
-		$options = tag_open('div', array('id' => 'options')) . '>';
+		$options = tag('div', array('id' => 'options'));
 		$options .= input('is_lottery', lang('shop.is_lottery'), 'checkbox', $search_val['is_lottery']);
 		if (in_array('is_vip', $this->getFilters()))
 			$options .= input('is_vip', lang('shop.is_vip'), 'checkbox', $search_val['is_vip']);

@@ -40,7 +40,7 @@ class EventTable extends RecordTable
 	}
 
 
-	protected function _sendEventBoxes()
+	public function sendEventBoxes()
 	{
 		if (null !== $this->_eventBoxes)
 			return;
@@ -74,7 +74,7 @@ bind(function ()
 	public function sort($events)
 	{
 		global $account;
-		$this->_sendEventBoxes();
+		$this->sendEventBoxes();
 
 		$days = array();
 		foreach ($events as $event)

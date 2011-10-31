@@ -176,7 +176,7 @@ class Doctrine_Relation_Parser
 
                     if ( ! $parser->hasRelation($this->_table->getComponentName())) {
                         $parser->bind($this->_table->getComponentName(),
-                                      array('type'    => Doctrine_Relation::ONE,
+                                      $c = array('type'    => Doctrine_Relation::ONE,
                                             'local'   => $def['local'],
                                             'foreign' => $idColumnName,
                                             'localKey' => true,
@@ -185,12 +185,12 @@ class Doctrine_Relation_Parser
 
                     if ( ! $this->hasRelation($backRefRelationName)) {
                         if (in_array($def['class'], $localClasses)) {
-                            $this->bind($def['refClass'] . " as " . $backRefRelationName, array(
+                            $this->bind($def['refClass'] . " as " . $backRefRelationName, $c= array(
                                     'type' => Doctrine_Relation::MANY,
                                     'foreign' => $def['foreign'],
                                     'local'   => $idColumnName));
                         } else {
-                            $this->bind($def['refClass'] . " as " . $backRefRelationName, array(
+                            $this->bind($def['refClass'] . " as " . $backRefRelationName, $c= array(
                                     'type' => Doctrine_Relation::MANY,
                                     'foreign' => $def['local'],
                                     'local'   => $idColumnName));

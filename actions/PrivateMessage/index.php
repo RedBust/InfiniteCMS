@@ -3,7 +3,7 @@ $unreads = $account->User->getUnreadPM();
 
 $threads = Query::create() //it'll be heavy (wrote at the very start)
 				->from('PrivateMessageThread pmt')
-				->leftJoin('pmt.Receivers pmr INDEXBY pmr.user_guid')
+				->leftJoin('pmt.Receivers pmr INDEXBY pmr.account_id')
 						->leftJoin('pmr.Account pmra') //Private Message Receiver's Account
 					->leftJoin('pmt.Answers pma')
 						->leftJoin('pma.Author pmau') //Private Message Answer's User
@@ -15,9 +15,7 @@ $threads = Query::create() //it'll be heavy (wrote at the very start)
 echo make_link('@pm.create', lang('PrivateMessage - create', 'title'));
 
 if (empty($threads))
-{
 	echo lang('pm.any');
-}
 else
 {
 	echo '
@@ -28,7 +26,7 @@ else
 		$receivers = array();
 		foreach ($thread->Receivers as $i => $receiver)
 		{
-			if ($receiver->user_guid != $account->guid)
+			if ($receiver->account_id != $account->guid)
 			{
 				$receivers[] = make_link($receiver);
 			}

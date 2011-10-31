@@ -24,6 +24,7 @@ Doctrine_Manager::getInstance()->bindComponent('User', 'other');
  * @property Doctrine_Collection $TicketAnswer
  * @property Doctrine_Collection $PrivateMessageAnswer
  * @property Doctrine_Collection $PrivateMessageThreadReceiver
+ * @property Doctrine_Collection $Contest
  * 
  * @package    InfiniteCMS
  * @subpackage Models
@@ -110,6 +111,11 @@ abstract class BaseUser extends Record
 
         $this->hasMany('PrivateMessageThreadReceiver', array(
              'local' => 'guid',
-             'foreign' => 'user_guid'));
+             'foreign' => 'account_id'));
+
+        $this->hasMany('Contest', array(
+             'refClass' => 'ContestJuror',
+             'local' => 'user_id',
+             'foreign' => 'contest_id'));
     }
 }

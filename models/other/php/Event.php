@@ -12,6 +12,7 @@
  */
 class Event extends BaseEvent
 {
+	protected static $registeredEvents = array();
 	protected $datePassed = null;
 
 	public function canJoin()
@@ -95,30 +96,45 @@ class Event extends BaseEvent
 			return '';
 		return make_link($this->Guild, '[G]');
 	}
+	public function getLink()
+	{
+		return $this->getGuildLink() . make_link($this->getURL(), $this->name);
+	}
 
 	public function __toString()
 	{
+		return $this->toString();
+	}
+	public function toString($forceCannot = false)
+	{
+		$this->getTable()->sendEventBoxes();
 		global $account;
 
-		$canParticipate = level(LEVEL_LOGGED) && $this->canJoin() ? $account->canParticipate($this) : false;
+		$canParticipate = $forceCannot ? false : level(LEVEL_LOGGED) && $this->canJoin() ? $account->canParticipate($this) : false;
 
 		if ($this->Participants->count())
 			$participants = $this->getParticipantsString();
 		else
 			$participants = $this->isFinished() ? '' : lang('participants.any');
 
-		echo tag('div', array('id' => 'event-' . $this->id, 'class' => 'showThis'),
-		 $this->getParticipateLink($canParticipate) . $this->getRewardString() . $participants);
-		jQ('registerEvent(' . $this->id . ')');
+		if (!in_array($this->id, self::$registeredEvents))
+		{
+			self::$registeredEvents[] = $this->id;
 
-		return $this->toListItem($canParticipate);
+			echo tag('div', array('id' => 'event-' . $this->id, 'class' => 'showThis'),
+			 $this->getParticipateLink($canParticipate) . $this->getInfoString() . $participants);
+			jQ('registerEvent(' . $this->id . ')');
+		}
+
+		return $this->toListItem($canParticipate, $forceCannot);
 	}
-	public function toListItem($can)
+	public function toListItem($can, $forceCannot = false)
 	{
 		global $account;
+
 		return tag('b', $this->getHour() . 'h' . $this->getMinute() . $this->getGuildLink() . ': ') . $this->name .
 		 ( js_link('showEvent(' . $this->id . ')', make_img('icons/group', EXT_PNG, lang('participants')), '#', array('class' => 'showThis'))) .
-		 ( level(LEVEL_LOGGED) && $account->getMainChar() ? make_link($this->getParticipateURL($can), 
+		 ( level(LEVEL_LOGGED) && $account->getMainChar() && !$forceCannot ? make_link($this->getParticipateURL($can), 
 		   make_img('icons/group_' . ($can ? 'add' : 'delete'), EXT_PNG, lang('event.join')),
 		   null, array('class' => 'hideThis')) : '');
 	}
@@ -126,7 +142,7 @@ class Event extends BaseEvent
 	{
 		$participants = array();
 		foreach ($this->Participants as $character)
-			$participants[] = $character->asEventParticipant($this->getWinnerId());
+			$participants[] = $character->toEventParticipant($this->getWinnerId());
 		return tag('h3', lang('participant' . ( count($participants) > 1 ? 's' : '' )) .
 		 ( $this->capacity == -1 || $this->capacity == 1 ? '' : ' (' . count($participants) . '/' . $this->capacity . ')' ) .
 		 ' : ') . $this->getWinnerString() . implode(', ', $participants);
@@ -181,14 +197,14 @@ var form_char = $("#form_char").autocomplete(
 		return make_img('icons/group_' . ($can ? 'add' : 'delete'), EXT_PNG) .
 		 tag('b', make_link($this->getParticipateURL($can), lang('event.' . ($can ? 'join' . ($this->Participants->count() ? '' : '_first') : 'part')), array(), array(), false)) . tag('br');
 	}
-	public function getRewardString()
+	public function getInfoString()
 	{
-		$reward = '';
+		$info = '';
 		if ($this->relatedExists('Reward'))
-			$reward .= tag('br') . tag('fieldset', tag('legend', tag('b', lang('reward'))) . $this->Reward) . tag('br');
+			$info .= tag('br') . tag('fieldset', tag('legend', tag('b', lang('reward'))) . $this->Reward) . tag('br');
 		if ($this->isFinished())
-			$reward .= tag('i', lang('event.elapsed')) . tag('br');
-		return $reward;
+			$info .= tag('i', lang('event.elapsed')) . tag('br');
+		return $info;
 	}
 
 	public function setWinner(Character $winner)

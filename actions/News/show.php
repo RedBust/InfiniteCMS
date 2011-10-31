@@ -1,14 +1,9 @@
 <?php
-$id = intval($router->requestVar('id', -1));
-if ($id == -1)
-{
-	printf(lang('news.not_exists'), html($id));
-	return;
-}
+$router->codeIf(404, -1 == $id = intval($router->requestVar('id', -1)));
 if ($cache = Cache::start($router->getController() . '_show_' . $id .
 	 '_' . $member->getLevel()))
 {
-	if (!( $news = NewsTable::getInstance()
+	$router->codeUnless(404, $news = NewsTable::getInstance()
 							->createQuery('n')
 							->where('n.id = ?', $id)
 							->leftJoin('n.Author u')
@@ -16,12 +11,7 @@ if ($cache = Cache::start($router->getController() . '_show_' . $id .
 							->leftJoin('n.Comments c')
 								->leftJoin('c.Author au')
 									->leftJoin('au.Account ac')
-							->fetchOne() ))
-	{
-		printf(lang('news.not_exists'), html($id));
-		return;
-	}
-
+							->fetchOne());
 	jQ('
 var acc = $("#comments");
 acc.accordion(

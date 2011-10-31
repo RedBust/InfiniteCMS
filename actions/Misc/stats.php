@@ -1,9 +1,5 @@
 <?php
-if (!$config['STATS'])
-{
-	define('HTTP_CODE', 404);
-	return;
-}
+$router->codeUnless(404, $config['STATS']);
 define('SKIP_STATS', true);
 
 if ($cache = Cache::start($router->getController() . '_stats', 1))//'+6 hours'))

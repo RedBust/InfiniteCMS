@@ -1,14 +1,20 @@
 <?php
 $page = $router->requestVar('id', 1);
 $char = '';
+$table = CharacterTable::getInstance();
+$contest = ContestTable::getInstance()->retrieve();
+if (!$contest)
+	$contest = NULL;
 
 $orderBy = $router->requestVar('orderBy');
 $orders = array(
-	'level' => 'xp',
 	'kamas',
 	'honor',
 	'deshonor',
+	'level' => 'xp',
 );
+if ($contest)
+	$orders[] = 'votes';
 $ordersLang = array();
 foreach ($orders as $k => $order)
 {
@@ -18,7 +24,7 @@ foreach ($orders as $k => $order)
 if (isset($orders[$orderBy]))
 	$orderBy = $orders[$orderBy]; //Such as level => xp
 if (!in_array($orderBy, $orders))
-	$orderBy = reset($orders);
+	$orderBy = end($orders);
 
 if (!in_array($m = strtoupper($router->requestVar('orderMode')), array('ASC', 'DESC')))
 	$m = 'DESC';
@@ -32,14 +38,25 @@ $sBreed = isset($breeds[$breed = $router->requestVar('breed')]) ? $breed : -1; /
 $sGender = isset($genders[$gender = $router->requestVar('gender')]) ? $gender : -1; //selected gender
 
 
-$char = $router->postVar('character');
+$char = urldecode($router->requestVar('character'));
 if (!empty($char))
 {
 	$prev = Query::create()
-				->select('COUNT(c.guid) AS prev')
-					->from('Character c')
-				->where('c.guid <= (SELECT sc.guid FROM Character sc WHERE sc.name = ?)', $char)
-				->orderBy(sprintf('c.%s %s', $orderBy, $m));
+				->select('COUNT(c.guid) AS prev');
+	if ($contest)
+	{
+		$prev
+				->from('ContestParticipant cp')
+					->leftJoin('cp.Character c')
+				->andWhere('cp.contest_id = ?', $contest->id);
+	}
+	else
+	{
+		$prev->from('Character c');
+	}
+	$prev
+				->andWhere('c.guid <= (SELECT sc.guid FROM Character sc WHERE sc.name = ?)', $char)
+				->orderBy(sprintf('%s.%s %s', $orderBy == 'votes' ? 'cp' : 'c', $orderBy, $m));
 	if (!$config['LADDER_ADMIN'])
 	{
 		$prev->leftJoin('c.Account a')
@@ -51,6 +68,7 @@ if (!empty($char))
 		$prev->andWhere('c.sexe = ?', $sGender);
 	$prev = $prev->fetchOneArray();
 	$prev = $prev['prev'];
+
 	if (0 == $prev)
 	{
 		$char = '';
@@ -64,48 +82,101 @@ if (!empty($char))
 	}
 }
 
-$ladderDql = Query::create()
-				->from('Character c')
+
+$ladderDql = Query::create();
+if ($contest)
+{ //@todo partial ?
+	echo tag('h1', lang('contest') . ' : ' . js_link('contestInfo.dialog("open")', $contest->getName())),
+	 tag('div', array('id' => 'contestInfo', 'title' => $contest->getName()));
+	partial('ContestJuror/index', array('contest'), PARTIAL_CONTROLLER);
+	if ($contest->relatedExists('Reward'))
+	{
+		echo tag('br') . tag('fieldset', array('id' => 'reward'),
+		 tag('legend', tag('b', lang('reward'))) .
+		 tag('div', $contest->Reward)) . tag('br');
+	}
+	echo '</div>';
+
+	if (level(LEVEL_LOGGED) && $account->canCompete($contest))
+		echo $contest->getParticipateLink(), tag('br'), tag('br'); //@todo allow unregister ?
+
+	jQ('
+var contestInfo = $("#contestInfo").dialog(dialogOpt);
+bind(function ()
+{
+	contestInfo.dialog("close");
+	delete contestInfo;
+});');
+
+	$ladderDql
+				->from('ContestParticipant cp')
+					->leftJoin('cp.Character c')
+				->andWhere('cp.contest_id = ?', $contest->id);
+}
+else
+	$ladderDql->from('Character c');
+$ladderDql
 					->leftJoin('c.Account a')
 						->leftJoin('c.GuildMember gm')
 							->leftJoin('gm.Guild g')
-					->where('a.banned = 0');
+					->andWhere('a.banned = 0');
 if (!$config['LADDER_ADMIN'])
 	$ladderDql->andWhere('a.level = 0');
 if ($sBreed != -1)
 	$ladderDql->andWhere('c.class = ?', $sBreed);
 if ($sGender != -1)
 	$ladderDql->andWhere('c.sexe = ?', $sGender);
-$ladderDql->orderBy(sprintf('c.%s %s', $orderBy, $m));
-$pager = new Doctrine_Pager($ladderDql, $page, $config['LADDER_LIMIT']);
-$persos = $pager->execute();
-/* @var $persos Collection */
-$layout = new Doctrine_Pager_Layout($pager, new Doctrine_Pager_Range_Sliding(array('chunk' => 4)), to_url(array('controller' => $router->getController(), 'action' => $router->getAction(), 'orderBy' => $orderBy, 'orderMode' => $m, 'gender' => $sGender, 'breed' => $sBreed, 'id' => ''), false));
-$layout->setTemplate('[<a href="{%url}">{%page}</a>]');
-$layout->setSelectedTemplate('[<b>{%page}</b>]');
+$ladderDql->orderBy(sprintf('%s.%s %s', $orderBy == 'votes' ? 'cp' : 'c', $orderBy, $m));
 
-echo tag('fieldset', tag('legend', array('id' => 'search'), lang('character.search') . tag('span', array('class' => 'showThis'), $sGender == -1 && $sBreed == -1 && empty($char) ? ' >' : ' <')) .
- tag('div', array('class' => $sGender == -1 && $sBreed == -1 && empty($char) && $orderBy == reset($orders) && $m == 'DESC' ? 'hideThis' : ''), make_form(array(
-	array('character', lang('name'), NULL, $char),
-	array('orderBy', lang('ladder.order_by'), 'select', $ordersLang, $orderBy),
-	array('orderMode', lang('ladder.order_mode'), 'select',
-	 array('DESC' => lang('ladder.order_mode.DESC'), 'ASC' => lang('ladder.order_mode.ASC')), $m),
-	array('gender', lang('acc.ladder.sex'), 'select', $genders, $sGender),
-	array('breed', lang('acc.ladder.class'), 'select', $breeds, $sBreed),
-)))), str_repeat(tag('br'), 3);
-jQ('var searchForm = $("fieldset").find("div"),
-	searchVisible = ' . ( $gender == -1 && $breed == -1 && empty($char) && $orderBy == reset($orders) && $m == 'DESC' ? 'false' : 'true' ) . ';
-	searchLegend = $("#search").click(function ()
+$urlMask = to_url(array('controller' => $router->getController(), 'action' => $router->getAction(), 'orderBy' => $orderBy, 'orderMode' => $m, 'gender' => $sGender, 'breed' => $sBreed, 'contest' => $contest ? $contest->id : -1, 'id' => ''), false);
+$chunk = 4;
+if ($contest)
+{ //omg ... gonna move that ...
+	$totalPersos = $ladderDql->execute();
+	$persos = new Collection('Character');
+	$i = 0;
+	$lastVotes = NULL;
+	$rangePerso = range($start = 1 + ($page - 1) * $config['LADDER_LIMIT'], $end = $start - 1 + $config['LADDER_LIMIT']);
+
+	foreach ($totalPersos as $record)
+	{
+		if ($record->votes != $lastVotes)
+		{
+			++$i;
+			$lastVotes = $record->votes;
+		}
+
+		if (in_array($i, $rangePerso))
+		{
+			$persos->add($record);
+		}
+
+		if ($i > $end)
+			break;
+	}
+	$lastPage = ceil($i / $config['LADDER_LIMIT']);
+	$rangePage = range(1, $lastPage);
+	$showRange = range($page - $chunk / 2, $page + $chunk / 2);
+	$dispPages = array_intersect($showRange, $rangePage);
+	//if you can read minds, you can read mine here : FUCK YOU MYSQL NOT ALLOWING LIMIT IN SUBQUERIES ! FUUUUU-
+}
+else
 {
-	searchForm.slideToggle();
-	searchVisible = !searchVisible; //DON\'T ASK ME WHY searchForm.is(":visible") DOESN\'T WORK, I AIN\'T GOT A CLUE ! SHITTY LIB
-	if (searchVisible) //and just calling searchForm.is(":visible") in the browser\'s console works fine ... FUCK YOU.
-		searchLegend.find("span").html(" <");
-	else
-		searchLegend.find("span").html(" >");
-});');
-$persos->ladderDisplay(($layout->getPager()->getPage() - 1) * $config['LADDER_LIMIT'], $char);
-echo paginate($layout);
+	$pager = new Doctrine_Pager($ladderDql, $page, $config['LADDER_LIMIT']);
+	$persos = $pager->execute();
+	/* @var $persos Collection */
+	$layout = new Doctrine_Pager_Layout($pager, new Doctrine_Pager_Range_Sliding(array('chunk' => $chunk)), $urlMask);
+	$start = ($layout->getPager()->getPage() - 1) * $config['LADDER_LIMIT'];
+	$layout->setTemplate('[<a href="{%url}">{%page}</a>]');
+	$layout->setSelectedTemplate('[<b>{%page}</b>]');
+}
+
+echo $table->getSearch();
+$persos->ladderDisplay($start - 1, $contest, $char);
+if ($contest)
+	echo paginate($page, $lastPage, $dispPages, $urlMask);
+else
+	echo paginateLayout($layout);
 
 if (!$persos->count())
 	echo tag('b', lang('acc.ladder.no_character'));

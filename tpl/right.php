@@ -2,21 +2,22 @@
 					<div class="module<?php echo $connected ? 2 : 1 ?>">
 						<?php
 						if ($connected): //member is not logged ?
-							$unreads = $account->User->getUnreadPM();
+							if ($config['PM_BY_PAGE'])
+								$unreads = $account->User->getUnreadPM();
 							//show infos
 							echo lang('pseudo') . ': ' . make_link($account, empty($account->pseudo) ? $account->account : $account->pseudo) .
-							 tag('span', array('id' => 'pm_inbox'), $unreads->count() ? '' : '&nbsp;' . make_link('@pm', make_img('icons/email', EXT_PNG, lang('PrivateMessage - index', 'title')), array(), array('data-unless-selector' => '#pm')) ) . tag('br') .
-							 ( $config['PASS']['enable'] && $config['ENABLE_SHOP'] ? $account->User->getPoints() . tag('br') : '' ) .
+							 ( $config['PM_BY_PAGE'] ? tag('span', array('id' => 'pm_inbox'), $unreads->count() ? '' : '&nbsp;' . make_link('@pm', make_img('icons/email', EXT_PNG, lang('PrivateMessage - index', 'title')), array(), array('data-unless-selector' => '#pm')) ) : '' ) . tag('br') .
+							 ( $config['PASS']['ENABLE'] && $config['ENABLE_SHOP'] ? $account->User->getPoints() . tag('br') : '' ) .
 							 lang('level') . ': ' . $account->getLevel() . tag('br') .
-							 tag('span', array('id' => 'pm_info'), $account->User->getNextPMNotif()) .
+							 ( $config['PM_BY_PAGE'] ? tag('span', array('id' => 'pm_info'), $account->User->getNextPMNotif()) : '' ) .
 							 make_link(new Account, lang('menu.acc.edit')) . tag('br') .
 							 make_link('@sign_off', lang('menu.logout'), array(), array(), false) . tag( 'br' ) .
 							 ( $config['URL_VOTE'] != -1 ? make_link('@vote', lang('menu.vote'), array(), array(), false) . tag( 'br' ) : '' ) .
-							 ( $config['PASS']['enable'] ? make_link('@credit', lang('menu.credit')) : '' ) .
+							 ( $config['PASS']['ENABLE'] ? make_link('@credit', lang('menu.credit')) : '' ) .
 							 ( level(LEVEL_VIP) || empty($config['COST_VIP']) || $account->User->points < $config['COST_VIP'] ? '' :
 							  make_link('@vip', lang('Account - vip', 'title')) . ' (' . $config['COST_VIP'] . ')' );
 						else:
-							$pseudo = $router->postVar( Member::CHAMP_PSEUDO );
+							$pseudo = $router->postVar(Member::CHAMP_PSEUDO);
 							echo tag('form', array('method' => 'POST', 'action' => replace_url('@sign_in'), 'id' => 'login_form'),
 							 input(Member::CHAMP_PSEUDO, NULL, NULL, $pseudo, array('class' => 'text')) .
 							 input(Member::CHAMP_PASS, NULL, 'password', array('class' => 'pwd')) .

@@ -90,11 +90,16 @@ class Member extends Multiton
 		return $lvl;
 	}
 
-	public static function getLevels()
+	public static function getLevels($simple = false)
 	{
-		return array(
-			LEVEL_BANNED => lang('rank.banned'),
-			LEVEL_GUEST => lang('rank.guest'),
+		$levels = array();
+		if (!$simple)
+		{
+			$levels[LEVEL_BANNED] = lang('rank.banned');
+			$levels[LEVEL_GUEST] = lang('rank.guest');
+		}
+
+		$levels += array(
 			LEVEL_LOGGED => lang('rank.player'),
 			'' . LEVEL_VIP => lang('rank.vip'),
 			LEVEL_TEST => lang('rank.test'),
@@ -102,6 +107,7 @@ class Member extends Multiton
 			LEVEL_MJ => lang('rank.gm'),
 			LEVEL_ADMIN => lang('rank.admin'),
 		);
+		return $levels;
 	}
 
 	public static function getFormattedLevels()

@@ -36,7 +36,7 @@ $("#poll_name").editInPlace({url: %s});', javascript_val(to_url($base_eip_url + 
 		%other_value%Date: date%other_type%,
 		onSelect: function (dateText, inst)
 		{
-			dp%type%%id%Content.html(dateText).load(%update_url%, {"update_value": dateText}, function (response, status)
+			dp%type%%id%Content.html(dateText).load(%update_url%, {"update_value": dateText, "_csrf_token": "%token%"}, function (response, status)
 			{
 				date = $.datepicker.parseDate("dd/mm/yy", response);
 				dp%other_type%%id%.datepicker("option", "%type_name%Date", date);
@@ -62,6 +62,7 @@ $("#poll_name").editInPlace({url: %s});', javascript_val(to_url($base_eip_url + 
 			'%other_type%' => $other,
 			'%other_value%' => $types[$other],
 			'%calendar_opts%' => $calendar_opts,
+			'%token%' => session_id(),
 		));
 	}
 	jQ($js);

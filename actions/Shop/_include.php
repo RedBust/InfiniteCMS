@@ -8,5 +8,5 @@ if (!level(LEVEL_LOGGED))
 if (!$config['ENABLE_SHOP'] && !level(LEVEL_ADMIN))
 {
 	echo lang('shop.off');
-	define('HTTP_CODE', 301); //W8 WAT ONLY ADMINS ARE AUTHORIZED ? OP IS A FAGGOT
+	define('HTTP_CODE', 301); //W8 WAT ONLY ADMINS ARE AUTHORIZED ? "OP IS A FAGGOT"
 }

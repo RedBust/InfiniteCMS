@@ -2,16 +2,12 @@
 $id = $router->requestVar('id', -1);
 $admin = level( LEVEL_ADMIN );
 
-if (!( $shopItem = Query::create()
+$router->codeUnless(404, $shopItem = Query::create()
 		->select('i.cost, e.*')
 			->from('ShopItem i')
 				->leftJoin('i.Effects e')
 			->where('id = ?', $id)
-		->fetchOne() ))
-{
-	printf(lang('shop.item.not_exists'), intval($id));
-	return;
-}
+		->fetchOne());
 $return_back = '<br />' . make_link(array('controller' => 'Shop', 'action' => 'index', 'cat' => $shopItem->category_id), lang('back_to_index'));
 
 $char = $account->getMainChar();

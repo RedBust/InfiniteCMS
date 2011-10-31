@@ -2,11 +2,7 @@
 if (!check_level(LEVEL_MODO))
 	return;
 
-if (!$com = CommentTable::getInstance()->find($id = $router->requestVar('id', -1)))
-{
-	define('HTTP_CODE', 404);
-	return;
-}
+$router->codeUnless(404, $com = CommentTable::getInstance()->find($id = $router->requestVar('id', -1)));
 
 /* @var $com Commentaire */
 //smart way (bad)

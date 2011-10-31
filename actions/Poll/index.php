@@ -4,7 +4,7 @@ $polls = Query::create()
 				->leftJoin('p.Options o')
 					->leftJoin('o.Polleds u'); //User
 if (!level(LEVEL_ADMIN))
-{ //PLAEZ DO NOT OVERDID THAT. Don't put OVER NINE THOUSANDS POLLS in the same daterange. kthx.
+{ //PLAEZ DO NOT ABUSE. Don't put OVER NINE THOUSANDS POLLS in the same daterange. kthx.
 	$polls->where('NOW() BETWEEN p.date_start AND p.date_end'); //Doctrine_Expression does not work. Don't wanna seek why
 
 	$lastElapsedPoll = Query::create()

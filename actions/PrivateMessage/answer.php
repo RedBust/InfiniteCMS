@@ -1,7 +1,7 @@
 <?php
 $thread = Query::create()
 				->from('PrivateMessageThread pmt')
-				->leftJoin('pmt.Receivers pmr INDEXBY pmr.user_guid')
+				->leftJoin('pmt.Receivers pmr INDEXBY pmr.account_id')
 					->leftJoin('pmr.Account pmra')
 				->where('pmt.id = ?', $id = intval($router->requestVar('id')))
 				->fetchOne();
@@ -25,7 +25,7 @@ if (!empty($msg))
 
 	foreach ($thread->Receivers as $receiver)
 	{
-		if ($receiver->user_guid == $account->guid || $receiver->next_page != 0
+		if ($receiver->account_id == $account->guid || $receiver->next_page != 0
 		 || !$receiver->present)
 			continue;
 

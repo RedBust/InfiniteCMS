@@ -12,4 +12,4 @@ if ($categories->count())
 	echo '</ul>';
 }
 
-echo tag('br') . make_link(array('controller' => 'ShopCategory', 'action' => 'update'), lang('ShopCategory - create', 'title'));
+echo tag('br') . make_link(new ShopCategory);

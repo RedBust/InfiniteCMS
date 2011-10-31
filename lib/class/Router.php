@@ -480,4 +480,14 @@ class Router extends Multiton
 	{
 		return $this->isMethod(self::GET);
 	}
+
+	public function codeIf($code, $if)
+	{
+		if ($if)
+			throw new Router_CodeException($code);
+	}
+	public function codeUnless($code, $unless)
+	{
+		return $this->codeIf($code, !$unless);
+	}
 }

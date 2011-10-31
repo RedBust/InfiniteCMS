@@ -2,11 +2,7 @@
 if (!check_level(LEVEL_ADMIN))
 	return;
 
-if (!$role = StaffRoleTable::getInstance($id = $router->requestVar('id')))
-{
-	define('HTTP_CODE', 404);
-	return;
-}
+$router->codeUnless(404, $role = StaffRoleTable::getInstance($id = $router->requestVar('id')));
 
 $role->delete();
 redirect(StaffRoleTable::getInstance());

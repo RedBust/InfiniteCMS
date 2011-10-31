@@ -1,10 +1,6 @@
 <?php
 $table = CharacterTable::getInstance();
-if (!( $charac = $table->retrieve() ))
-{
-	echo lang('character.does_not_exists');
-	return;
-}
+$router->codeUnless(404, $charac = $table->retrieve();
 /* @var $charac Character */
 
 if (!function_exists('gd_info'))
@@ -33,7 +29,7 @@ $text_color = imagecolorallocate($image, 255, 255, 255);
 
 imagestring($image, 20, 3, 5, $charac->name, $text_color);
 if ($charac->relatedExists('Account'))
-	imagestring($image, 3, 5, 18, sprintf(lang('character._on_acc_of'), $charac->Account->pseudo) . '.', $text_color);
+	imagestring($image, 3, 5, 18, sprintf(lang('character.on_acc_of'), $charac->Account->pseudo) . '.', $text_color);
 
 $main_infos = IG::getBreed($charac->class) . ' ' . IG::getGender($charac->sexe) .
 	' (lv ' . $charac->level  . ').';
@@ -47,7 +43,7 @@ if ($charac->relatedExists('GuildMember') && $charac->GuildMember->relatedExists
 		$guild_title = 'character.member_of';
 
 	$guild_infos = sprintf(lang($guild_title), $charac->GuildMember->Guild->name) .
-		' (lv' . $charac->GuildMember->Guild->lvl . ').';
+		' (' . lang('lvl') . $charac->GuildMember->Guild->lvl . ').';
 	imagestring($image, 3, 5, 46, $guild_infos, $text_color);
 }
 
@@ -74,13 +70,9 @@ $stats = array(
 	array('intell', 'intelligence', '7e'),
 );
 $pos = range(0, 15);
-foreach ($charac->getItems() as $item)
-{ /* @var $item Item */
-	if (in_array($item->pos, $pos))
-		IG::parseStat($item->stats, false);
-}
+$charac->getItems()->process();
 foreach ($stats as $stat)
-{
+{ //@todo use getStats
 	$decalage += 10;
 	$name = $stat[0]; //english name
 	$value = $charac[$stat[1] === NULL ? $name : $stat[1]];

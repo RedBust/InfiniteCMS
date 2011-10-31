@@ -1,5 +1,5 @@
 <?php
-if (false)#if (empty($config['URL_VOTE']) || $config['URL_VOTE'] == -1)
+if (empty($config['URL_VOTE']) || $config['URL_VOTE'] == -1)
 {
 	define('HTTP_CODE', 404);
 	return;
@@ -19,7 +19,7 @@ $layout->setSelectedTemplate('[<b>{%page}</b>]');
 
 echo '
 <table border="1" style="width: 100%">' . tag('tr', tag('td', tag('b', lang('pseudo')) . tag('td', tag('b', lang('votes')))
-				. tag('td', tag('b', lang('character')))));
+ . tag('td', tag('b', lang('character')))));
 foreach ($ladder as $user)
 {
 	/* @var $p Character */
@@ -38,4 +38,4 @@ foreach ($ladder as $user)
 echo '
 </table>';
 
-echo tag('br'), echo paginate($layout);
+echo tag('br'), paginateLayout($layout);

@@ -3,11 +3,8 @@
 if (!check_level(LEVEL_LOGGED))
 	return;
 
-if (!( $news = NewsTable::getInstance()->find($id = $router->requestVar('id', -1)) ))
-{
-	printf(lang('news.not_exists'), html($id)) . make_link('@root', lang('back_to_index'));
-	return;
-}
+$router->codeUnless(404, $news = NewsTable::getInstance()->find($id = $router->requestVar('id', -1)));
+
 /* @var $news News */
 $back_msg = tag('br') . make_link($news, lang('back_to_news'));
 if (empty($config['MAX_COMMENTS']))

@@ -2,11 +2,6 @@
 if (!check_level(LEVEL_ADMIN))
 	return;
 
-$poll = PollTable::getInstance()->find($id = $router->requestVar('id'));
-if (!$poll)
-{
-	printf(lang('poll.not_exists'), html($id));
-	return;
-}
+$router->codeUnless(404, $poll = PollTable::getInstance()->find($id = $router->requestVar('id')));
 $poll->delete();
 redirect('@polls');

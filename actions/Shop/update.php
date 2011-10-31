@@ -4,11 +4,11 @@ if (!check_level(LEVEL_ADMIN))
 
 load_models('static');
 
-if (!( $item = Query::create()
+if (!$item = Query::create()
 					->from('ShopItem i')
 						->leftJoin('i.Effects e INDEXBY e.id')
 					->where('i.id = ?', $router->requestVar('id', -1))
-					->fetchOne() ))
+					->fetchOne())
 {
 	$item = new ShopItem;
 	$title = lang($router->getController() . ' - create', 'title');
@@ -23,10 +23,9 @@ if ($sent = ( count($_POST) > 0 ))
 	else
 		$vals = array($col => $_POST['update_value']);
 	$errors = $item->update_attributes($vals, $col);
+
 	if ($col !== NULL)
-	{
 		exit(nl2br($item[$col]));
-	}
 }
 
 if (!$sent || $errors != array())

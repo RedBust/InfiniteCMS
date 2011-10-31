@@ -10,6 +10,7 @@ return array(
 	'choose' => 'Choisir',
 	'character_name' => 'Nom du personnage',
 	'level' => 'Niveau',
+	'lvl ' => 'niv' ,
 	'xp' => 'Expérience',
 	'account' => 'Nom de compte',
 	'account_without_characters' => 'Compte sans personnages',
@@ -65,6 +66,8 @@ return array(
 	'move_to' => 'Déplacer vers',
 	'capacity' => 'Capacité',
 	'has_left' => 'A quitté',
+	'general' => 'Général',
+	'acc_w/_lv>=' => 'Les comptes avec un niveau supérieur ou égal à %s.',
 
 	'must_!empty' => 'Le champ "%s" ne doit pas &ecirc;tre vide', //%s = name of input
 	'incorrect_date' => '"%s" : date incorrecte',
@@ -167,9 +170,8 @@ return array(
 	'shop.cost_vip_lower' => 'Le coût pour VIP doit être inférieur au coût normal.',
 	'shop.cat.move_items_to' => 'Déplacer les objets dans cette catégorie vers',
 	'character.does_not_exists' => 'Le personnage n\'existe pas',
-	'character.on_acc' => '<b>%s</b> est sur votre compte', //%s = character name
-	'character.on_acc_of' => '<b>%s</b> est sur le compte de %s', //first %s = character name, second = account pseudo
-	'character._on_acc_of' => 'Sur le compte de %s',
+	'character.on_acc' => 'sur votre compte', //%s = character name
+	'character.on_acc_of' => 'sur le compte de %s', //first %s = character name, second = account pseudo
 	'character.avg_level' => 'Niveau moyen des personnages',
 	'character.avg_kamas' => 'Nombre moyen de kamas',
 	'character.guilded' => 'Nombre de personnage guildé',
@@ -178,6 +180,7 @@ return array(
 	'character.item_no' => '<b>%s</b> n\'a pas d\'objets.', //%s = character name
 	'character.item' => 'objet',
 	'character.spell' => 'sort',
+	'character.job' => 'métier',
 	'character.prefix_name' => 'Préfixe au nom du personnage',
 	'character.search' => 'Chercher un personnage',
 	'character.spell_name' => 'Nom du sort',
@@ -186,15 +189,15 @@ return array(
 	'character.leader_of' => 'Meneur de la guilde "%s"',
 	'character.member_of' => 'Membre de la guilde "%s"',
 	'character._rank_of' => '<b>%s</b> chez %s',
-	'character.guild_infos' => '<b>%s</b> appartient à la guilde %s, niveau %d.', //%1: character name | %2: guild emblem + guild name, %d: guild level
-	'character.give' => 'Faire un don',
+	'character.guild_infos' => '<b>%s</b> de la guilde %s, niveau %d.', //%1: GM rank | %2: guild emblem + guild name, %d: guild level
+	'character.give' => 'Don',
 	'character.given' => 'Vous avez donné une action de type <b>%s</b> avec la valeur <b>%s</b> à <b>%s</b>.', //1 => effect name. 2 = effect value. 3 = character name
 	'character.!on_acc' => 'Le personnage n\'existe pas ou n\'est pas sur votre compte.',
 	'character.!on_event' => 'Le personnage n\'existe pas ou ne participe pas à cet évènement.',
 	'character.main' => 'Personnage principal',
-	'character.main.new' => 'Il semble que ce soit votre première visite sur le site avec un personnage.<br />
+	'character.main.new' => 'Il semble que ce soit votre première visite sur le site avec un personnage - ou que vous avez supprimé le personnage qui était votre personnage principal.<br />
 Votre personnage principal a été changé (vous pouvez le voir dans le menu, en dessous des informations sur votre compte).<br />
-Votre personnage principal est le personnage qui recevra vos commandes boutique, qui sera celui inscrit aux évènements et, s\'il mène une guilde, il pourra organiser des évènements pour celui-ci. En outre, dans les messages privés, ce sera le personnage montré.<br /><b>Note :</b> vous pouvez le changer à tout moment via l\'icone à côté de son nom. La modification n\'est pas rétro-active, c\'est-à-dire que si vous vous êtes inscrit avec un autre personnage à un évènement (par exemple), celui-ci ne prendra pas sa place.',
+Votre personnage principal est le personnage qui recevra vos commandes boutique, qui participera aux concours, qui sera celui inscrit aux évènements et, s\'il mène une guilde, il pourra organiser des évènements pour celui-ci. En outre, dans les messages privés, ce sera le personnage montré.<br /><b>Note :</b> vous pouvez le changer à tout moment via l\'icone à côté de son nom. La modification n\'est pas rétro-active, c\'est-à-dire que si vous vous êtes inscrit avec un autre personnage à un évènement (par exemple), celui-ci ne prendra pas sa place.',
 	'character.main.lempty' => 'Vous n\'avez pas de personnage.', //lempty = list empty
 	'character.main.req_>1' => 'Vous devez avoir plus d\'un personnage pour changer de personnage principal.',
 	'character.main.modified' => 'Votre personnage principal a bien été modifié',
@@ -465,6 +468,7 @@ Vous pouvez vous inscrire %register%.{/register}{log}-->{/log}', //{log} = if lo
 	'pm.arrived' => '<a href="%s" class="pm-count">%s</a> Nouveau message privé.',
 	'pm.arriveds' => '<a href="%s" class="pm-count">%s</a> Nouveaux messages privés.',
 
+	'event' => '&Eacute;vènement',
 	'participants' => 'Participants',
 	'participant' => 'Participant',
 	'participants.any' => 'Aucun participant.',
@@ -483,6 +487,23 @@ Vous pouvez vous inscrire %register%.{/register}{log}-->{/log}', //{log} = if lo
 	'event.already_won' => 'Cet évènement a déjà un vainqueur.',
 	'event.tombola.explain' => 'Mode tombola (<i>on ne peut s\'inscrire qu\'après la date passée.<br />Si "capacité" est à <b>-1</b> : vous devrez cliquer sur le bouton "tirer un vainqueur".<br />Sinon, lorsque le nombre de participants atteindra la limite, un d\'eux sera tiré au hasard et recevra le lot</i>)',
 	'event.pick_winner' => 'Tirer un vainqueur',
+	'event.won' => 'A gagné %s',
+	'event.participate_to' => 'Participe à %s',
+	'event.participated_to' => 'A participé à %s',
 	'reward' => 'Récompense',
 	'winner' => 'Vainqueur',
+	'activity' => 'Activité',
+	'contest' => 'Concours',
+	'contest.any' => 'Il n\'y a pas de concours',
+	'contest.level' => 'Niveau minimum pour voter',
+	'contest.juror' => 'Juré',
+	'contest.acc_lv>c_lv' => 'La personne que vous avez tenté d\'ajouter en juré est d\'office juré de par son niveau.',
+	'contest.acc_must_lv<' => 'Le compte doit avoir un niveau inférieur à %s.',
+	'contest.already_juror' => 'La personne que vous avez tenté d\'ajouter est déjà juré.',
+	'contest.compete' => 'Participer au concours',
+	'contest.ended' => 'Ce concours est terminé.',
+	'contest.cant_c' => 'Vous ne pouvez participer à ce concours.', //can't compete
+	'contest.participate_to' => 'Concours dans %s',
+	'contest.participated_to' => 'A conconru dans %s',
+	'contest.participated_pos' => 'Est arrivé #%d à %s',
 );

@@ -13,6 +13,7 @@ class UserTable extends RecordTable
 	public function fromGuid($guid, $load = true)
 	{
 		static $users = array();
+		exit('uu');
 		if ($guid instanceof Account || is_array($guid))
 			$guid = $guid['guid'];
 		if (isset($users[$guid]))

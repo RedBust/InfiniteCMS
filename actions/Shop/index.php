@@ -8,7 +8,7 @@ if ($router->requestVar('mode') == 'search')
 	echo $table->getSearchBox();
 	return;
 }
-$raw = $router->isAjax()? (bool) $router->requestVar('raw', false) : false;
+$raw = $router->isAjax() ? (bool) $router->requestVar('raw', false) : false;
 $categories = Query::create()
 					->from('ShopCategory sic INDEXBY id')
 					->execute();
@@ -134,7 +134,7 @@ if (count($categories))
 	$layout = new Doctrine_Pager_Layout($pager, new Doctrine_Pager_Range_Sliding(array('chunk' => 4)), to_url($url_ary + array('page' => '')));
 	$layout->setTemplate('[<a href="{%url}">{%page}</a>]');
 	$layout->setSelectedTemplate('[<b>{%page}</b>]');
-	echo paginate($layout);
+	echo paginateLayout($layout);
 
 	//not used in case of any (all)objects
 	$search_url = array(

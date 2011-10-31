@@ -3,11 +3,7 @@ if (!check_level(LEVEL_ADMIN))
 	return;
 
 $mode = $router->requestVar('mode', 'Item');
-if ($mode !== 'Item' && $mode !== 'ItemEffect')
-{ //not good :p
-	define('HTTP_CODE', 404);
-	return;
-}
+$router->codeUnless(404, $mode == 'Item' || $mode == 'ItemEffect');
 $item = Doctrine_Core::getTable('Shop' . $mode)->find($id = $router->requestVar('id', -1));
 
 if (!$item)

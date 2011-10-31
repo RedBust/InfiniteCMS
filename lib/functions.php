@@ -213,10 +213,16 @@ function lang($key, $namespace = NULL, $default = '%%key%% (Untranslated)')
 function partial($name, $sandbox = PARTIAL_FULL, $act = PARTIAL_TPL)
 {
 	global $router, $member, $account;
+
+	if (strpos($name, '/') !== false)
+		list($c, $name) = explode('/', $name);
+	else
+		$c = $router->getController();
+
 	if ($act == PARTIAL_TPL)
 		$path = 'tpl';
 	else
-		$path = ROOT_ACTIONS . $router->getController() . DS;
+		$path = ROOT_ACTIONS . $c . DS;
 
 	global $connected, $member;
 	if ($sandbox >= PARTIAL_SEMI)
@@ -303,7 +309,7 @@ function tag($name, $opt = array(), $content = NULL)
 		$opt = array();
 	}
 
-	$end = $content === NULL || $name === 'img' || $name === 'br' ? ' />' :
+	$end = $content === NULL ? ( $name === 'img' || $name === 'br' ? ' />' : '>' ) :
 			'>' . $content . '</' . $name . '>';
 	return tag_open($name, $opt) . $end;
 }
@@ -475,6 +481,8 @@ function to_url($params, $strict = true, $rewrite = true)
 	global $router;
 	if (empty($params))
 		return '';
+	if (is_string($params))
+		return $params;
 	$url = encode_url_params($params, $strict, $rewrite);
 	return $rewrite ? getPath(( $router->rewrite() ? '' : '?' ) . $url) : '?' . $url;
 }
@@ -512,8 +520,12 @@ function to_url($params, $strict = true, $rewrite = true)
  *  - anything else : returns it.
  * @return string URL modified
  */
-function replace_url($url, $strict = true)
+function replace_url($url, $strict = true, $objectMethods = true)
 {
+	if ($objectMethods === true)
+		$objectMethods = array('getLink', 'getName', 'getURL', 'getUpdateURL');
+	$objectMethods = (array) $objectMethods;
+
 	global $routes;
 	if (!is_string($url))
 	{
@@ -522,20 +534,20 @@ function replace_url($url, $strict = true)
 			global $recordName;
 			if ($url->exists())
 			{ //no way to edit_path, I know. fuck you :3
-				if (method_exists($url, 'getLink') && $recordName !== false)
+				if (method_exists($url, 'getLink') && $recordName !== false && in_array('getLink', $objectMethods))
 					return $url->getLink($recordName);
 				else
 				{
-					if (!is_string($recordName))
+					if (!is_string($recordName) && in_array('getName', $objectMethods))
 						$recordName = $url->getName();
-					return to_url(array('controller' => get_class($url), 'action' => 'show', 'id' => $url->get($url->getTable()->getIdentifier())));
+					return to_url(method_exists($url, 'getURL') && in_array('getURL', $objectMethods) ? $url->getURL() : array('controller' => get_class($url), 'action' => 'show', 'id' => $url->get($url->getTable()->getIdentifier())));
 				}
 			}
 			else
 			{
 				if (empty($recordName))
 					$recordName = lang(get_class($url) . ' - create', 'title');
-				return to_url(array('controller' => get_class($url), 'action' => 'update')); //Account#update redirects to #create ;)
+				return to_url(method_exists($url, 'getUpdateURL') && in_array('getUpdateURL', $objectMethods) ? $url->getUpdateURL() : array('controller' => get_class($url), 'action' => 'update')); //Account#update redirects to #create ;)
 			}
 		}
 		else if ($url instanceof Doctrine_Table)
@@ -700,7 +712,7 @@ function make_img($url, $ext = EXT_JPG, $title = NULL, $alt = NULL, $add = array
 function url_for_image($url, $ext = EXT_JPG)
 {
 	global $config;
-	static $ignores = array('items');
+	static $ignores = array('items', 'jobs');
 	if (substr($url, 0, 4) !== 'http' && substr($url, 0, 7) !== 'file://')
 	{
 		$template = 'templates/' . $config['template'] . '/';
@@ -1082,6 +1094,45 @@ function encode_url_params(array $params = array(), $strict = true, $rewrite = t
 	return substr($url, 0, -( strlen($and) ));
 }
 
+function paginate($page, $lastPage, $range = array(), $uri = '', $sep = ' ')
+{
+	if (count($range) < 2)
+		return '';
+
+	$navigation = '';
+
+	if ($page != 1)
+	{
+		$navigation .= make_link($uri.'1', make_img('first', EXT_PNG, array('align' => 'absmiddle')));
+		if ($page != 2)
+		{ //if it's the second page, this link is useless ...
+			$navigation .= make_link($uri.($page - 1), make_img('previous', EXT_PNG, array('align' => 'absmiddle')));
+		}
+	}
+
+	// Pages one by one
+	$links = array();
+	foreach ($range as $p)
+	{
+		if ($page == $p)
+			$links[] = tag('b', $page);
+		else
+			$links[] = make_link($uri.$p, $p);
+	}
+	$navigation .= implode($sep, $links);
+
+	if ($page != $lastPage)
+	{
+		if ($lastPage != $page + 1)
+		{ //the "last" & "next" page are the same
+			$navigation .= $sep.make_link($uri.($page + 1), make_img('next', EXT_PNG, array('align' => 'absmiddle')));
+		}
+		$navigation .= make_link($uri.$lastPage, make_img('last', EXT_PNG, array('align' => 'absmiddle')));
+	}
+
+	return $navigation;
+}
+
 /**
  * paginates
  *
@@ -1090,48 +1141,13 @@ function encode_url_params(array $params = array(), $strict = true, $rewrite = t
  *
  * @param Doctrine_Pager_Layout $pager layout to display
  */
-function paginate(Doctrine_Pager_Layout $layout, $sep = ' ')
+function paginateLayout(Doctrine_Pager_Layout $layout, $sep = ' ')
 {
 	$pager = $layout->getPager();
 	if (!$pager->haveToPaginate())
 		return '';
 
-	$navigation = '';
-	$uri = $layout->getUrlMask();
-
-	// First and previous page
-	if ($pager->getPage() != 1)
-	{
-		$navigation .= make_link($uri.'1', make_img('first', EXT_PNG, array('align' => 'absmiddle')));
-		if ($pager->getPage() != 2)
-		{ //if it's the second page, this link is useless ...
-			$navigation .= make_link($uri.$pager->getPreviousPage(), make_img('previous', EXT_PNG, array('align' => 'absmiddle')));
-		}
-		$navigation .= $sep;
-	}
-
-	// Pages one by one
-	$links = array();
-	foreach ($layout->getPagerRange()->rangeAroundPage() as $page)
-	{
-		if ($pager->getPage() == $page)
-			$links[] = tag('b', $page);
-		else
-			$links[] = make_link($uri.$page, $page);
-	}
-	$navigation .= implode('   ', $links);
-
-	// Next and last page
-	if ($pager->getPage() != $pager->getLastPage())
-	{
-		if ($pager->getLastPage() != $pager->getNextPage())
-		{ //the "last" & "next" page are the same
-			$navigation .= $sep.make_link($uri.$pager->getNextPage(), make_img('next', EXT_PNG, array('align' => 'absmiddle')));
-		}
-		$navigation .= make_link($uri.$pager->getLastPage(), make_img('last', EXT_PNG, array('align' => 'absmiddle')));
-	}
- 
-	return $navigation;
+	return paginate($pager->getPage(), $pager->getLastPage(), $pager->getPagerRange()->rangeAroundPage(), $layout->getUrlMask(), $sep);
 }
 
 /**
@@ -1657,19 +1673,6 @@ function input_csrf_token($on = true)
 {
 	$_SESSION['_csrf_token_req'] = true;
 	return input('_csrf_token', NULL, 'hidden', session_id());
-/*
-	if ($on)
-	{
-		if (defined('SKIP_CSRF_TOKEN') && SKIP_CSRF_TOKEN)
-			return '';
-
-		__actual_code();
-	}
-	else
-	{
-		unset($_SESSION['_csrf_token_req']);
-		define('SKIP_CSRF_TOKEN', true);
-	}*/
 }
 
 /**
@@ -1843,13 +1846,11 @@ function load_models($cat)
  */
 function __shutdown()
 {
-	global $account, $member, $mem;
+	global $account, $member;
 	if (level(LEVEL_LOGGED))
 	{
-		if ($account !== NULL && $account->relatedExists('User'))
-		{
+		if ($account instanceof Account)
 			$account->save();
-		}
 		$account->free(true);
 		unset($account);
 	}

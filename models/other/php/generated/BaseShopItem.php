@@ -18,6 +18,7 @@ Doctrine_Manager::getInstance()->bindComponent('ShopItem', 'other');
  * @property Doctrine_Collection $Effects
  * @property ShopCategory $Category
  * @property Doctrine_Collection $Event
+ * @property Doctrine_Collection $Contest
  * 
  * @package    InfiniteCMS
  * @subpackage Models
@@ -74,6 +75,10 @@ abstract class BaseShopItem extends Record
              'foreign' => 'id'));
 
         $this->hasMany('Event', array(
+             'local' => 'id',
+             'foreign' => 'reward_id'));
+
+        $this->hasMany('Contest', array(
              'local' => 'id',
              'foreign' => 'reward_id'));
     }

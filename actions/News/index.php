@@ -40,7 +40,7 @@ if ($cache = Cache::start($router->getController() . '_index_' . intval($p = $ro
 					$new->getAuthorString(), sprintf(lang('created'), $new['created_at']), $new['updated_at'] && $new['updated_at'] != $new['created_at'] ? sprintf(lang('last_update'), $new['updated_at']) : '', pluralize(lang('news.com.title'), count($new['Comments']), true),
 					$new['id'], $content);
 		}
-		echo paginate($layout);
+		echo paginateLayout($layout);
 		unset($new);
 	}
 	else

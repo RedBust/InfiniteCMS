@@ -14,7 +14,8 @@ class Account extends BaseAccount
 	private $profilSent = false;
 	public static $profils = array();
 	public $charsInit = false;
-	public $amis = array();
+	private $amis = NULL,
+			$rFriends = NULL; //reverse friends 
 	protected $isEncrypted = false;
 
 	public static function sendPreProfil()
@@ -68,13 +69,12 @@ binds.add(function (undef)
 			self::$profils[] = $accountId;
 			global $member, $connected, $router;
 			//todo => global $acc = $this;
-			if ($profil_cache = Cache::start('Account_show_profil_' . $this->guid . '_' . ($connected ? $account->guid : -1), strtotime('+3 hours')))
+			if ($profil_cache = Cache::start('Accoubt_show_' . $this->guid . '_' . ($connected ? $account->guid : -1) . '_profile', strtotime('+3 hours')))
 			{
-				$cont = require $router->getPath('Account', 'show');
 				echo tag('div', array(
 					'id' => 'profil-' . $this->guid,
 					'style' => 'display: none;',
-				), $cont);
+				), require $router->getPath('Account', 'show'));
 				$profil_cache->save(Cache::SHOW, Cache::NO_JS);
 			}
 			if ($cache instanceof Cache)
@@ -97,11 +97,7 @@ if($c = Cache::start("Account_show_' . $this->guid . '_" . ($connected ? $accoun
 	public function getLink($text = NULL)
 	{
 		$this->sendProfil();
-		return js_link('showProfil(' . $this->guid . ');', $text === NULL ? $this->getName() : $text, to_url(array(
-			'controller' => 'Account',
-			'action' => 'show',
-			'id' => $this->guid
-		)));
+		return js_link('showProfil(' . $this->guid . ');', $text === NULL ? $this->getName() : $text, replace_url($this, true, array()));
 	}
 
 	public function getName()
@@ -141,6 +137,40 @@ if($c = Cache::start("Account_show_' . $this->guid . '_" . ($connected ? $accoun
 		return empty($config['COST_VIP']) ? false : $this->vip;
 	}
 
+	public function canJudge($contest)
+	{
+		if ($contest->ended || !$this->isJury($contest))
+			return false;
+
+		return !$contest->Voters->contains($this->getUser()->id);
+	}
+	public function isJury($contest)
+	{
+		if ($this->level >= $contest->level)
+			return true;
+
+		return $contest->Jurors->contains($this->getUser()->id);
+	}
+	public function canCompete($contest)
+	{
+		if ($contest->ended || !$this->getMainChar())
+			return false;
+
+		return !$this->currentlyCompete($contest);
+	}
+	public function currentlyCompete($contest)
+	{
+		if ($contest instanceof Contest || is_array($contest))
+			$contest = $contest['id'];
+
+
+		foreach ($this->Characters as $character)
+		{
+			if ($character->ContestParticipations->contains($contest))
+				return true;
+		}
+		return false;
+	}
 	public function canParticipate($event)
 	{
 		if (!$this->getMainChar())
@@ -210,23 +240,40 @@ if($c = Cache::start("Account_show_' . $this->guid . '_" . ($connected ? $accoun
 	}
 
 	/**
-	 * return friends
+	 * returns friends
 	 *
 	 * @return Collection list of friends
 	 */
 	public function getFriends()
 	{
-		if (empty($this->friends))
+		if (empty($this->friends) || $this->friends == ',')
 			return array();
 
-		if ($this->amis === array())
+		if ($this->amis === NULL)
 		{ //init
-			$this->amis = Query::create()
-					->from(__CLASS__)
-						->whereIn('guid', explode(',', $this->friends))
-					->execute();
+			$this->amis = $this->getTable()
+								->createQuery()
+									->whereIn('guid', explode(';', $this->friends))
+									->andWhere('guid != ?', $this->guid)
+								->execute();
 		}
 		return $this->amis;
+	}
+	/**
+	 * @return Collection list of reverse friends
+	 */
+	public function getReverseFriends($hydrate = null)
+	{
+		if ($this->rFriends === NULL)
+		{
+			$this->rFriends = new Collection(__CLASS__);
+			foreach ($this->getFriends() as $friend)
+			{
+				if (in_array($this->guid, explode(';', $friend->friends)))
+					$this->rFriends[] = $friend;
+			}
+		}
+		return $this->rFriends;
 	}
 
 	/**
@@ -242,6 +289,17 @@ if($c = Cache::start("Account_show_' . $this->guid . '_" . ($connected ? $accoun
 		foreach ($this->getFriends() as $friend)
 		{ /* @var $friend Account */
 			if ($acc->guid == $friend->guid)
+				return true;
+		}
+		return false;
+	}
+	public function hasReverseFriend(Account $acc)
+	{
+		if ($acc->guid == $this->guid)
+			return false;
+		foreach ($this->getReverseFriends as $rFriend)
+		{
+			if ($acc->guid == $rFriend)
 				return true;
 		}
 		return false;
@@ -431,16 +489,23 @@ if($c = Cache::start("Account_show_' . $this->guid . '_" . ($connected ? $accoun
 		return $errors;
 	}
 
-	public function getMainChar()
+	public function getUser()
 	{
-		if (!$this->Characters->count())
-			return null;
 		if (!$this->relatedExists('User'))
 			$this->User = UserTable::getInstance()->fromGuid($this);
-		if ($this->User->main_char != 0 && $this->Characters->contains($this->User->main_char))
-			return $this->Characters[$this->User->main_char];
+		return $this->User;
+	}
+	public function getMainChar()
+	{
+		global $account;
 
-		jQ('$("#firstMainChar").dialog(dialogOptO);');
+		if (!$this->Characters->count())
+			return null;
+		if ($this->getUser()->main_char != 0 && $this->Characters->contains($this->getUser()->main_char))
+			return $this->Characters[$this->getUser()->main_char];
+
+		if ($account->guid == $this->guid)
+			jQ('$("#firstMainChar").dialog(dialogOptO);');
 
 
 		$main_char = $this->Characters->getFirst();
@@ -452,21 +517,12 @@ if($c = Cache::start("Account_show_' . $this->guid . '_" . ($connected ? $accoun
 					$main_char = $character;
 			}
 		}
-		$this->User->main_char = $main_char->guid;
-		return $main_char;
-	}
+		$this->getUser()->main_char = $main_char->guid;
 
-	public function getReverseFriendsQ() //Q = query
-	{
-		return $this->getTable()
-					->createQuery()
-					->whereIn('guid', explode(';', $this->friends))
-						->andWhere('friends LIKE ? OR friends LIKE ? OR friends = ?',
-					 array($this->guid . ';%', '%;' . $this->guid . ';%', $this->guid));
-	}
-	public function getReverseFriends($hydrate = null)
-	{
-		return $this->getReverseFriendsQ()->execute($hydrate);
+		if ($account->guid != $this->guid)
+			$this->getUser()->save();
+
+		return $main_char;
 	}
 
 	public function getRolesString()

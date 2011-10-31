@@ -3,22 +3,14 @@ if (!check_level(LEVEL_ADMIN))
 	return;
 
 $id = $router->requestVar('id', $_SESSION['guid']);
-$acc = AccountTable::getInstance()
+$router->codeUnless($acc = AccountTable::getInstance()
 					->createQuery('a')
 						->leftJoin('a.User u')
 					->where('a.guid = ?', $id) //guid => account id
-					->fetchOne();		
-if (!$acc)
-{
-	echo lang('acc.does_not_exists');
-	return;
-}
-if (!$acc->relatedExists('User'))
-	$acc->User = UserTable::getInstance()->fromGuid($acc->guid);
-$c = $acc->User;
+					->fetchOne());
+$c = $acc->getUser();
 /* @var $c User */
-$sent = count($_POST) > 0;
-if ($sent)
+if (!empty($_POST))
 {
 	$cols = $router->requestVar('col', '');
 	$vals = $_POST;
@@ -38,16 +30,7 @@ if ($sent)
 	if (!empty($cols) && !is_array($cols))
 		exit(nl2br($c[$col]));
 }
-if (!$sent || $errors != array())
-{
+if (empty($_POST) || !empty($errors))
 	partial('_form', 'c', PARTIAL_CONTROLLER);
-}
-elseif ($sent && $errors === array())
-{
-	echo lang('acc.edited');
-	redirect(array(
-		'controller' => 'Account',
-		'action' => 'show',
-		'id' => $acc->guid,
-	));
-}
+else
+	redirect($acc);

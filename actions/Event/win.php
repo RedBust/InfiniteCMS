@@ -2,17 +2,13 @@
 if (!check_level(LEVEL_LOGGED))
 	return; //MJ are allowed to select winner
 
-if (!( $event = EventTable::getInstance()
+$router->codeUnless(404, $event = EventTable::getInstance()
 						->createQuery('e')
 							->leftJoin('e.Participants p')
 							->leftJoin('e.Reward r')
 								->leftJoin('r.Effects re')
 						->where('id = ?', $id = $router->requestVar('id'))
-						->fetchOne() ))
-{
-	define('HTTP_CODE', 404);
-	return;
-}
+						->fetchOne());
 if (!$account->canSetWinner($event) || $event->isFinished())
 {
 	define('LEVEL_FALLBACK', true);

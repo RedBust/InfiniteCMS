@@ -4,13 +4,13 @@ if (!is_numeric($page) || $page < 1)
 	$page = 1;
 $thread = Query::create()
 				->from('PrivateMessageThread pmt')
-					->leftJoin('pmt.Receivers pmr INDEXBY pmr.user_guid')
+					->leftJoin('pmt.Receivers pmr INDEXBY pmr.account_id')
 						->leftJoin('pmr.Account pmra')
 					->andWhere('pmt.id = ' . intval($id = $router->requestVar('id')))
 				->fetchOne();
 if ($thread ? (($thread->Receivers->contains($account->guid) ? !$thread->Receivers[$account->guid]->present : true)
   && !level(LEVEL_ADMIN)) : true)
-{
+{ //won't use Router::codeUnless here :d
 	echo lang('pm.does_not_exist');
 	return;
 }
@@ -49,7 +49,7 @@ if ($rcv->next_page != 0 && $rcv->next_page < $pager->getPage() + 1)
 	$rcv->next_page = $pager->getPage() == $pager->getLastPage() ? 0 : $pager->getPage() + 1;
 	$rcv->save();
 }
-echo '</table>', paginate($layout),
+echo '</table>', paginateLayout($layout),
  tag('div', array('id' => 'pm-answer'), tag('br') .
   tag('h4', tag('b', lang('pm.answer'))) .
   make_form(array(

@@ -1,13 +1,9 @@
 <?php
 $table = ShopCategoryTable::getInstance();
-if (!$category = $table->createQuery('c')
+$router->codeUnless(404, $category = $table->createQuery('c')
 					->leftJoin('c.Items i')
 					->where('c.id = ?', $id = $router->requestVar('id'))
-					->fetchOne())
-{
-	define('HTTP_CODE', 404);
-	return;
-}
+					->fetchOne());
 
 echo tag('h3', $category->getName());
 

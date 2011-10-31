@@ -142,6 +142,7 @@ StaffRole:
 #      type: enum
 #      length: 3
 #      values: [0, 1, 2]
+
 Review:
   connection: other
   actAs:
@@ -220,6 +221,7 @@ TicketCategory:
       alias: Tickets
       type: many
 Ticket:
+  connection: other
   columns:
     category_id: int(9)
     state:
@@ -291,7 +293,7 @@ PrivateMessageThreadReceiver:
   connection: other
   columns:
     thread_id: int
-    user_guid: int
+    account_id: int
     present:
       type: bool
       default: true
@@ -304,10 +306,10 @@ PrivateMessageThreadReceiver:
       local: thread_id
       foreign: id
     User:
-      local: user_guid
+      local: account_id
       foreign: guid
     Account:
-      local: user_guid
+      local: account_id
       foreign: guid
 
 Event:
@@ -346,6 +348,70 @@ EventParticipant:
     event_id: int
     character_id: int
 
+Contest:
+  connection: other
+  columns:
+    reward_id: int
+    name: varchar
+    ended: #frozen since
+      type: int
+      default: 0
+    level: int #min level to vote
+  relations:
+    Jurors: #additionnal voting staff
+      class: User
+      refClass: ContestJuror
+      type: many
+      local: contest_id
+      foreign: user_id
+    Voters: #voters
+      class: User
+      refClass: ContestVoter
+      type: many
+      local: contest_id
+      foreign: user_id
+    Participants:
+      class: ContestParticipant
+      type: many
+      local: id
+      foreign: contest_id
+    Reward:
+      class: ShopItem
+      local: reward_id
+      foreign: id
+ContestParticipant:
+  connection: other
+  columns:
+    contest_id: int
+    character_id: int
+    votes:
+      type: integer
+      default: 0
+    position:
+    #BELIEVE ME ! I do hate to do that. But since Doctrine does not allow
+    #->leftJoin('(SELECT * FROM ContestParticipant ORDER BY votes LIMIT #{ladder_limit})')
+    #I don't have much choice :(.
+      type: integer
+      default: 0
+  relations:
+    Contest:
+      type: one
+      local: contest_id
+      foreign: id
+    Character:
+      type: one
+      local: character_id
+      foreign: guid
+ContestJuror:
+  connection: other
+  columns:
+    contest_id: int
+    user_id: int
+ContestVoter:
+  connection: other
+  columns:
+    contest_id: int
+    user_id: int
 
 
 Account:
@@ -354,114 +420,30 @@ Account:
   columns:
     guid:
       type: integer(4)
-      fixed: false
-      unsigned: false
       primary: true
       autoincrement: true
-    account:
-      type: string(30)
-      fixed: false
-      unsigned: false
-      primary: false
-      notnull: true
-      autoincrement: false
-    pass:
-      type: string(50)
-      fixed: false
-      unsigned: false
-      primary: false
-      notnull: true
-      autoincrement: false
+    account: string(30)
+    pass: string(50)
     level:
       type: integer(4)
-      fixed: false
-      unsigned: false
-      primary: false
       default: '0'
-      notnull: true
-      autoincrement: false
-    email:
-      type: string(100)
-      fixed: false
-      unsigned: false
-      primary: false
-      notnull: true
-      autoincrement: false
-    lastip:
-      type: string(15)
-      fixed: false
-      unsigned: false
-      primary: false
-      notnull: true
-      autoincrement: false
-    lastconnectiondate:
-      type: string(100)
-      fixed: false
-      unsigned: false
-      primary: false
-      notnull: true
-      autoincrement: false
+    email: string(100)
+    lastip: string(15)
+    lastconnectiondate: string(100)
     question:
       type: string(100)
-      fixed: false
-      unsigned: false
-      primary: false
-      default: DELETE?
-      notnull: true
-      autoincrement: false
+      default: 'DELETE?'
     reponse:
       type: string(100)
-      fixed: false
-      unsigned: false
-      primary: false
-      default: DELETE
-      notnull: true
-      autoincrement: false
-    pseudo:
-      type: string(30)
-      fixed: false
-      unsigned: false
-      primary: false
-      notnull: true
-      autoincrement: false
-    banned:
-      type: integer(1)
-      fixed: false
-      unsigned: false
-      primary: false
-      default: '0'
-      notnull: true
-      autoincrement: false
-    reload_needed:
-      type: integer(1)
-      fixed: false
-      unsigned: false
-      primary: false
-      default: '1'
-      notnull: true
-      autoincrement: false
+      default: 'DELETE'
+    pseudo: string(30)
+    banned: bool
+    reload_needed: bool
     bankkamas:
       type: integer(4)
-      fixed: false
-      unsigned: false
-      primary: false
       default: '0'
-      notnull: true
-      autoincrement: false
-    bank:
-      type: string()
-      fixed: false
-      unsigned: false
-      primary: false
-      notnull: true
-      autoincrement: false
-    friends:
-      type: string()
-      fixed: false
-      unsigned: false
-      primary: false
-      notnull: true
-      autoincrement: false
+    bank: string()
+    friends: string()
     logged:
       type: boolean
       default: '0'
@@ -482,52 +464,37 @@ Account:
       type: many
       local: guid
       foreign: account_id
+Guild:
+  connection: other
+  tableName: guilds
+  columns:
+    id: integer(4)
+    name: string(50)
+    emblem: string(20)
+    lvl:
+      type: integer(4)
+      default: '1'
+    xp:
+      type: integer(8)
+      default: '0'
+  relations:
+    Members:
+      class: GuildMember
+      type: many
+      local: id
+      foreign: guild
 GuildMember:
   connection: other
   tableName: guild_members
   columns:
     guid:
       type: integer(4)
-      fixed: false
-      unsigned: false
       primary: true
-      notnull: true
-      autoincrement: false
-    guild:
-      type: integer(4)
-      fixed: false
-      unsigned: false
-      primary: false
-      notnull: true
-      autoincrement: false
-    rank:
-      type: integer(4)
-      fixed: false
-      unsigned: false
-      primary: false
-      notnull: true
-      autoincrement: false
-    rights:
-      type: integer(4)
-      fixed: false
-      unsigned: false
-      primary: false
-      notnull: true
-      autoincrement: false
-    xpdone:
-      type: integer(8)
-      fixed: false
-      unsigned: false
-      primary: false
-      notnull: true
-      autoincrement: false
-    pxp:
-      type: integer(4)
-      fixed: false
-      unsigned: false
-      primary: false
-      notnull: true
-      autoincrement: false
+    guild: integer(4)
+    rank: integer(4)
+    rights: integer(4)
+    xpdone: integer(8)
+    pxp: integer(4)
   relations:
     Guild:
       type: one
@@ -536,283 +503,40 @@ GuildMember:
     Character:
       local: guid
       foreign: guid
-Guild:
-  connection: other
-  tableName: guilds
-  columns:
-    id:
-      type: integer(4)
-      fixed: false
-      unsigned: false
-      primary: false
-      notnull: true
-      autoincrement: false
-    name:
-      type: string(50)
-      fixed: false
-      unsigned: false
-      primary: false
-      notnull: true
-      autoincrement: false
-    emblem:
-      type: string(20)
-      fixed: false
-      unsigned: false
-      primary: false
-      notnull: true
-      autoincrement: false
-    lvl:
-      type: integer(4)
-      fixed: false
-      unsigned: false
-      primary: false
-      default: '1'
-      notnull: true
-      autoincrement: false
-    xp:
-      type: integer(8)
-      fixed: false
-      unsigned: false
-      primary: false
-      default: '0'
-      notnull: true
-      autoincrement: false
-  relations:
-    Members:
-      class: GuildMember
-      type: many
-      local: id
-      foreign: guild
 Item:
   connection: other
   tableName: items
   columns:
     guid:
       type: integer(4)
-      fixed: false
-      unsigned: false
       primary: true
-      autoincrement: false
-    template:
-      type: integer(4)
-      fixed: false
-      unsigned: false
-      primary: false
-      notnull: true
-      autoincrement: false
-    qua:
-      type: integer(4)
-      fixed: false
-      unsigned: false
-      primary: false
-      notnull: true
-      autoincrement: false
-    pos:
-      type: integer(4)
-      fixed: false
-      unsigned: false
-      primary: false
-      notnull: true
-      autoincrement: false
-    stats:
-      type: string()
-      fixed: false
-      unsigned: false
-      primary: false
-      notnull: true
-      autoincrement: false
-LiveAction:
-  connection: other
-  tableName: live_action
-  columns:
-    id:
-      type: integer(4)
-      fixed: false
-      unsigned: false
-      primary: true
-      autoincrement: true
-    playerid:
-      type: integer(4)
-      fixed: false
-      unsigned: false
-      primary: false
-      notnull: true
-      autoincrement: false
-    action:
-      type: integer(4)
-      fixed: false
-      unsigned: false
-      primary: false
-      notnull: true
-      autoincrement: false
-    nombre:
-      type: integer(4)
-      fixed: false
-      unsigned: false
-      primary: false
-      notnull: true
-      autoincrement: false
-  relations:
-    Character:
-      type: one
-      local: playerid
-      foreign: guid
-MountPark:
-  connection: other
-  tableName: mountpark_data
-  columns:
-    mapid:
-      type: integer(4)
-      fixed: false
-      unsigned: false
-      primary: true
-      autoincrement: false
-    size:
-      type: integer(4)
-      fixed: false
-      unsigned: false
-      primary: false
-      notnull: true
-      autoincrement: false
-    owner:
-      type: integer(4)
-      fixed: false
-      unsigned: false
-      primary: false
-      notnull: true
-      autoincrement: false
-    guild:
-      type: integer(4)
-      fixed: false
-      unsigned: false
-      primary: false
-      default: '-1'
-      notnull: true
-      autoincrement: false
-    price:
-      type: integer(4)
-      fixed: false
-      unsigned: false
-      primary: false
-      default: '0'
-      notnull: true
-      autoincrement: false
-    data:
-      type: string()
-      fixed: false
-      unsigned: false
-      primary: false
-      notnull: true
-      autoincrement: false
+    template: integer(4)
+    qua: integer(4)
+    pos: integer(4)
+    stats: string()
 Mount:
   connection: other
   tableName: mounts_data
   columns:
     id:
       type: integer(4)
-      fixed: false
-      unsigned: false
       primary: true
-      autoincrement: false
-    color:
-      type: integer(4)
-      fixed: false
-      unsigned: false
-      primary: false
-      notnull: true
-      autoincrement: false
-    sexe:
-      type: integer(4)
-      fixed: false
-      unsigned: false
-      primary: false
-      notnull: true
-      autoincrement: false
-    name:
-      type: string(30)
-      fixed: false
-      unsigned: false
-      primary: false
-      notnull: true
-      autoincrement: false
-    xp:
-      type: integer(4)
-      fixed: false
-      unsigned: false
-      primary: false
-      notnull: true
-      autoincrement: false
-    level:
-      type: integer(4)
-      fixed: false
-      unsigned: false
-      primary: false
-      notnull: true
-      autoincrement: false
-    endurance:
-      type: integer(4)
-      fixed: false
-      unsigned: false
-      primary: false
-      notnull: true
-      autoincrement: false
-    amour:
-      type: integer(4)
-      fixed: false
-      unsigned: false
-      primary: false
-      notnull: true
-      autoincrement: false
-    maturite:
-      type: integer(4)
-      fixed: false
-      unsigned: false
-      primary: false
-      notnull: true
-      autoincrement: false
-    serenite:
-      type: integer(4)
-      fixed: false
-      unsigned: false
-      primary: false
-      notnull: true
-      autoincrement: false
-    reproductions:
-      type: integer(4)
-      fixed: false
-      unsigned: false
-      primary: false
-      notnull: true
-      autoincrement: false
-    fatigue:
-      type: integer(4)
-      fixed: false
-      unsigned: false
-      primary: false
-      notnull: true
-      autoincrement: false
-    energie:
-      type: integer(4)
-      fixed: false
-      unsigned: false
-      primary: false
-      notnull: true
-      autoincrement: false
-    items:
-      type: string()
-      fixed: false
-      unsigned: false
-      primary: false
-      notnull: true
-      autoincrement: false
+    color: integer(4)
+    sexe: integer(4)
+    name: string(30)
+    xp: integer(4)
+    level: integer(4)
+    endurance: integer(4)
+    amour: integer(4)
+    maturite: integer(4)
+    serenite: integer(4)
+    reproductions: integer(4)
+    fatigue: integer(4)
+    energie: integer(4)
+    items: string()
     ancetres:
       type: string(50)
-      fixed: false
-      unsigned: false
-      primary: false
       default: ',,,,,,,,,,,,,'
-      notnull: true
-      autoincrement: false
   relations:
     Owner:
       class: Character
@@ -824,296 +548,85 @@ Character:
   columns:
     guid:
       type: integer(4)
-      fixed: false
-      unsigned: false
       primary: true
-      autoincrement: false
-    name:
-      type: string(30)
-      fixed: false
-      unsigned: false
-      primary: false
-      notnull: true
-      autoincrement: false
-    sexe:
-      type: integer(1)
-      fixed: false
-      unsigned: false
-      primary: false
-      notnull: true
-      autoincrement: false
-    class:
-      type: integer(2)
-      fixed: false
-      unsigned: false
-      primary: false
-      notnull: true
-      autoincrement: false
-    color1:
-      type: integer(4)
-      fixed: false
-      unsigned: false
-      primary: false
-      notnull: true
-      autoincrement: false
-    color2:
-      type: integer(4)
-      fixed: false
-      unsigned: false
-      primary: false
-      notnull: true
-      autoincrement: false
-    color3:
-      type: integer(4)
-      fixed: false
-      unsigned: false
-      primary: false
-      notnull: true
-      autoincrement: false
-    kamas:
-      type: integer(4)
-      fixed: false
-      unsigned: false
-      primary: false
-      notnull: true
-      autoincrement: false
-    spellboost:
-      type: integer(4)
-      fixed: false
-      unsigned: false
-      primary: false
-      notnull: true
-      autoincrement: false
-    capital:
-      type: integer(4)
-      fixed: false
-      unsigned: false
-      primary: false
-      notnull: true
-      autoincrement: false
+    name: string(30)
+    sexe: integer(1)
+    class: integer(2)
+    color1: integer(4)
+    color2: integer(4)
+    color3: integer(4)
+    kamas: integer(4)
+    spellboost: integer(4)
+    capital: integer(4)
     energy:
       type: integer(4)
-      fixed: false
-      unsigned: false
-      primary: false
       default: '10000'
-      notnull: true
-      autoincrement: false
-    level:
-      type: integer(4)
-      fixed: false
-      unsigned: false
-      primary: false
-      notnull: true
-      autoincrement: false
+    level: integer(4)
     xp:
       type: integer(8)
-      fixed: false
-      unsigned: false
-      primary: false
       default: '0'
-      notnull: true
-      autoincrement: false
-    size:
-      type: integer(4)
-      fixed: false
-      unsigned: false
-      primary: false
-      notnull: true
-      autoincrement: false
-    gfx:
-      type: integer(4)
-      fixed: false
-      unsigned: false
-      primary: false
-      notnull: true
-      autoincrement: false
+    size: integer(4)
+    gfx: integer(4)
     alignement:
       type: integer(4)
-      fixed: false
-      unsigned: false
-      primary: false
       default: '0'
-      notnull: true
-      autoincrement: false
     honor:
       type: integer(4)
-      fixed: false
-      unsigned: false
-      primary: false
       default: '0'
-      notnull: true
-      autoincrement: false
     deshonor:
       type: integer(4)
-      fixed: false
-      unsigned: false
-      primary: false
       default: '0'
-      notnull: true
-      autoincrement: false
     alvl:
       type: integer(4)
-      fixed: false
-      unsigned: false
-      primary: false
       default: '1'
-      notnull: true
-      autoincrement: false
-    account:
-      type: integer(4)
-      fixed: false
-      unsigned: false
-      primary: false
-      notnull: true
-      autoincrement: false
-    vitalite:
-      type: integer(4)
-      fixed: false
-      unsigned: false
-      primary: false
-      notnull: false
-      autoincrement: false
+    account: integer(4)
+    vitalite: integer(4)
     force:
       type: integer(4)
-      fixed: false
-      unsigned: false
-      primary: false
       default: '0'
-      notnull: true
-      autoincrement: false
     sagesse:
       type: integer(4)
-      fixed: false
-      unsigned: false
-      primary: false
       default: '0'
-      notnull: true
-      autoincrement: false
     intelligence:
       type: integer(4)
-      fixed: false
-      unsigned: false
-      primary: false
       default: '0'
-      notnull: true
-      autoincrement: false
     chance:
       type: integer(4)
-      fixed: false
-      unsigned: false
-      primary: false
       default: '0'
-      notnull: true
-      autoincrement: false
     agilite:
       type: integer(4)
-      fixed: false
-      unsigned: false
-      primary: false
       default: '0'
-      notnull: true
-      autoincrement: false
     seespell:
       type: integer(1)
-      fixed: false
-      unsigned: false
-      primary: false
       default: '0'
-      notnull: true
-      autoincrement: false
     seefriend:
       type: integer(1)
-      fixed: false
-      unsigned: false
-      primary: false
       default: '1'
-      notnull: true
-      autoincrement: false
     canaux:
       type: string(15)
-      fixed: false
-      unsigned: false
-      primary: false
       default: '*#%!pi$:?'
-      notnull: true
-      autoincrement: false
     map:
       type: integer(4)
-      fixed: false
-      unsigned: false
-      primary: false
       default: '8479'
-      notnull: true
-      autoincrement: false
-    cell:
-      type: integer(4)
-      fixed: false
-      unsigned: false
-      primary: false
-      notnull: true
-      autoincrement: false
+    cell: integer(4)
     pdvper:
       type: integer(4)
-      fixed: false
-      unsigned: false
-      primary: false
       default: '100'
-      notnull: true
-      autoincrement: false
-    spells:
-      type: string()
-      fixed: false
-      unsigned: false
-      primary: false
-      notnull: true
-      autoincrement: false
-    objets:
-      type: string()
-      fixed: false
-      unsigned: false
-      primary: false
-      notnull: true
-      autoincrement: false
+    spells: string()
+    objets: string()
     savepos:
       type: string(20)
-      fixed: false
-      unsigned: false
-      primary: false
       default: '10298,314'
-      notnull: true
-      autoincrement: false
     zaaps:
       type: string(250)
-      fixed: false
-      unsigned: false
-      primary: false
       default: ''
-      notnull: true
-      autoincrement: false
-    jobs:
-      type: string()
-      fixed: false
-      unsigned: false
-      primary: false
-      notnull: true
-      autoincrement: false
+    jobs: string()
     mountxpgive:
       type: integer(4)
-      fixed: false
-      unsigned: false
-      primary: false
       default: '0'
-      notnull: true
-      autoincrement: false
     mount:
       type: integer(4)
-      fixed: false
-      unsigned: false
-      primary: false
       default: '-1'
-      notnull: true
-      autoincrement: false
   relations:
     Account:
       local: account
@@ -1135,3 +648,40 @@ Character:
       type: many
       local: character_id
       foreign: event_id
+    ContestParticipations:
+      class: ContestParticipant
+      type: many
+      local: guid
+      foreign: character_id
+LiveAction:
+  connection: other
+  tableName: live_action
+  columns:
+    id:
+      type: integer(4)
+      primary: true
+      autoincrement: true
+    playerid: integer(4)
+    action: integer(4)
+    nombre: integer(4)
+  relations:
+    Character:
+      type: one
+      local: playerid
+      foreign: guid
+MountPark:
+  connection: other
+  tableName: mountpark_data
+  columns:
+    mapid:
+      type: integer(4)
+      primary: true
+    size: integer(4)
+    owner: integer(4)
+    guild:
+      type: integer(4)
+      default: '-1'
+    price:
+      type: integer(4)
+      default: '0'
+    data: string

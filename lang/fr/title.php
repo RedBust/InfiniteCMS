@@ -38,7 +38,7 @@ return array(
 	'Shop - search' => 'Recherche d\'objet boutique',
 
 	'ShopCategory - index' => 'Gérer les catégories d\'objet',
-	'ShopCategory - create' => 'Création d\'une catégorie d\'objet',	#fake
+	'ShopCategory - create' => 'Création d\'une catégorie d\'objet',		#fake
 	'ShopCategory - update' => 'Édition d\'une catégorie d\'objet',
 	'ShopCategory - delete' => 'Suppression d\'une catégorie d\'objet',
 
@@ -72,7 +72,16 @@ return array(
 	'Event - create' => 'Création d\'un évènement',
 
 	'StaffRole - index' => 'Équipe du serveur',
-	'StaffRole - create' => 'Création d\'un rôle',
+	'StaffRole - create' => 'Création d\'un rôle',							#fake
 	'StaffRole - update' => 'Édition d\'un rôle',
 	'StaffRole - delete' => 'Supprission d\'un rôle',
+
+	'Contest - index' => 'Concours',
+	'Contest - create' => 'Création d\'un concours',						#fake
+#	'Contest - update' => 'Édition d\'un concours',
+#	'Contest - delete' => 'Supprission d\'un concours',
+
+	'ContestJuror - create' => 'Ajout d\'un juré',
+
+	'ContestParticipant - vote' => 'Voter pour un participant',
 );
