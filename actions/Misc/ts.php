@@ -10,7 +10,7 @@
 	<?php if (!empty($config['TEAMSPEAK']['PORT'])): ?>
 	<tr>
 		<td>
-			<b><?php echo lang('PORT') ?>:</b>
+			<b><?php echo lang('port') ?>:</b>
 		</td>
 		<td>
 			<i><?php echo $config['TEAMSPEAK']['PORT'] ?></i>

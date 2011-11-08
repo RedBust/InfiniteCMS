@@ -135,7 +135,7 @@ try
 			else
 			{
 				$mem .= memory_get_usage() . ': Avant layout<br />';
-				require 'tpl/layout' . EXT;
+				require 'templates/_shared/php/layout' . EXT;
 				$mem .= memory_get_usage() . ': Apres layout<br />';
 			}
 		}

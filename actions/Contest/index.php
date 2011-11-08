@@ -10,7 +10,7 @@ if ($contests->count())
 	echo '<ul>';
 	foreach ($contests as $contest)
 	{
-		echo tag('li', ( $contest->ended ? '(' . lang('ended') . ')' : '' ) make_link($contest));
+		echo tag('li', ( $contest->ended ? '(' . lang('ended') . ')' : '' ) . make_link($contest));
 	}
 	echo '</ul>';
 }

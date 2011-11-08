@@ -2,17 +2,16 @@
 $page = $router->requestVar('page');
 if (!is_numeric($page) || $page < 1)
 	$page = 1;
-$thread = Query::create()
+$router->codeUnless(404, $thread = Query::create()
 				->from('PrivateMessageThread pmt')
 					->leftJoin('pmt.Receivers pmr INDEXBY pmr.account_id')
 						->leftJoin('pmr.Account pmra')
 					->andWhere('pmt.id = ' . intval($id = $router->requestVar('id')))
-				->fetchOne();
-if ($thread ? (($thread->Receivers->contains($account->guid) ? !$thread->Receivers[$account->guid]->present : true)
-  && !level(LEVEL_ADMIN)) : true)
-{ //won't use Router::codeUnless here :d
-	echo lang('pm.does_not_exist');
-	return;
+				->fetchOne());
+if (!level(LEVEL_ADMIN))
+{
+	$router->codeUnless(404, $thread->Receivers->contains($account->guid));
+	$router->codeUnless(404, $thread->Receivers[$account->guid]->present);
 }
 
 $answersDql = Query::create()

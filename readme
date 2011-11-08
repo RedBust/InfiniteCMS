@@ -4,6 +4,7 @@ __________  ____    ___  ___________  __________ _____   ___ __________  _______
     | |     | | \ \ | |  |  _______|     |  |    | | \  \| |     | |         |  |     |  _____|
 ____| |___  | |  \ \| |  |  |        ____|  |___ | |  \    | ____| |___      |  |     |  |______
 |_________| |_|   \___|  |__|        |_________| |_|   \___| |_________|     |__|     |_________|
+
 ___________ ____    ___  ___________
 | _________||   \  /   | |  _______|
 | |         | |\ \/ /| | |  |______
@@ -20,6 +21,8 @@ CMS sous la license GNU General Public License V3:
   You can't sell this CMS
  - Vous pouvez distribuer vos thèmes
   You can release your templates
+ - Vous ne pouvez pas vendre vos thèmes
+  You can not sell your templates
  - Vous pouvez distribuer vos traductions
   You can release your translations
  - Vous pouvez modifier ce CMS, mais vous ne devez pas le distribuer à votre nom

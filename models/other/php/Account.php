@@ -246,7 +246,7 @@ if($c = Cache::start("Account_show_' . $this->guid . '_" . ($connected ? $accoun
 	 */
 	public function getFriends()
 	{
-		if (empty($this->friends) || $this->friends == ',')
+		if (empty($this->friends) || $this->friends == ';')
 			return array();
 
 		if ($this->amis === NULL)
@@ -504,7 +504,7 @@ if($c = Cache::start("Account_show_' . $this->guid . '_" . ($connected ? $accoun
 		if ($this->getUser()->main_char != 0 && $this->Characters->contains($this->getUser()->main_char))
 			return $this->Characters[$this->getUser()->main_char];
 
-		if ($account->guid == $this->guid)
+		if ($account instanceof Account && $account->guid == $this->guid)
 			jQ('$("#firstMainChar").dialog(dialogOptO);');
 
 
@@ -519,7 +519,7 @@ if($c = Cache::start("Account_show_' . $this->guid . '_" . ($connected ? $accoun
 		}
 		$this->getUser()->main_char = $main_char->guid;
 
-		if ($account->guid != $this->guid)
+		if ($account instanceof Account && $account->guid != $this->guid)
 			$this->getUser()->save();
 
 		return $main_char;

@@ -1,5 +1,5 @@
 <?php
-$icon_path = sprintf('static/templates/%s/images/', $config['template']);
+$icon_path = sprintf('templates/%s/images/', $config['template']);
 echo make_form(array(
 	array('name', lang('name') . tag('br'), NULL, $category->name),
 	array('desc', lang('desc') . tag('br'), NULL, $category->description),

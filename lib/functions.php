@@ -220,7 +220,7 @@ function partial($name, $sandbox = PARTIAL_FULL, $act = PARTIAL_TPL)
 		$c = $router->getController();
 
 	if ($act == PARTIAL_TPL)
-		$path = 'tpl';
+		$path = 'templates/_shared/php';
 	else
 		$path = ROOT_ACTIONS . $c . DS;
 
@@ -374,15 +374,18 @@ function stylesheet_tag()
  */
 function javascript_tag()
 {
+	static $jsFiles = '';
 	$args = func_get_args();
-	$jsFiles = '';
+	if (empty($args))
+		return $jsFiles;
+
 	$ext = '.js';
 	foreach ($args as $js)
 	{
-		$url = strpos($js, 'http://') === 0 ? $js : getPath() . 'static/js/' . str_replace($ext, '', $js) . $ext;
+		$url = strpos($js, 'http://') === 0 ? $js : getPath() . 'templates/_shared/js/' . str_replace($ext, '', $js) . $ext;
 		$jsFiles .= "\n\t\t" . tag('script', array('type' => 'text/javascript', 'src' => $url), '');
 	}
-	echo $jsFiles;
+	return $jsFiles;
 }
 
 /**
@@ -715,16 +718,16 @@ function url_for_image($url, $ext = EXT_JPG)
 	static $ignores = array('items', 'jobs');
 	if (substr($url, 0, 4) !== 'http' && substr($url, 0, 7) !== 'file://')
 	{
-		$template = 'templates/' . $config['template'] . '/';
+		$template = $config['template'];
 		foreach ($ignores as $ignore)
 		{
 			if (strpos($url, $ignore) === 0)
 			{
-				$template = '';
+				$template = '_shared';
 				break; //stop here, we found what we need
 			}
 		}
-		$url = getPath() . 'static/' . $template . 'images/' . $url;
+		$url = getPath() . 'templates/' . $template . '/images/' . $url;
 	}
 	return $url . '.' . $ext;
 }
@@ -1147,7 +1150,7 @@ function paginateLayout(Doctrine_Pager_Layout $layout, $sep = ' ')
 	if (!$pager->haveToPaginate())
 		return '';
 
-	return paginate($pager->getPage(), $pager->getLastPage(), $pager->getPagerRange()->rangeAroundPage(), $layout->getUrlMask(), $sep);
+	return paginate($pager->getPage(), $pager->getLastPage(), $layout->getPagerRange()->rangeAroundPage(), $layout->getUrlMask(), $sep);
 }
 
 /**
