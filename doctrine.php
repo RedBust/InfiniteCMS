@@ -22,7 +22,7 @@ if (!$hasArg || ( $hasArg && $_SERVER['argv'][1] == '--generate-models' ) )
 		'baseTableClassName' => 'RecordTable',
 	);
 
-	$bdir = 'models/other/';
+	$bdir = 'lib/models/other/';
 	Doctrine_Core::generateModelsFromYaml($bdir . 'yaml', $bdir . 'php', $options);
 	load_models('other');
 	$file = fopen($bdir . 'sql/schema.sql', 'w+');
@@ -34,8 +34,8 @@ if (!$hasArg || ( $hasArg && $_SERVER['argv'][1] == '--generate-models' ) )
 else
 {
 	$cli = new Doctrine_Cli(array(
-		'models_path'         =>	ROOT . 'models/base/php',
-		'yaml_schema_path'    =>	'models/yaml'
+		'models_path'         =>	ROOT . 'lib/models/other/php',
+		'yaml_schema_path'    =>	'lib/models/other/yaml'
 	));
 	$cli->run( $_SERVER['argv'] );
 }

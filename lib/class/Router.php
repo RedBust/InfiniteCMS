@@ -7,6 +7,8 @@ define('ROOT_ACTIONS', ROOT . 'actions/');
  *
  * @file $Id: Router.php 53 2011-01-15 11:11:37Z nami.d0c.0 $
  */
+
+//I wanna throw all this into my trash.
 class Router extends Multiton
 {
 	const GET = 'GET',
@@ -40,21 +42,25 @@ class Router extends Multiton
 	protected function init()
 	{
 		global $config;
+		//@todo cache this :( ? it's so heavy
+
 		if ($this->_stockR === null)
 			$this->_stockR = $_REQUEST; //we stock a copy
 		try
 		{
 			/** Personnal note:
 			 * If you want to customize the CMS, and if your skills are not good as Rasmus Ledorf's,
-			 *  I recommend for you to skip this module and to go in any else file.
+			 *  I recommend you to skip this module and to go in any other file.
 			 * SimpleXMElement is the biggest SHIT I've ever seen in my entire dev life
 			 * between bugs, bugged comportement and unnexistant/undocumented functions ... You can't do anything
 			 *  without loosing at least 1h. Believe me, you should go further.
 			 */
-			$file = new SimpleXMLElement('models/rewrite.xml', null, true); //open a file
+			//wanna ask "why is it located under lib/models ?" Well, I dunno. at all
+			//I SAID I WON'T TOUCH THAT CRAP ANYMORE.
+			$file = new SimpleXMLElement('lib/models/rewrite.xml', null, true); //open a file
 		} catch (Exception $e)
 		{
-			exit(sprintf('Err(o|eu)r: %s', $e->getMessage()));
+			exit(sprintf('Router error: %s', $e->getMessage()));
 		}
 
 		$alias = array();
@@ -227,8 +233,8 @@ class Router extends Multiton
 	 */
 	public function isAjax()
 	{
-		return ( isset($_SERVER['HTTP_X_REQUESTED_WITH'])
-		&& strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest' );
+		return isset($_SERVER['HTTP_X_REQUESTED_WITH'])
+		&& strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest';
 	}
 
 	public function isRoute()

@@ -1854,7 +1854,7 @@ function str2dec($string, $base)
 
 function load_models($cat)
 {
-	$cat = 'models/' . $cat . '/php/';
+	$cat = 'lib/models/' . $cat . '/php/';
 	Doctrine_Core::loadModels($cat . 'generated/');
 	Doctrine_Core::loadModels($cat);
 	set_include_path(get_include_path() . PATH_SEPARATOR . $cat . PATH_SEPARATOR . $cat . 'generated/');
