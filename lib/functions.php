@@ -220,7 +220,7 @@ function partial($name, $sandbox = PARTIAL_FULL, $act = PARTIAL_TPL)
 		$c = $router->getController();
 
 	if ($act == PARTIAL_TPL)
-		$path = 'templates/_shared/php';
+		$path = 'assets/_shared/php';
 	else
 		$path = ROOT_ACTIONS . $c . DS;
 
@@ -261,9 +261,20 @@ function attributes(array $opt = array())
 		}
 		else
 		{
-			if (is_array($value) && $key == 'style')
+			if (is_array($value))
 			{
-				$value = array_to_style($value);
+				if ($key == 'style')
+					$value = array_to_style($value);
+				if ($key == 'data')
+				{
+					$datas = array();
+					foreach ($value as $k => $v)
+					{
+						$datas['data-' . $k] = $v;
+					}
+					$opts .= attributes($datas);
+					continue;
+				}
 			}
 			$opts .= sprintf(' %s="%s"', $key, $value);
 		}
@@ -352,16 +363,24 @@ function meta($equiv, $content)
  */
 function stylesheet_tag()
 {
+	static $stylesheets = array();
 	global $config;
+
 	$args = func_get_args();
-	$stylesheets = '';
-	$ext = '.css';
-	foreach ($args as $css)
+	if (empty($args))
 	{
-		$url = strpos($css, 'http://') === 0 ? $arg : getPath() . 'static/templates/' . $config['template'] . '/css/' . str_replace($ext, '', $css) . $ext;
-		$stylesheets .= "\t\t\t" . '@import url("' . $url . ( DEBUG ? '?' . rand(0, 50) : '' ) . '");' . "\n";
+		$import = '';
+		$ext = '.css';
+		foreach ($stylesheets as $css)
+		{
+			$url = strpos($css, 'http://') === 0 ? $arg : getPath() . 'assets/' . $config['template'] . '/css/' . str_replace($ext, '', $css) . $ext;
+			$import .= "\t\t\t" . '@import url("' . $url . ( DEBUG ? '?' . rand(0, 50) : '' ) . '");' . "\n";
+		}
+		$stylesheets = array(); //reset
+		return tag('style', array('type' => 'text/css'), "\n$import\t\t");
 	}
-	echo tag('style', array('type' => 'text/css'), "\n$stylesheets\t\t");
+
+	$stylesheets = array_unique(array_merge($stylesheets, $args));
 }
 
 /**
@@ -374,18 +393,23 @@ function stylesheet_tag()
  */
 function javascript_tag()
 {
-	static $jsFiles = '';
+	static $jsFiles = array();
+
 	$args = func_get_args();
 	if (empty($args))
-		return $jsFiles;
-
-	$ext = '.js';
-	foreach ($args as $js)
 	{
-		$url = strpos($js, 'http://') === 0 ? $js : getPath() . 'templates/_shared/js/' . str_replace($ext, '', $js) . $ext;
-		$jsFiles .= "\n\t\t" . tag('script', array('type' => 'text/javascript', 'src' => $url), '');
+		$ext = '.js';
+		$js = '';
+		foreach ($jsFiles as $file)
+		{
+			$url = strpos($file, 'http://') === 0 ? $file : getPath() . 'assets/_shared/js/' . str_replace($ext, '', $file) . $ext;
+			$js .= "\n\t\t" . tag('script', array('type' => 'text/javascript', 'src' => $url), '');
+		}
+		$jsFiles = array();
+		return $js;
 	}
-	return $jsFiles;
+
+	$jsFiles = array_unique(array_merge($jsFiles, $args));
 }
 
 /**
@@ -727,7 +751,7 @@ function url_for_image($url, $ext = EXT_JPG)
 				break; //stop here, we found what we need
 			}
 		}
-		$url = getPath() . 'templates/' . $template . '/images/' . $url;
+		$url = getPath() . 'assets/' . $template . '/images/' . $url;
 	}
 	return $url . '.' . $ext;
 }

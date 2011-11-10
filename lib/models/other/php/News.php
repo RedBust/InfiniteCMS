@@ -35,7 +35,7 @@ class News extends BaseNews
 				), '', $content);
 		$content = preg_replace('`<div>(.*)</div>`', '$1<br />', $content);
 		$content = str_replace("\n", '', $content);
-		$content = str_replace('../../templates', getPath() . 'templates', $content);
+		$content = str_replace('../../assets', getPath() . 'assets', $content);
 		return $content;
 	}
 

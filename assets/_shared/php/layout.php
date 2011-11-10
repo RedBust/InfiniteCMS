@@ -11,6 +11,7 @@
 			if ($config['JAVASCRIPT'])
 			{
 				stylesheet_tag('jQuery.UI', 'jQuery.tipTip', 'jQuery.tokenInput.Facebook', 'jQuery.tokenInput');
+				echo stylesheet_tag();
 			}
 		?>
 		<style type="text/css">
@@ -25,7 +26,7 @@
 		#right #servInfo
 		{
 			height:75px;
-			background:url(<?php echo getPath() ?>/templates/<?php echo $config['template'] ?>/images/status<?php echo SERVER_STATE . '.' . EXT_JPG ?>) no-repeat;
+			background:url(<?php echo getPath() ?>assets/<?php echo $config['template'] ?>/images/status<?php echo SERVER_STATE . '.' . EXT_JPG ?>) no-repeat;
 			width: 184px;
 			margin-left: 22px;
 		}
@@ -96,10 +97,8 @@
 			if ($config['JAVASCRIPT']):
 				partial('js', PARTIAL_FULL);
 				echo jQ();
-				//I should remove the script tag from here ...
+			endif;
 			?>
-			</script>
-			<?php endif ?>
 		</div>
 	</body>
 </html>

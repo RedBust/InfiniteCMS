@@ -1,5 +1,56 @@
 <?php jQ(true) ?>
 <script type="text/javascript">
+
+function resetMarks()
+{
+	jQuery('.hideThis').hide();
+	jQuery('.showThis').show();
+}
+
+var locations = new Array();
+function bind(fn, pos)
+{
+	binds.add( fn, pos );
+}
+var binds =
+{
+	base_ajax_binds:
+	{
+		'before': [],
+		'after': [ resetMarks ]
+	},
+	ajax_binds: {},
+
+	<?php if ($config['LOAD_TYPE'] != LOAD_NONE): ?>
+	reset: function ()
+	{
+		this.ajax_binds = this.base_ajax_binds;
+	},
+	add: function (fn, pos)
+	{
+		if (!pos || pos == 'before')
+			this.ajax_binds['before'].push( fn );
+		else
+			this.ajax_binds[pos].push( fn );
+	},
+	process: function (pos)
+	{
+		jQuery.each( this.ajax_binds[pos], function (k, v)
+		{
+			if (jQuery.isFunction(v))
+				v();
+			else
+				eval(v + '()');
+		} );
+		this.ajax_binds[pos] = this.base_ajax_binds[pos];
+	}
+	<?php else: ?>
+	reset: function () {}
+	add: function () {}
+	process: function () {}
+	<?php endif ?>
+};
+binds.reset();
 <?php if ($config['LOAD_TYPE'] == LOAD_MDIALOG): ?>
 var loader = $('#loading');
 loader.dialog( dialogOpt );
@@ -55,7 +106,7 @@ function populateContent(data)
 	<?php endif ?>
 	//we need path because of URL rewriting
 	//@todo: check if the path which have to be used is not the one from the 1st page loaded
-	servInfo.css('background', 'url(' + data[1] + 'templates/<?php echo $config['template'] ?>/images/status' + data[2] + '.<?php echo EXT_JPG ?>');
+	servInfo.css('background', 'url(' + data[1] + 'assets/<?php echo $config['template'] ?>/images/status' + data[2] + '.<?php echo EXT_JPG ?>');
 	pm_info.html(data[3]);
 	if (data[3] == '') //no mp
 		pm_inbox.html(inbox_html);
@@ -375,10 +426,8 @@ if (level(LEVEL_ADMIN))
 	apply_' . $type . '();';
 	jQ($js);
 }
-echo javascript_tag('jQuery/core', 'jQuery/editInPlace', 'jQuery/dropShadow', 'jQuery/timers', 'jQuery/tipTip', 'jQuery/SWFObject', 'jQuery/highCharts', 'jQuery/tokenInput',
- 'jQuery/UI/core', 'jQuery/UI/timepicker',
- 'TinyMCE/tiny_mce', 'TinyMCE/jQuery.tiny_mce');
-?><script type="text/javascript">
+?>
+<script type="text/javascript">
 var dialogOpt =
 {
 	autoOpen: false,
@@ -395,9 +444,10 @@ var dialogOptO = //O = open
 	resizable: true,
 	width: 600
 };
+var path = '<?php echo getPath() ?>';
 var tinyMCEOpt =
 {
-	script_url : '<?php echo getPath() ?>templates/_shared/js/TinyMCE/tiny_mce.js',
+	script_url : path + 'assets/_shared/js/TinyMCE/tiny_mce.js',
 
 	// General options
 	theme : 'advanced',
@@ -420,13 +470,15 @@ var tinyMCEOpt =
 
 	// Drop lists for link/image/media/template dialogs
 	/*
-	template_external_list_url : 'static/lists/template_list.js',
-	external_link_list_url : 'static/lists/link_list.js',
-	external_image_list_url : 'static/lists/image_list.js',
-	media_external_list_url : 'static/lists/media_list.js'
+	template_external_list_url : 'assets/lists/template_list.js',
+	external_link_list_url : 'assets/lists/link_list.js',
+	external_image_list_url : 'assets/lists/image_list.js',
+	media_external_list_url : 'assets/lists/media_list.js'
 	*/
 };
 var csrf_token = '<?php echo session_id() ?>';
+
+
 
 function explode(delimiter, string, limit)
 {	//(thanks to phpJS for this function)
@@ -492,57 +544,5 @@ function str_replace (search, replace, subject, count) {
 	}
 	return sa ? s : s[0];
 }
-
-
-
-
-function resetMarks()
-{
-	jQuery('.hideThis').hide();
-	jQuery('.showThis').show();
-}
-
-var locations = new Array();
-function bind(fn, pos)
-{
-	binds.add( fn, pos );
-}
-var binds =
-{
-	base_ajax_binds:
-	{
-		'before': [],
-		'after': [ resetMarks ]
-	},
-	ajax_binds: {},
-
-	<?php if ($config['LOAD_TYPE'] != LOAD_NONE): ?>
-	reset: function ()
-	{
-		this.ajax_binds = this.base_ajax_binds;
-	},
-	add: function (fn, pos)
-	{
-		if (!pos || pos == 'before')
-			this.ajax_binds['before'].push( fn );
-		else
-			this.ajax_binds[pos].push( fn );
-	},
-	process: function (pos)
-	{
-		jQuery.each( this.ajax_binds[pos], function (k, v)
-		{
-			if (jQuery.isFunction(v))
-				v();
-			else
-				eval(v + '()');
-		} );
-		this.ajax_binds[pos] = this.base_ajax_binds[pos];
-	}
-	<?php else: ?>
-	reset: function () {}
-	add: function () {}
-	process: function () {}
-	<?php endif ?>
-};
-binds.reset();
+</script>
+<?php echo javascript_tag() ?>

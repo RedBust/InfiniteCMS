@@ -57,7 +57,7 @@ return array(
 	'stats_simple' => '%s %s.', //+5 wisdom.
 	'date_to' => 'au', //to singular
 	'icon' => 'Icône',
-	'icon_tips' => ' (<i>le fichier doit être placé dans <b>templates/%s/images/</b> et terminer par .png</i>)',
+	'icon_tips' => ' (<i>le fichier doit être placé dans <b>assets/%s/images/</b> et terminer par .png</i>)',
 	'actual' => 'actuel',
 	'incorrect_type' => 'Type incorrect',
 	'incorrect_value' => 'Valeur incorrecte',

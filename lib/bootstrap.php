@@ -145,6 +145,10 @@ set_include_path(implode(PATH_SEPARATOR, array(
 require 'lib/functions' . EXT;
 $config = require 'config' . EXT;
 
+javascript_tag('jQuery/core', 'jQuery/editInPlace', 'jQuery/dropShadow', 'jQuery/timers', 'jQuery/tipTip', 'jQuery/SWFObject', 'jQuery/highCharts', 'jQuery/tokenInput',
+ 'jQuery/UI/core', 'jQuery/UI/timepicker',
+ 'TinyMCE/tiny_mce', 'TinyMCE/jQuery.tiny_mce');
+
 define('SERVER_STATE', @fsockopen($config['IP_SERV'], $config['PORT_SERV'], $errno, $errstr, 1) ? 'on' : 'off');
 
 //config adjustment
@@ -246,18 +250,6 @@ if (!DEV)
 		ShopItemEffectTable::TYPE_ADD_PREFIX => lang('character.prefix_name'),
 	);
 
-	if (!empty($_SESSION['_csrf_token_req']) && $router->isPost())
-	{
-		$requestToken = $router->postVar('_csrf_token');
-		if ($requestToken !== session_id()) //using === here is VERY SIGNIFICANT
-		{
-			if (DEBUG)
-				echo 'invalid token<hr />'; //simple notice ...
-			else
-				define('HTTP_CODE', 404);
-		}
-	}
-
 	if (DEBUG)
 		$mem .= memory_get_usage() . ': Models loaded ... - ' . __FILE__ . ':' . __LINE__ . '<br />';
 
@@ -290,6 +282,18 @@ if (!DEV)
 
 		if (DEBUG)
 			$mem .= memory_get_usage() . ': Acc loaded - ' . __FILE__ . ':' . __LINE__ . '<br />';
+	}
+
+	if (!level(LEVEL_ADMIN) && !empty($_SESSION['_csrf_token_req']) && $router->isPost())
+	{
+		$requestToken = $router->postVar('_csrf_token');
+		if ($requestToken !== session_id()) //using === here is VERY SIGNIFICANT
+		{
+			if (DEBUG)
+				echo 'invalid token<hr />'; //simple notice ...
+			else
+				define('HTTP_CODE', 404);
+		}
 	}
 }
 /* @var $account Account */
