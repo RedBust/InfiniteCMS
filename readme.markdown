@@ -44,8 +44,9 @@ Ce CMS n'est pas compatible avec exon.
 # Problème courants
 Que faire en premier ?
 Tout d'abord, de base, vous devriez avoir un de ces messages :
-_Problems during the init. Please contact the server admin._
-_Problems during page loading. Please contact the server admin._
+`Problems during the init. Please contact the server admin.`
+`Problems during page loading. Please contact the server admin.`
+
 Il faut activer le mode debug. Ce mode est activé par défaut si vous accédez au CMS via localhost/. Si vous ne pouvez pas, vous pouvez le forcer.
 Pour faire ceci, ouvrez /index.php et après `<?php`, ajoutez
 ```php
