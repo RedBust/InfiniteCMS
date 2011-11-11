@@ -33,7 +33,7 @@ function showRightsPanel(rights)
 	rightsPanels[rights].show();
 	rightsPanel.dialog("open");
 }
-bind(function ()
+pageBind(function ()
 {
 	rightsPanel.dialog("close");
 	delete rightsPanel;

@@ -63,7 +63,7 @@ function registerEvent(id)
 {
 	events[id] = $("#event-" + id).addClass("event").appendTo(eventParticipants);
 }
-bind(function ()
+pageBind(function ()
 {
 	eventParticipants.dialog("close");
 	delete eventParticipants;

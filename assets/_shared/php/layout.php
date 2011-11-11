@@ -71,7 +71,7 @@
 		}
 		?>
 
-		<div id="contenteur"><!-- Template and div id's from Woa, not me :p -->
+		<div id="contenteur"><!-- Template and div IDs are from Woa, not me :p -->
 		<?php
 		echo tag('div', array('id' => 'header'),
 		 tag('div', array('class' => 'play'),
@@ -93,12 +93,7 @@
 				THIS IS A FOOTER, SO RIGHT SO GOOD ISN'T IT (AC, actually commented. Don't you know how to remove <!-- and -- > ?!
 				<!--InfiniteCMS <?php echo VERSION ?> by Nami-Doc. 2009-<?php echo date('Y') ?> -- >
 			</div-->
-			<?php
-			if ($config['JAVASCRIPT']):
-				partial('js', PARTIAL_FULL);
-				echo jQ();
-			endif;
-			?>
+			<?php $config['JAVASCRIPT'] && partial('js', PARTIAL_FULL) ?>
 		</div>
 	</body>
 </html>

@@ -10,6 +10,7 @@ consider Event as VIP-only if Reward.is_vip ? NO
  Fixed the friends splitting (now you can see all the friends you have, not only one)
  Splitted Character/show using jQuery.UI.Tabs
  Added jobs in Character/show with icon and level, first line : recolt jobs. Second : craft. Third : etheral. Etheral jobs will appear just under the normal job
+ Added event/contest s participations in Character/show
  Added a complete contest system, with fake pagination (no solution here), using the ladder system
   You can set a reward
   You can add jury / define a "min gmlevel" to be jury

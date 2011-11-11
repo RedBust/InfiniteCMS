@@ -88,7 +88,7 @@ addEffect
 			  .html( %s + " :" ) )
 			 .append( $( "<input />", { "type": "text", "name": "value[" + idEffect + "]" } ) ) );
 	} );
-binds.add(function ()
+pageBind(function ()
 	{
 		delete idEffect;
 		delete addEffect;

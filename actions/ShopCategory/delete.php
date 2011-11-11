@@ -30,7 +30,7 @@ if ($category->Items->count())
 		$category->delete();
 		redirect($table);
 	}
-	else
+	else //@todo what to do if it's the only category remaining ?
 		echo make_form(array(
 			array('move', lang('shop.cat.move_items_to'), 'record', array('model' => 'ShopCategory', 'empty' => true, 'exclude' => $category->id), $router->requestVar('move')),
 		));

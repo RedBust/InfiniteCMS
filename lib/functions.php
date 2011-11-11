@@ -906,11 +906,10 @@ function js_link($js, $text, $link = '#', $add = array(), $event = NULL)
 		$in = false;
 
 	static $JSs = array();
-
 	if ($js === NULL)
-	{
 		return make_link($link, $text, array(), $add);
-	}
+
+	$link = replace_url($link);
 
 	if (!$event)
 		$event = 'click';

@@ -13,10 +13,9 @@ ___________ ____    ___  ___________
 |__________||_|      |_| |_________|
 
 
-LE CMS ~ De vos Rêves
+##LE CMS ~ De vos Rêves
 
 
-CMS sous la license GNU General Public License V3:
  - Vous ne pouvez pas vendre ce CMS
   You can't sell this CMS
  - Vous pouvez distribuer vos thèmes
@@ -36,3 +35,14 @@ Ne pas envoyer:
  - doctrine.php
  - doctrine.bat
  - readme
+
+# Problème courants
+Que faire en premier ?
+Tout d'abord, de base, vous devriez avoir un de ces messages :
+_Problems during the init. Please contact the server admin._
+_Problems during page loading. Please contact the server admin._
+Il faut activer le mode debug. Ce mode est activé par défaut si vous accédez au CMS via localhost/. Si vous ne pouvez pas, vous pouvez le forcer.
+Pour faire ceci, ouvrez /index.php et après `<?php`, ajoutez
+```php
+define('DEBUG', true);
+```

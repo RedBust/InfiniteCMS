@@ -1,18 +1,188 @@
-<?php jQ(true) ?>
-<script type="text/javascript">
+<?php
+if (level(LEVEL_ADMIN))
+{
+	$js = '';
+	$level_opt = array();
+	$levels = Member::getLevels();
+	unset($levels[LEVEL_GUEST]);
+	foreach (array_reverse($levels, true) as $val => $text)
+		$level_opt[] = '"' . floatval($val) . '": "' . $text . '"';
+	$level_opt = implode(', ', $level_opt);
+	jQ('var level_opts = {' . $level_opt . '};');
+	
+	$spec = array('level' => '
+	field_type: "select",
+	select_text: $this.html(),
+	select_options: level_opts,');
+	$types = array('points', 'level');
 
+	$controllers = array('points' => 'User', 'level' => 'Account');
+	foreach ($types as $type)
+		$js .= '
+	var data_id;
+	function apply_' . $type . '()
+	{
+		//cache is not usable =x
+		jQuery(".f_' . $type . '").each(function()
+		{
+			$this = jQuery(this);
+			if(!$this.attr("validated"))
+			{
+				$this.editInPlace(
+				{
+					url: "' . to_url(array(
+						'controller' => $controllers[$type],
+						'action' => 'update',
+						'header' => 0,
+						'col' => $type,
+						'id' => '%%$this.data(\'id\')%%',
+					), false) . '",
+					success: function (newValue)
+					{
+						$(".f_' . $type . '[data-id=" + $this.data("id") + "]").each(function()
+						{
+							$(this).html(newValue);
+						});
+					},
+					' . ( isset($spec[$type]) ? $spec[$type] : '' ) . '
+				});
+				$this.attr("validated", true);
+			}
+		});
+		setTimeout(apply_' . $type . ', 5000);
+	}
+	apply_' . $type . '();';
+	jQ($js);
+}
+?>
+<script type="text/javascript">
+var dialogOpt =
+{
+	autoOpen: false,
+	draggable: true,
+	modal: true,
+	resizable: true,
+	width: 600
+};
+var dialogOptO = //O = open
+{
+	autoOpen: true,
+	draggable: true,
+	modal: true,
+	resizable: true,
+	width: 600
+};
+var path = '<?php echo getPath() ?>';
+var tinyMCEOpt =
+{
+	script_url : path + 'assets/_shared/js/TinyMCE/tiny_mce.js',
+
+	// General options
+	theme : 'advanced',
+	plugins : 'safari,pagebreak,style,layer,table,save,advhr,advimage,advlink,iespell,spellchecker,emotions,iespell,insertdatetime,preview,media,searchreplace,print,contextmenu,paste,directionality,fullscreen,fullpage,noneditable,visualchars,nonbreaking,xhtmlxtras,template,inlinepopups', //'fullpage,save',
+	theme_advanced_buttons3_add : 'fullpage',
+
+	//templates
+	skin : 'o2k7',
+	skin_variant : 'silver',
+
+	//themes opts
+	theme_advanced_buttons1 : 'save,newdocument,|,bold,italic,underline,strikethrough,|,justifyleft,justifycenter,justifyright,justifyfull,|,styleselect,formatselect,fontselect,fontsizeselect',
+	theme_advanced_buttons2 : 'cut,copy,paste,pastetext,pasteword,|,search,replace,|,bullist,numlist,|,outdent,indent,blockquote,|,undo,redo,|,link,unlink,anchor,image,cleanup,help,code,|,insertdate,inserttime,preview,|,forecolor,backcolor',
+	theme_advanced_buttons3 : 'tablecontrols,|,hr,removeformat,visualaid,|,sub,sup,|,charmap,emotions,iespell,media,advhr,|,print,|,ltr,rtl,|,fullscreen',
+	theme_advanced_buttons4 : 'insertlayer,moveforward,movebackward,absolute,|,styleprops,spellchecker,|,cite,abbr,acronym,del,ins,attribs,|,visualchars,nonbreaking,template,pagebreak', //,blockquote,|,insertfile,insertimage',
+	theme_advanced_toolbar_location : 'top',
+	theme_advanced_toolbar_align : 'left',
+	theme_advanced_statusbar_location : 'bottom',
+	theme_advanced_resizing : true
+
+	// Drop lists for link/image/media/template dialogs
+	/*
+	template_external_list_url : 'assets/lists/template_list.js',
+	external_link_list_url : 'assets/lists/link_list.js',
+	external_image_list_url : 'assets/lists/image_list.js',
+	media_external_list_url : 'assets/lists/media_list.js'
+	*/
+};
+var csrf_token = '<?php echo session_id() ?>';
+
+
+
+function explode(delimiter, string, limit)
+{	//(thanks to phpJS for this function)
+	//Why I use this, and not the native String.split ? because 'limit' param is not delimiting when stop,
+	// but what to NOT return ...
+	var emptyArray = { 0: '' };
+
+	// third argument is not required
+	if( arguments.length < 2 ||
+		typeof arguments[0] == undefined || typeof arguments[1] == undefined )
+	{
+		return null;
+	}
+
+	if( delimiter === '' || delimiter === false || delimiter === null )
+	{
+		return false;
+	}
+	if( typeof delimiter == 'function'
+		|| typeof delimiter == 'object'
+		|| typeof string == 'function'
+		|| typeof string == 'object' )
+	{
+		return emptyArray;
+	}
+
+	if( delimiter === true )
+	{
+		delimiter = '1';
+	}
+	if( !limit )
+	{
+		return string.toString().split( delimiter.toString() );
+	}
+	else
+	{
+		// support for limit argument
+		var splitted = string.toString().split( delimiter.toString() );
+		var partA = splitted.splice( 0, limit - 1 );
+		var partB = splitted.join( delimiter.toString() );
+		partA.push( partB );
+		return partA;
+	}
+}
+function str_replace (search, replace, subject, count) {
+	var i = 0, j = 0, temp = '', repl = '', sl = 0, fl = 0,
+	f = [].concat(search),
+	r = [].concat(replace),
+	s = subject,
+	ra = r instanceof Array, sa = s instanceof Array;    s = [].concat(s);
+	if (count) {
+		this.window[count] = 0;
+	}
+	for (i=0, sl=s.length; i < sl; i++) {
+		if (s[i] === '') {
+			continue;
+		}
+		for (j=0, fl=f.length; j < fl; j++) {            temp = s[i]+'';
+			repl = ra ? (r[j] !== undefined ? r[j] : '') : r[0];
+			s[i] = (temp).split(f[j]).join(repl);
+			if (count && s[i] !== temp) {
+				this.window[count] += (temp.length-s[i].length)/f[j].length;}        }
+	}
+	return sa ? s : s[0];
+}
+</script>
+<?php echo javascript_tag() ?>
+<script type="text/javascript">
 function resetMarks()
 {
-	jQuery('.hideThis').hide();
+	$('.hideThis').remove();
 	jQuery('.showThis').show();
 }
 
 var locations = new Array();
-function bind(fn, pos)
-{
-	binds.add( fn, pos );
-}
-var binds =
+pageBinds =
 {
 	base_ajax_binds:
 	{
@@ -50,7 +220,11 @@ var binds =
 	process: function () {}
 	<?php endif ?>
 };
-binds.reset();
+function pageBind(fn, pos)
+{
+	pageBinds.add(fn, pos);
+}
+pageBinds.reset();
 <?php if ($config['LOAD_TYPE'] == LOAD_MDIALOG): ?>
 var loader = $('#loading');
 loader.dialog( dialogOpt );
@@ -367,182 +541,7 @@ $('.slideMenu').live('click', function ()
 		$this.slideToggle();
 } );
 resetMarks();
+
+
+<?php echo jQ() ?>
 </script>
-<?php
-jQ();
-
-if (level(LEVEL_ADMIN))
-{
-	$js = '';
-	$level_opt = array();
-	$levels = Member::getLevels();
-	unset($levels[LEVEL_GUEST]);
-	foreach (array_reverse($levels, true) as $val => $text)
-		$level_opt[] = '"' . floatval($val) . '": "' . $text . '"';
-	$level_opt = implode(', ', $level_opt);
-	jQ('var level_opts = {' . $level_opt . '};');
-	
-	$spec = array('level' => '
-	field_type: "select",
-	select_text: $this.html(),
-	select_options: level_opts,');
-	$types = array('points', 'level');
-
-	$controllers = array('points' => 'User', 'level' => 'Account');
-	foreach ($types as $type)
-		$js .= '
-	var data_id;
-	function apply_' . $type . '()
-	{
-		//cache is not usable =x
-		jQuery(".f_' . $type . '").each(function()
-		{
-			$this = jQuery(this);
-			if(!$this.attr("validated"))
-			{
-				$this.editInPlace(
-				{
-					url: "' . to_url(array(
-						'controller' => $controllers[$type],
-						'action' => 'update',
-						'header' => 0,
-						'col' => $type,
-						'id' => '%%$this.data(\'id\')%%',
-					), false) . '",
-					success: function (newValue)
-					{
-						$(".f_' . $type . '[data-id=" + $this.data("id") + "]").each(function()
-						{
-							$(this).html(newValue);
-						});
-					},
-					' . ( isset($spec[$type]) ? $spec[$type] : '' ) . '
-				});
-				$this.attr("validated", true);
-			}
-		});
-		setTimeout(apply_' . $type . ', 5000);
-	}
-	apply_' . $type . '();';
-	jQ($js);
-}
-?>
-<script type="text/javascript">
-var dialogOpt =
-{
-	autoOpen: false,
-	draggable: true,
-	modal: true,
-	resizable: true,
-	width: 600
-};
-var dialogOptO = //O = open
-{
-	autoOpen: true,
-	draggable: true,
-	modal: true,
-	resizable: true,
-	width: 600
-};
-var path = '<?php echo getPath() ?>';
-var tinyMCEOpt =
-{
-	script_url : path + 'assets/_shared/js/TinyMCE/tiny_mce.js',
-
-	// General options
-	theme : 'advanced',
-	plugins : 'safari,pagebreak,style,layer,table,save,advhr,advimage,advlink,iespell,spellchecker,emotions,iespell,insertdatetime,preview,media,searchreplace,print,contextmenu,paste,directionality,fullscreen,fullpage,noneditable,visualchars,nonbreaking,xhtmlxtras,template,inlinepopups', //'fullpage,save',
-	theme_advanced_buttons3_add : 'fullpage',
-
-	//templates
-	skin : 'o2k7',
-	skin_variant : 'silver',
-
-	//themes opts
-	theme_advanced_buttons1 : 'save,newdocument,|,bold,italic,underline,strikethrough,|,justifyleft,justifycenter,justifyright,justifyfull,|,styleselect,formatselect,fontselect,fontsizeselect',
-	theme_advanced_buttons2 : 'cut,copy,paste,pastetext,pasteword,|,search,replace,|,bullist,numlist,|,outdent,indent,blockquote,|,undo,redo,|,link,unlink,anchor,image,cleanup,help,code,|,insertdate,inserttime,preview,|,forecolor,backcolor',
-	theme_advanced_buttons3 : 'tablecontrols,|,hr,removeformat,visualaid,|,sub,sup,|,charmap,emotions,iespell,media,advhr,|,print,|,ltr,rtl,|,fullscreen',
-	theme_advanced_buttons4 : 'insertlayer,moveforward,movebackward,absolute,|,styleprops,spellchecker,|,cite,abbr,acronym,del,ins,attribs,|,visualchars,nonbreaking,template,pagebreak', //,blockquote,|,insertfile,insertimage',
-	theme_advanced_toolbar_location : 'top',
-	theme_advanced_toolbar_align : 'left',
-	theme_advanced_statusbar_location : 'bottom',
-	theme_advanced_resizing : true
-
-	// Drop lists for link/image/media/template dialogs
-	/*
-	template_external_list_url : 'assets/lists/template_list.js',
-	external_link_list_url : 'assets/lists/link_list.js',
-	external_image_list_url : 'assets/lists/image_list.js',
-	media_external_list_url : 'assets/lists/media_list.js'
-	*/
-};
-var csrf_token = '<?php echo session_id() ?>';
-
-
-
-function explode(delimiter, string, limit)
-{	//(thanks to phpJS for this function)
-	//Why I use this, and not the native String.split ? because 'limit' param is not delimiting when stop,
-	// but what to NOT return ...
-	var emptyArray = { 0: '' };
-
-	// third argument is not required
-	if( arguments.length < 2 ||
-		typeof arguments[0] == undefined || typeof arguments[1] == undefined )
-	{
-		return null;
-	}
-
-	if( delimiter === '' || delimiter === false || delimiter === null )
-	{
-		return false;
-	}
-	if( typeof delimiter == 'function'
-		|| typeof delimiter == 'object'
-		|| typeof string == 'function'
-		|| typeof string == 'object' )
-	{
-		return emptyArray;
-	}
-
-	if( delimiter === true )
-	{
-		delimiter = '1';
-	}
-	if( !limit )
-	{
-		return string.toString().split( delimiter.toString() );
-	}
-	else
-	{
-		// support for limit argument
-		var splitted = string.toString().split( delimiter.toString() );
-		var partA = splitted.splice( 0, limit - 1 );
-		var partB = splitted.join( delimiter.toString() );
-		partA.push( partB );
-		return partA;
-	}
-}
-function str_replace (search, replace, subject, count) {
-	var i = 0, j = 0, temp = '', repl = '', sl = 0, fl = 0,
-	f = [].concat(search),
-	r = [].concat(replace),
-	s = subject,
-	ra = r instanceof Array, sa = s instanceof Array;    s = [].concat(s);
-	if (count) {
-		this.window[count] = 0;
-	}
-	for (i=0, sl=s.length; i < sl; i++) {
-		if (s[i] === '') {
-			continue;
-		}
-		for (j=0, fl=f.length; j < fl; j++) {            temp = s[i]+'';
-			repl = ra ? (r[j] !== undefined ? r[j] : '') : r[0];
-			s[i] = (temp).split(f[j]).join(repl);
-			if (count && s[i] !== temp) {
-				this.window[count] += (temp.length-s[i].length)/f[j].length;}        }
-	}
-	return sa ? s : s[0];
-}
-</script>
-<?php echo javascript_tag() ?>

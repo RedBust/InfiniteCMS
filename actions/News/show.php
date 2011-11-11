@@ -23,7 +23,7 @@ acc.accordion(
 		axis: "y",
 		handle: "h3"
 } );
-binds.add(function ()
+pageBind(function ()
 {
 	delete acc;
 });');

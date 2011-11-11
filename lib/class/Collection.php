@@ -174,7 +174,7 @@ class Collection extends Doctrine_Collection
 			);
 			jQ('
 field_opts = {' . implode("\n" . ', ', $type_opt) . '};
-binds.add(function ()
+pageBind(function ()
 {
 	delete field_opts;
 });');

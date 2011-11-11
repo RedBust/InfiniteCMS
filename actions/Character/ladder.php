@@ -102,7 +102,7 @@ if ($contest)
 
 	jQ('
 var contestInfo = $("#contestInfo").dialog(dialogOpt);
-bind(function ()
+pageBind(function ()
 {
 	contestInfo.dialog("close");
 	delete contestInfo;
@@ -158,6 +158,7 @@ if ($contest)
 	$rangePage = range(1, $lastPage);
 	$showRange = range($page - $chunk / 2, $page + $chunk / 2);
 	$dispPages = array_intersect($showRange, $rangePage);
+	--$start;
 	//if you can read minds, you can read mine here : FUCK YOU MYSQL NOT ALLOWING LIMIT IN SUBQUERIES ! FUUUUU-
 }
 else
@@ -172,7 +173,7 @@ else
 }
 
 echo $table->getSearch();
-$persos->ladderDisplay($start - 1, $contest, $char);
+$persos->ladderDisplay($start, $contest, $char);
 if ($contest)
 	echo paginate($page, $lastPage, $dispPages, $urlMask);
 else

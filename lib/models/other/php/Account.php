@@ -38,7 +38,7 @@ function showProfil(id)
 		.show();
 	profilBox.dialog("open");
 }
-binds.add(function (undef)
+pageBind(function (undef)
 {
 	delete profils;
 	if (profilBox != undef)

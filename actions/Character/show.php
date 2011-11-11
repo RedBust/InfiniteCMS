@@ -15,7 +15,7 @@ $evC = $charac->Events->count();
 $coC = $charac->ContestParticipations->count();
 
 jQ('$("#character").tabs().find( ".ui-tabs-nav" ).sortable({ axis: "x" });');
-echo tag('div', array('id' => 'character'), NULL), tag('ul', array('class' => 'showThis'),
+echo tag('div', array('id' => 'character'), NULL), tag('ul', //can't use showThis here, don't ask me why ;))
   tag('li', tag('a', array('href' => '#general'), lang('general'))) .
   tag('li', tag('a', array('href' => '#stats'), lang('shop._stats'))) .
   ( count($items) ? tag('li', tag('a', array('href' => '#items'), pluralize(lang('shop._items'), count($items)))) : '' ) .
@@ -43,9 +43,9 @@ if ($charac->relatedExists('GuildMember'))
 if (level(LEVEL_MJ) && $map = $charac->getMap()) /* @var $map Map */
 	printf(lang('character.pos'), $charac->name, $charac->map, $map->getPosX(), $map->getPosY(), $charac->cell);
 
-echo '</div>', tag('br', array('class' => 'hideThis')), tag('h3', array('class' => 'hideThis'), lang('shop._stats')),
- tag('div', array('id' => 'stats'), $charac->getStatsHTMLTable()), tag('br', array('class' => 'hideThis'));
 
+echo '</div>', tag('br', array('class' => 'hideThis')), //tag('h3', array('class' => 'hideThis'), lang('shop._stats')),
+ tag('div', array('id' => 'stats'), $charac->getStatsHTMLTable()), tag('br', array('class' => 'hideThis'));
 
 if (count($items))
 {

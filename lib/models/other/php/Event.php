@@ -133,8 +133,8 @@ class Event extends BaseEvent
 		global $account;
 
 		return tag('b', $this->getHour() . 'h' . $this->getMinute() . $this->getGuildLink() . ': ') . $this->name .
-		 ( js_link('showEvent(' . $this->id . ')', make_img('icons/group', EXT_PNG, lang('participants')), '#', array('class' => 'showThis'))) .
-		 ( level(LEVEL_LOGGED) && $account->getMainChar() && !$forceCannot ? make_link($this->getParticipateURL($can), 
+		 ( js_link('showEvent(' . $this->id . ')', make_img('icons/group', EXT_PNG, lang('participants')), '#', array('class' => ''))) .
+		 ( !$this->isFinished() && level(LEVEL_LOGGED) && $account->getMainChar() && !$forceCannot ? make_link($this->getParticipateURL($can), 
 		   make_img('icons/group_' . ($can ? 'add' : 'delete'), EXT_PNG, lang('event.join')),
 		   null, array('class' => 'hideThis')) : '');
 	}

@@ -43,7 +43,12 @@ function newsEditPanel(id)
 		f = false;
 	}
 }
-bind( function () { newsPanel.dialog( "close" ); delete newPanel; delete f; } );');
+pageBind(function ()
+{
+	newsPanel.dialog( "close" );
+	delete newPanel;
+	delete f;
+});');
 		define('FROM_INCLUDE', true);
 	}
 }
