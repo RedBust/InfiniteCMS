@@ -1,3 +1,4 @@
+```
 __________  ____    ___  ___________  __________ _____   ___ __________  ___________  ___________
 |___  ____| |   \   | |  |  _______| |____  ___| |    \  | | |____  ___| |____  ____| |  _______|
     | |     | |\ \  | |  |  |______      |  |    | |\  \ | |     | |         |  |     |  |____
@@ -11,23 +12,24 @@ ___________ ____    ___  ___________
 | |         | | \__/ | | |_______  |
 | |________ | |      | |  ______|  |
 |__________||_|      |_| |_________|
+```
 
 
 ##LE CMS ~ De vos Rêves
 
 
  - Vous ne pouvez pas vendre ce CMS
-  You can't sell this CMS
+You can't sell this CMS
  - Vous pouvez distribuer vos thèmes
-  You can release your templates
+You can release your templates
  - Vous ne pouvez pas vendre vos thèmes
-  You can not sell your templates
+You can not sell your templates
  - Vous pouvez distribuer vos traductions
-  You can release your translations
+You can release your translations
  - Vous pouvez modifier ce CMS, mais vous ne devez pas le distribuer à votre nom
-  You can modify the CMS, but you can't release your modifications as it's your CMS
+You can modify the CMS, but you can't release your modifications as it's your CMS
  - Le thème DOIT être changé (aucun support si le thème n'est pas changé)
-  The template MUST be changed (if template is not changed, you will get no support)
+The template MUST be changed (if template is not changed, you will get no support)
 
 Do not upload:
 Ne pas envoyer:
@@ -35,6 +37,9 @@ Ne pas envoyer:
  - doctrine.php
  - doctrine.bat
  - readme
+
+This CMS is not compatible with exon.
+Ce CMS n'est pas compatible avec exon.
 
 # Problème courants
 Que faire en premier ?
