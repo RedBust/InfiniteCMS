@@ -197,7 +197,7 @@ return array(
 	//default lang
 	//langue de base
 	'use_lang' => 'fr',
-	//Langs to load (if commented, it load only "use_lang")
+	//Langs to load (if commented, it loads only "use_lang")
 	// to uncomment, remove the sharp at the beginning of the line
 	//Langues à charger (si commenté, la seule langue chargée sera celle d'use_lang)
 	// Pour décommenter, enlever le dièse avant la ligne
@@ -206,7 +206,7 @@ return array(
 
 	//Template to use (default => 'default')
 	//Thème à utiliser (par défaut => 'default')
-	'template' => 'default',
+	'TEMPLATE' => 'default',
 
 
 	//Use rewrite_mod ? (/News/show/[id] instead of ?controller=news&action=show&id=[id])

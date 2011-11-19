@@ -57,7 +57,7 @@ $("#poll_name").editInPlace({url: %s});', javascript_val(to_url($base_eip_url + 
 			'%type%' => $type,
 			'%id%' => $poll->id,
 			'%type_name%' => $type_name,
-			'%edit_img%' => javascript_val(url_for_image('icons/calendar_edit', EXT_PNG)),
+			'%edit_img%' => javascript_val(asset_path('icons/calendar_edit' . EXT_PNG, ASSET_IMAGE)),
 			'%update_url%' => javascript_val(to_url($base_eip_url + array('col' => 'date_'.$type))),
 			'%other_type%' => $other,
 			'%other_value%' => $types[$other],

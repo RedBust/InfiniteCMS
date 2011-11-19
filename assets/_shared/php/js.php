@@ -274,13 +274,13 @@ var href,
 
 function populateContent(data)
 {
-	binds.process('before');
+	pageBinds.process('before');
 	<?php if ($config['LOAD_TYPE'] === LOAD_MDIALOG): ?>
 	loader.dialog('close');
 	<?php endif ?>
 	//we need path because of URL rewriting
 	//@todo: check if the path which have to be used is not the one from the 1st page loaded
-	servInfo.css('background', 'url(' + data[1] + 'assets/<?php echo $config['template'] ?>/images/status' + data[2] + '.<?php echo EXT_JPG ?>');
+	servInfo.css('background', str_replace('url(' + data[1] + '<?php echo asset_path('status%status%' . EXT_JPG, ASSET_IMAGE, FORCE_TEMPLATE, false) ?>', '%status%', data[2]));
 	pm_info.html(data[3]);
 	if (data[3] == '') //no mp
 		pm_inbox.html(inbox_html);
@@ -312,8 +312,8 @@ function populateContent(data)
 		document.title = data[0];
 	}
 	in_ajax = false;
-	binds.process('after');
-	binds.reset();
+	pageBinds.process('after');
+	pageBinds.reset();
 }
 function updateContent(URL)
 {

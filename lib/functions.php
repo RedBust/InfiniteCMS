@@ -219,11 +219,6 @@ function partial($name, $sandbox = PARTIAL_FULL, $act = PARTIAL_TPL)
 	else
 		$c = $router->getController();
 
-	if ($act == PARTIAL_TPL)
-		$path = 'assets/_shared/php';
-	else
-		$path = ROOT_ACTIONS . $c . DS;
-
 	global $connected, $member;
 	if ($sandbox >= PARTIAL_SEMI)
 		global $layout;
@@ -233,7 +228,10 @@ function partial($name, $sandbox = PARTIAL_FULL, $act = PARTIAL_TPL)
 	foreach ((array) $sandbox as $h)
 		global ${$h};
 
-	require $path . DS . $name . EXT;
+	if ($act == PARTIAL_TPL)
+		return require asset_path($name, ASSET_PHP);
+	else
+		require ROOT_ACTIONS . $c . DS . $name . EXT;
 }
 
 /**
@@ -320,7 +318,7 @@ function tag($name, $opt = array(), $content = NULL)
 		$opt = array();
 	}
 
-	$end = $content === NULL ? ( $name === 'img' || $name === 'br' ? ' />' : '>' ) :
+	$end = $content === NULL ? ( in_array($name, array('img', 'br', 'link')) ? ' />' : '>' ) :
 			'>' . $content . '</' . $name . '>';
 	return tag_open($name, $opt) . $end;
 }
@@ -363,21 +361,54 @@ function meta($equiv, $content)
  */
 function stylesheet_tag()
 {
-	static $stylesheets = array();
+	static $stylesheets = array(),
+		$path = 'asset/css/';
 	global $config;
 
 	$args = func_get_args();
 	if (empty($args))
 	{
-		$import = '';
-		$ext = '.css';
+		$import = array();
 		foreach ($stylesheets as $css)
 		{
-			$url = strpos($css, 'http://') === 0 ? $arg : getPath() . 'assets/' . $config['template'] . '/css/' . str_replace($ext, '', $css) . $ext;
-			$import .= "\t\t\t" . '@import url("' . $url . ( DEBUG ? '?' . rand(0, 50) : '' ) . '");' . "\n";
+			$import[] = asset_path($css, ASSET_STYLESHEET);
 		}
-		$stylesheets = array(); //reset
-		return tag('style', array('type' => 'text/css'), "\n$import\t\t");
+		$token = md5(implode(',', array_map(function ($f)
+		{
+			$f = str_replace(getPath(), '', $f);
+			return md5($f . ':' . filemtime($f));
+		}, $import)));
+
+		if ($cache = Cache::start('asset/css/' . $token . '.css', -1, Cache::ACT_NOTHING))
+		{
+			Cache::ensureDir('asset/css/');
+			foreach ($import as $f)
+			{
+				$content = file_get_contents(str_replace(getPath(), '', $f));
+				$c = explode('%images%', $content);
+				$isFirst = true;
+				$content = array();
+				foreach ($c as $part)
+				{
+					if ($isFirst)
+						$isFirst = false;
+					else
+					{
+						$file = substr($part, 0, strpos($part, ')')); //get the image, as icon.png
+						$part = str_replace($file, asset_path($file, ASSET_IMAGE), $part); //replace it with it's real location, as /InfiniteCMS/assets/_shared/items ...
+					}
+
+					$content[] = $part;
+				}
+				echo implode('', $content);
+			}
+			unset($content, $import);
+			$cache->save(Cache::SKIP, Cache::NO_JS);
+		}
+		unset($cache);
+
+		$stylesheets = array();
+		return tag('link', array('rel' => 'stylesheet', 'href' => getPath() . Cache::getDir() . $path . $token . '.css'));
 	}
 
 	$stylesheets = array_unique(array_merge($stylesheets, $args));
@@ -387,29 +418,98 @@ function stylesheet_tag()
  * includes all javascripts files (params, @see func_get_args)
  *
  * @package Helper
- * @subpackage HTML
+ * @subpackage Asset
  *
- * @return void
+ * @return void|string JS script tags
  */
 function javascript_tag()
 {
-	static $jsFiles = array();
+	static $jsFiles = array(),
+		$path = 'asset/js/';
 
 	$args = func_get_args();
 	if (empty($args))
 	{
-		$ext = '.js';
-		$js = '';
-		foreach ($jsFiles as $file)
+		$js = array();
+		foreach ($jsFiles as $jsFile)
 		{
-			$url = strpos($file, 'http://') === 0 ? $file : getPath() . 'assets/_shared/js/' . str_replace($ext, '', $file) . $ext;
-			$js .= "\n\t\t" . tag('script', array('type' => 'text/javascript', 'src' => $url), '');
+			$js[] = asset_path($jsFile, ASSET_JAVASCRIPT);
 		}
+		$token = md5(implode(',', array_map(function ($f)
+		{
+			$f = str_replace(getPath(), '', $f);
+			return $f . ':' . filemtime($f);
+		}, $js)));
+
+		if ($cache = Cache::start($path . $token . '.js', -1, Cache::ACT_NOTHING))
+		{
+			Cache::ensureDir($path);
+			foreach ($js as $f)
+				echo file_get_contents(str_replace(getPath(), '', $f));
+			$cache->save(Cache::SKIP, Cache::NO_JS);
+		}
+		unset($cache, $js);
+
 		$jsFiles = array();
-		return $js;
+		return tag('script', array('type' => 'text/javascript', 'src' => getPath() . Cache::getDir() . $path . $token . '.js'), '');
 	}
 
 	$jsFiles = array_unique(array_merge($jsFiles, $args));
+}
+
+/**
+ * returns the path for an asset
+ *
+ * @package Helper
+ * @subpackage Asset
+ *
+ * @param string $file filename
+ * @param string $type asset type
+ * @param integer $force asset location
+ * @param boolean $getPath prepend getPath to return value ?
+ * @return string asset's path
+ */
+function asset_path($file, $type, $force = NULL, $getPath = NULL)
+{
+	global $config;
+	static $types = array(
+		ASSET_PHP			=> array('%s/php/%s.php', false),
+		ASSET_JAVASCRIPT	=> '%s/js/%s.js',
+		ASSET_STYLESHEET	=> '%s/css/%s.css',
+		ASSET_IMAGE			=> '%s/images/%s',
+	);
+
+	if ($force === NULL)
+		$force = FORCE_NOT;
+	if (strpos($file, 'http://') === 0)
+		return $file;
+
+	$dir = 'assets/';
+	if (isset($types[$type]))
+		$type = (array) $types[$type];
+	else
+		throw new InvalidArgumentException('ASSET : unknow type ' . $type);
+	$pathMask = $dir . $type[0];
+	if ($getPath === NULL)
+		$getPath = isset($type[1]) ? $type[1] : true;
+
+	if ($file === NULL)
+	{
+		$pathMask = substr($pathMask, 0, strpos($pathMask, '%s', strpos($pathMask, '%s') + 1));
+		if ($force == FORCE_SHARED)
+			return sprintf($pathMask, '_shared');
+		else
+			return sprintf($pathMask, $config['TEMPLATE']);
+	}
+
+	$prePath = $getPath ? getPath() : '';
+
+	if (( $path = sprintf($pathMask, $config['TEMPLATE'], $file) ) && $force == FORCE_TEMPLATE ? true : file_exists($path))
+		return $prePath . $path;
+	if (( $path = sprintf($pathMask, '_shared', $file) ) && $force == FORCE_SHARED ? true : file_exists($path))
+		return $prePath . $path;
+
+	return false;
 }
 
 /**
@@ -498,6 +598,7 @@ function css($c, $opt = array())
  * encodes params plus formates the URL
  *
  * @global Router $router
+ *
  * @param array $params Params to encode
  * @param boolean $strict Strict encoding ? (&amp;) or no ?
  * @param boolean $rewrite Rewrite the URL ?
@@ -724,36 +825,7 @@ function make_img($url, $ext = EXT_JPG, $title = NULL, $alt = NULL, $add = array
 	}
 	if (is_string($title) && empty($alt))
 		$alt = $title;
-	return tag('img', $add + array('src' => url_for_image($url, $ext), 'title' => $title, 'alt' => $alt));
-}
-
-/**
- * returns the url for an image
- *
- * @package Helper
- * @subpackage HTML
- *
- * @param string $url the image (relative or not) url
- * @param string $ext the image extension
- */
-function url_for_image($url, $ext = EXT_JPG)
-{
-	global $config;
-	static $ignores = array('items', 'jobs');
-	if (substr($url, 0, 4) !== 'http' && substr($url, 0, 7) !== 'file://')
-	{
-		$template = $config['template'];
-		foreach ($ignores as $ignore)
-		{
-			if (strpos($url, $ignore) === 0)
-			{
-				$template = '_shared';
-				break; //stop here, we found what we need
-			}
-		}
-		$url = getPath() . 'assets/' . $template . '/images/' . $url;
-	}
-	return $url . '.' . $ext;
+	return tag('img', $add + array('src' => asset_path($url . $ext, ASSET_IMAGE), 'title' => $title, 'alt' => $alt));
 }
 
 /**

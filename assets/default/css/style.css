@@ -5,9 +5,9 @@ ul, li { list-style: none;}
 
  /*HEADER*/
  
- #header { background:url(../images/header.jpg) no-repeat; width:1075px; height:231px;  margin:0 auto;  position:relative; }
- .play  { width:151px;  height:70px;  position:absolute; top:160px; left:415px; background:url(../images/play.png) no-repeat; border:0px;}
- .play:hover {background:url(../images/playh.png) no-repeat; border:0px;}
+ #header { background:url(%images%header.jpg) no-repeat; width:1075px; height:231px;  margin:0 auto;  position:relative; }
+ .play  { width:151px;  height:70px;  position:absolute; top:160px; left:415px; background:url(%images%play.png) no-repeat; border:0px;}
+ .play:hover {background:url(%images%playh.png) no-repeat; border:0px;}
  .play a img { border:0px; }
  
 #selected-char {
@@ -16,7 +16,7 @@ ul, li { list-style: none;}
  
 /*CONTENU*/
 
-#contenu { background:url(../images/cont.png) ;  width:1060px; height:820px; margin:0 auto;   position:relative;  }
+#contenu { background:url(%images%cont.png) ;  width:1060px; height:820px; margin:0 auto;   position:relative;  }
 	
 	#left  { width:205px; float:left;   } 
 	#left .module1 { height:70px;  margin-left:17px; margin-top:-2px;  margin-bottom:-2px;}
@@ -24,24 +24,24 @@ ul, li { list-style: none;}
 
 	/*since InfiniteCMS 1.3
 	only represents a title !*/
-	.module5 { height:62px; background:url(../images/module5.jpg) no-repeat; margin-left:14px; margin-top:-18px; margin-top:1px;}
+	.module5 { height:62px; background:url(%images%module5.jpg) no-repeat; margin-left:14px; margin-top:-18px; margin-top:1px;}
 	.module5 .title { height:62px; width:175px; color:#151515; font-size:20px; text-shadow:0 1px 0 #6e6b6b; font-family:arial; padding:10px 0 0 20px;  }
 
 	/*#left */
-	.module2 { height:155px; background:url(../images/module1.jpg) no-repeat; margin-left:14px; margin-top:-18px; margin-top:1px;}
+	.module2 { height:155px; background:url(%images%module1.jpg) no-repeat; margin-left:14px; margin-top:-18px; margin-top:1px;}
 	.module2 .title { height:55px; width:175px; color:#151515; font-size:20px; text-shadow:0 1px 0 #6e6b6b; font-family:arial; padding:10px 0 0 20px;  }
 	.module2  ul { font-size:13px; font-family:arial; margin-top:-21px; margin-left:-26px; }
 	.module2  ul  li { margin-bottom:2px; }
 	.module2  ul  a {   margin-bottom:2px; font-size:13px; font-family:arial; color:#211d1c; text-decoration:none; }
 	.module2  ul li.guildInfo  a { margin-bottom:2px; font-size:13px; font-family:arial; color:#211d1c; }
 	
-	#left .module3 { height:182px; background:url(../images/module2.jpg) no-repeat; margin-left:14px;  }
+	#left .module3 { height:182px; background:url(%images%module2.jpg) no-repeat; margin-left:14px;  }
 	#left .module3 .title { height:55px; width:175px; color:#151515; font-size:20px; text-shadow:0 1px 0 #6e6b6b; font-family:arial; padding:10px 0 0 10px;  }
 	#left .module3  ul { font-size:13px; font-family:arial; margin-top:-21px; margin-left:-26px; }
 	#left .module3  ul  li { margin-bottom:2px; }
 	#left .module3  ul  a {  margin-bottom:2px; font-size:13px; font-family:arial; color:#211d1c; text-decoration:none; }
 	
-	#left .module4, #right .module4 { height:182px; background:url(../images/module3.jpg) no-repeat; margin-left:14px; margin-top:-30px; }
+	#left .module4, #right .module4 { height:182px; background:url(%images%module3.jpg) no-repeat; margin-left:14px; margin-top:-30px; }
 	#left .module4 .title, #right .module4 .title { height:55px; width:175px; color:#151515; font-size:20px; text-shadow:0 1px 0 #6e6b6b; font-family:arial; padding:10px 0 0 20px;  }
 	#left .module4  ul, #right .module4 ul { font-size:13px; font-family:arial; margin-top:-21px; margin-left:-26px; }
 	#left .module4  ul  li, #right .module4  ul  li { margin-bottom:2px; }
@@ -50,13 +50,13 @@ ul, li { list-style: none;}
 	
 	
 	#milieu  { width:555px; float:left;  height:500px; } 
-	#milieu  #carousel { background:url(../images/carousel.jpg) no-repeat; height:163px; width:545px; margin-top:5px; margin-left:5px; margin-bottom:45px; position:relative; z-index:1;  }
+	#milieu  #carousel { background:url(%images%carousel.jpg) no-repeat; height:163px; width:545px; margin-top:5px; margin-left:5px; margin-bottom:45px; position:relative; z-index:1;  }
 	#milieu  .img{ position:absolute; z-index:2; margin-top:-203px; margin-left:13px;  }
 	#milieu .post { width:545px; margin-bottom:35px; margin-top:5px; margin-left:5px;  }
 	#milieu .post .infos { height:18px; width:545px; }
 	#milieu .post .infos .title { font-size:16px; margin-left:8px; float:left;}
 	#milieu .post .infos .autre { font-size:11px; float:right; margin-top:5px; }
-	#milieu .post .content {  background:url(../images/thumb.jpg) repeat-y; width:545px; margin-top:2px; padding:8px;  }
+	#milieu .post .content {  background:url(%images%thumb.jpg) repeat-y; width:545px; margin-top:2px; padding:8px;  }
 	#milieu .post .content .simple { height: 105px; }
 	#milieu .post .content .exp { height:210px;  }
 	/* Nami: j'ai modifi� 105 en 150 pour height, repeat-y pour url, mais l'image devient d�gueulasse ... */
@@ -65,19 +65,19 @@ ul, li { list-style: none;}
 	
 	
 	#right  {  width:205px; float:left;  height:350px; } 
-	#right .module1 { height:196px; background:url(../images/login.png) no-repeat; margin-left:22px; margin-top:-3px; }
+	#right .module1 { height:196px; background:url(%images%login.png) no-repeat; margin-left:22px; margin-top:-3px; }
 	#right .module1 ul { margin-top:-4px; margin-left:-30px; }
 	#right .module1 ul li { margin-bottom:-7px; }
 	#right .module1 ul li a { font-size:12px; color:#414141; text-decoration:none;  margin-left:10px; width:150px; margin-top:5px;   }
-	#right .module1  .text{ background:url(../images/tex.jpg) no-repeat; width:127px; height:39px; border:0px; margin-top:15px; margin-left:25px; font-size:13px; padding:4px;  }
-	#right .module1  .pwd{ background:url(../images/pssw.jpg) no-repeat; width:127px; height:39px; border:0px; margin-top:0px; margin-left:25px; font-size:13px; padding:4px; }
-	#right .module1 .ok { background:url(../images/ok.jpg) no-repeat; width:51px; height:26px; border:0px; margin-top:10px; margin-left:60px;}
-	#right .module1 .ok:hover{ background:url(../images/okh.jpg) no-repeat; }
+	#right .module1  .text{ background:url(%images%tex.jpg) no-repeat; width:127px; height:39px; border:0px; margin-top:15px; margin-left:25px; font-size:13px; padding:4px;  }
+	#right .module1  .pwd{ background:url(%images%pssw.jpg) no-repeat; width:127px; height:39px; border:0px; margin-top:0px; margin-left:25px; font-size:13px; padding:4px; }
+	#right .module1 .ok { background:url(%images%ok.jpg) no-repeat; width:51px; height:26px; border:0px; margin-top:10px; margin-left:60px;}
+	#right .module1 .ok:hover{ background:url(%images%okh.jpg) no-repeat; }
 	
 	
 	/*FOOTER*/
 
-	#footer { background:url(../images/copy.jpg) no-repeat; width:1060px; height:45px;  margin:0 auto;  position:relative; }
+	#footer { background:url(%images%copy.jpg) no-repeat; width:1060px; height:45px;  margin:0 auto;  position:relative; }
 	
 	
 .highslide-wrapper {

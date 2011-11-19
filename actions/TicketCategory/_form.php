@@ -1,9 +1,9 @@
 <?php
-$icon_path = sprintf('assets/%s/images/', $config['template']);
+$icon_path = asset_path(NULL, ASSET_IMAGE, FORCE_TEMPLATE);
 echo make_form(array(
 	array('name', lang('name') . tag('br'), NULL, $category->name),
 	array('desc', lang('desc') . tag('br'), NULL, $category->description),
-	array('icon', lang('icon') . sprintf(lang('icon_tips'), $config['template']) . tag('br') .
+	array('icon', lang('icon') . sprintf(lang('icon_tips'), $config['TEMPLATE']) . tag('br') .
 	 tag('b', lang('actual') . ':') . tag('img', array('id' => 'icon_preview', 'src' => $icon_path . $category->icon . '.png' )) . tag('br'), NULL, $category->icon),
 ));
 jQ('var icon_preview = $("#icon_preview");

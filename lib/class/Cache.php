@@ -10,11 +10,16 @@ class Cache
 	const DIR = 'cache';
 
 	const SKIP = false,
-	SHOW = true,
-	JS = true,
-	NO_JS = false,
-	CARET = true,
-	END = false;
+		SHOW = true,
+
+		JS = true,
+		NO_JS = false,
+
+		CARET = true,
+		END = false,
+
+		ACT_LOAD = 0,
+		ACT_NOTHING = 1;
 
 	static protected $cachedFiles = null,
 		$actual = null,
@@ -48,7 +53,7 @@ class Cache
 	}
 	static public function ensureDir($add = '')
 	{
-		$dir = self::getDir() . $add;
+		$dir = self::getDir() . ltrim($add, '/');
 		if (file_exists($dir))
 		{
 			if (!is_dir($dir))
@@ -97,7 +102,7 @@ class Cache
 	 *
 	 * @param boolean $activate whether it must be enabled or not
 	 */
-	public static function setVarPrefix($prefix)
+	static public function setVarPrefix($prefix)
 	{
 		self::$varPrefix = $prefix;
 	}
@@ -105,28 +110,32 @@ class Cache
 	/**
 	 * gets var prefix
 	 */
-	public static function getVarPrefix($prefix)
+	static public function getVarPrefix($prefix)
 	{
 		return self::$varPrefix;
 	}
 
-	protected static function _load()
+	static protected function _load()
 	{
 		if (self::$cachedFiles === null)
 		{
 			self::$cachedFiles = array();
-			$files = glob(self::getDir() . '*' . EXT);
-			if (empty($files))
-			{
-				$files = array();
-			}
-			$dirLen = strlen(self::getDir());
-			foreach ($files as $file)
-			{
-				self::$cachedFiles[substr($file, $dirLen, -4)] = filemtime($file); //strip cache/ and .php
-			}
+			self::_loadFiles(self::getDir());
 		}
 	}
+	static protected function _loadFiles($dir)
+	{
+		$files = glob(( $dir = rtrim($dir, '/') . '/' ) . '*');
+		$dirLen = strlen(self::getDir()); //it's getDir() and not $dir cause we wanna keep the "real" dir
+		foreach ($files as $file)
+		{
+			if (is_dir($file))
+				self::_loadFiles($file);
+			else
+				self::$cachedFiles[substr($file, $dirLen)] = filemtime($file); //strip cache/ and .php
+		}
+	}
+	
 
 	/**
 	 * starts caching ... Or require cached file if present & valid.
@@ -134,28 +143,33 @@ class Cache
 	 * @param int|string $lifeTime cachefile's lifetime (integer or strotime() arg). -1 for infinite lifetime
 	 * @return Cache|false Cache instance if the cache needs to be refreshed, false if the cache is still valid
 	 */
-	public static function start($name, $lifeTime = -1)
+	public static function start($name, $lifeTime = -1, $act = NULL)
 	{
-		if (self::$actual != null)
-		{
+		if (self::$actual != NULL)
 			throw ExceptionManager::nestingCache(self::$actual, $name);
-		}
+		if ($act == NULL)
+			$act = self::ACT_LOAD;
 
 		self::_load();
+		$name = self::getNameFor($name);
 		if (isset(self::$cachedFiles[$name])
 				&& ($lifeTime == -1 || !date_passed(self::$cachedFiles[$name], $lifeTime)))
 		{
-			require self::getDir() . $name . EXT;
-			$prefix = self::_formatPrefix($name);
-			if (isset($vars))
+			if ($act == self::ACT_LOAD)
 			{
-				foreach ($vars as $vname)
+				require self::getDir() . $name;
+				$prefix = self::_formatPrefix($name);
+				if (isset($vars))
 				{
-					$GLOBALS[$prefix . $vname] = $$vname;
+					foreach ($vars as $vname)
+					{
+						$GLOBALS[$prefix . $vname] = $$vname;
+					}
 				}
 			}
 			return false;
-		} else
+		}
+		else
 		{
 			self::destroy($name); //remove the cache as it's not used anymore.
 			return new self($name);
@@ -256,12 +270,21 @@ class Cache
 	 *
 	 * @param string $name cache's name
 	 */
-	protected static function _formatPrefix($name)
+	static protected function _formatPrefix($name)
 	{
 		if (empty(self::$varPrefix))
 			return '';
 		else
 			return self::_format(self::$varPrefix, array('cache' => $name)) . '_';
+	}
+
+	static protected function getNameFor($name)
+	{
+		return strpos($name, '.') === false ? $name . EXT : $name;
+	}
+	public function getName()
+	{
+		return self::getNameFor($this->name);
 	}
 
 	/**
@@ -277,12 +300,13 @@ class Cache
 		if ($js === null)
 			$js = self::JS;
 
-		file_put_contents(self::getDir() . $this->name . EXT, $this->_exportVars() . ($js == self::JS ? $this->_exportJS() : '') . ob_get_contents() . ' ' . $this->input);
+		$content = $this->_exportVars() . ($js == self::JS ? $this->_exportJS() : '') . ob_get_contents() . ' ' . $this->input;
+		file_put_contents(self::getDir() . $this->getName(), $content);
 		if ($show == self::SHOW)
 		{ //if you want to nest a cache inside another WITH variables (i.e.) ...
 			ob_flush();
 		}
-		$prefix = self::_formatPrefix($this->name);
+		$prefix = self::_formatPrefix($this->getName());
 		foreach ($this->vars as $vname => $value)
 		{
 			$GLOBALS[$prefix . $vname] = $value;

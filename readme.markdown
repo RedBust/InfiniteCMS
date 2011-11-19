@@ -27,7 +27,7 @@ You can not sell your templates
  - Vous pouvez distribuer vos traductions
 You can release your translations
  - Vous pouvez modifier ce CMS, mais vous ne devez pas le distribuer à votre nom
-You can modify the CMS, but you can't release your modifications as it's your CMS
+You can modify the CMS, but you can't release your modifications under your name
  - Le thème DOIT être changé (aucun support si le thème n'est pas changé)
 The template MUST be changed (if template is not changed, you will get no support)
 

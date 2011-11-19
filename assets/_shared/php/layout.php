@@ -9,10 +9,9 @@
 			//@todo prod.css & prod.js
 			stylesheet_tag('style');
 			if ($config['JAVASCRIPT'])
-			{
 				stylesheet_tag('jQuery.UI', 'jQuery.tipTip', 'jQuery.tokenInput.Facebook', 'jQuery.tokenInput');
-				echo stylesheet_tag();
-			}
+
+			echo stylesheet_tag();
 		?>
 		<style type="text/css">
 		.showThis
@@ -26,7 +25,7 @@
 		#right #servInfo
 		{
 			height:75px;
-			background:url(<?php echo getPath() ?>assets/<?php echo $config['template'] ?>/images/status<?php echo SERVER_STATE . '.' . EXT_JPG ?>) no-repeat;
+			background:url(<?php echo asset_path('status' . SERVER_STATE . EXT_JPG, ASSET_IMAGE) ?>) no-repeat;
 			width: 184px;
 			margin-left: 22px;
 		}
@@ -89,8 +88,9 @@
 					<?php partial('right', PARTIAL_FULL) ?>
 				</div>
 			</div>
+			<?php partial('footer', PARTIAL_FULL) ?>
 			<!--div id="footer">
-				THIS IS A FOOTER, SO RIGHT SO GOOD ISN'T IT (AC, actually commented. Don't you know how to remove <!-- and -- > ?!
+				THIS IS A FOOTER, SO RIGHT SO GOOD ISN'T IT (OK/AC, actually commented. Don't you know how to remove <!-- and -- > ?!
 				<!--InfiniteCMS <?php echo VERSION ?> by Nami-Doc. 2009-<?php echo date('Y') ?> -- >
 			</div-->
 			<?php $config['JAVASCRIPT'] && partial('js', PARTIAL_FULL) ?>

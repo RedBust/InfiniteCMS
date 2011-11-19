@@ -61,9 +61,22 @@ defined('DEBUG') || define('DEBUG', ( isset($_SERVER['SESSIONNAME']) && $_SERVER
 define('VERSION', '1.3.0');
 
 //Some extensions
-define('EXT_GIF', 'gif');
-define('EXT_JPG', 'jpg');
-define('EXT_PNG', 'png');
+define('EXT_GIF', '.gif');
+define('EXT_JPG', '.jpg');
+define('EXT_PNG', '.png');
+
+//Asset types
+define('ASSET_PHP',			'php');
+define('ASSET_JAVASCRIPT',	'js');
+define('ASSET_STYLESHEET',	'css');
+define('ASSET_IMAGE',		'image');
+define('ASSET_GIMAGE',		'global_image');
+
+//Asset locations
+//@todo rename {ASSET_BOTH, ASSET_SHARED, ASSET_TEMPLATE} ?
+define('FORCE_NOT', 0);
+define('FORCE_SHARED', 1);
+define('FORCE_TEMPLATE', 2);
 
 //Page-load type
 define('LOAD_NONE', -1);   //no-AJaX
