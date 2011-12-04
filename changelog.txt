@@ -1,8 +1,8 @@
 ﻿(AJaX = pas de rechargement de la page)
 @todo
-ban ips
 link to account's profile from character's profileBox (=> unless current_page?)
 consider Event as VIP-only if Reward.is_vip ? NO
+ban management
 
 1.3(?):
  Using javascript_tag() and stylesheet_tag() results in asset compilation :

@@ -9632,7 +9632,8 @@ tinymce.create('tinymce.ui.Toolbar:tinymce.ui.Container', {
 		Dispatcher = tinymce.util.Dispatcher, undefined, instanceCounter = 0;
 
 	// Setup some URLs where the editor API is located and where the document is
-	tinymce.documentBaseURL = window.location.href.replace(/[\?#].*$/, '').replace(/[\/\\][^\/]+$/, '');
+	var baseUrl = window.tinyMceBaseUrl ? window.tinyMceBaseUrl : window.location.href;
+	tinymce.documentBaseURL = baseUrl.replace(/[\?#].*$/, '').replace(/[\/\\][^\/]+$/, '');
 	if (!/[\/\\]$/.test(tinymce.documentBaseURL))
 		tinymce.documentBaseURL += '/';
 

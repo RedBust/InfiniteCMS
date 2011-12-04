@@ -20,7 +20,7 @@ echo tag('div', array('id' => 'character'), NULL), tag('ul', //can't use showThi
   tag('li', tag('a', array('href' => '#stats'), lang('shop._stats'))) .
   ( count($items) ? tag('li', tag('a', array('href' => '#items'), pluralize(lang('shop._items'), count($items)))) : '' ) .
   ( $charac->getSpellCount() ? tag('li', tag('a', array('href' => '#spells'), pluralize(ucfirst(lang('character.spell')), $charac->getSpellCount()))) : '' ) .
-  ( count($charac->getJobs()) ? tag('li', tag('a', array('href' => '#jobs'), pluralize(ucfirst(lang('character.job')), count($charac->getJobs())))) : '' ) .
+  ( $charac->hasJobs() ? tag('li', tag('a', array('href' => '#jobs'), pluralize(ucfirst(lang('character.job')), count($charac->getJobs())))) : '' ) .
   ( $evC || $coC ? tag('li', tag('a', array('href' => '#activity'), lang('activity'))) : '' ) .
   ( level(LEVEL_ADMIN) ? tag('li', tag('a', array('href' => '#give'), lang('character.give'))) : '' )
  ),
@@ -84,7 +84,7 @@ if (count($charac->getSpells()))
 	);
 	//spell list
 	echo tag('div', array('id' => 'spells')), str_repeat(tag('br', array('class' => 'hideThis')), 2), tag('table', array('border' => '1', 'style' => 'width: 100%')), tag('thead'), tag('tr',
-	   tag('td', $align + array('style' => 'width: 42%;'), tag('b', lang('character.spell_name'))) .
+	   tag('td', $align + array('style' => 'width: 42%;'), tag('b', lang('character.spell'))) .
 	   tag('td', $align + array('style' => 'width: 23%;'), tag('b', lang('character.spell_level'))) .
 	   tag('td', $align + array('style' => 'width: 35%;'), tag('b', lang('character.spell_pos')))) .
 	  '</thead>' . tag('tbody', array('style' => 'height: 550px; overflow: auto'));
@@ -92,7 +92,7 @@ if (count($charac->getSpells()))
 	foreach ($charac->getSpells() as $spell)
 	{ //build spell row
 		echo tag('tr', array('data-id' => $spell[0]),
-		 tag('td', lang($spell[0], 'spell')) .
+		 tag('td', make_img('spells/' . $spell[0], EXT_PNG, lang($spell[0], 'spell'))) .
 		 tag('td', $spell[1]) .
 		 tag('td', $charac->getSpellPos($spell[2])));
 	}
@@ -102,7 +102,7 @@ if (count($charac->getSpells()))
 </div>';
 }
 
-if (count($charac->getJobs()))
+if ($charac->hasJobs())
 {
 	echo '
 <div id="jobs">

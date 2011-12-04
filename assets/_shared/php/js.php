@@ -72,10 +72,13 @@ var dialogOptO = //O = open
 	resizable: true,
 	width: 600
 };
-var path = '<?php echo getPath() ?>';
+var path = '<?php echo getPath() ?>',
+	absPath = '<?php echo getPath(NULL, true) ?>';
+
+tinyMceBaseUrl = absPath + 'assets/_shared/js/TinyMCE/'; //hackish. Sure. But ... HOW THE HECK AM I SUPPOSED TO DEAL WITH DAT KRAP ?
 var tinyMCEOpt =
 {
-	script_url : path + 'assets/_shared/js/TinyMCE/tiny_mce.js',
+//	script_url : tinyMceBaseUrl + 'tiny_mce.js',
 
 	// General options
 	theme : 'advanced',
@@ -344,7 +347,7 @@ function updateContent(URL)
 		},
 		error: function (error)
 		{
-			loader.html('An error occured during the page loading. Try to change the "REWRITE" setting in your config.php file.');
+			loader.html('An error occured during the page loading.<?php if ($config['REWRITE']): ?> Try to change the "REWRITE" setting in your config.php file to false <?php endif ?>. You can also clear you cache/ directory. - Une erreur s\'est produite durant le chargement de la page. <?php if ($config['REWRITE']): ?>Vous pouvez essayer de mettre le réglage "REWRITE" à false dans config.php. <?php endif ?>Vous devriez aussi vider votre cache');
 			<?php if (DEBUG): ?>
 			loader.html( loader.html() + error );
 			<?php endif ?>

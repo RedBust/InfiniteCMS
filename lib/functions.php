@@ -121,14 +121,19 @@ spl_autoload_register('load');
  */
 function level($required = LEVEL_LOGGED, $reverse = false)
 {
-	global $member, $account;
+	global $member, $account, $config;
 
 	if ($required == LEVEL_GUEST)
 		return $reverse ? $member->isConnected() : !$member->isConnected(); //return true if !connected (without reverse)
 	if ($required == LEVEL_LOGGED)
 		return $reverse ? !$member->isConnected() : $member->isConnected(); //return true if connected (without reverse)
 	if ($required == LEVEL_VIP)
+	{
+		if (empty($config['COST_VIP']) || !$member->isConnected())
+			return false;
+
 		return $reverse ? !$account->isVIP() : $account->isVIP();
+	}
 
 	$lvl = $member->isConnected() ? $account->getLvl() : LEVEL_GUEST;
 	return ( $reverse ) ? $lvl < $required : $lvl >= $required;
@@ -370,45 +375,31 @@ function stylesheet_tag()
 	{
 		$import = array();
 		foreach ($stylesheets as $css)
-		{
 			$import[] = asset_path($css, ASSET_STYLESHEET);
-		}
-		$token = md5(implode(',', array_map(function ($f)
+		$url = compute($import, $path . '%s.css', function ($content, $file)
 		{
-			$f = str_replace(getPath(), '', $f);
-			return md5($f . ':' . filemtime($f));
-		}, $import)));
-
-		if ($cache = Cache::start('asset/css/' . $token . '.css', -1, Cache::ACT_NOTHING))
-		{
-			Cache::ensureDir('asset/css/');
-			foreach ($import as $f)
+			$c = explode('%images%', $content);
+			$isFirst = true;
+			$content = array();
+			foreach ($c as $part)
 			{
-				$content = file_get_contents(str_replace(getPath(), '', $f));
-				$c = explode('%images%', $content);
-				$isFirst = true;
-				$content = array();
-				foreach ($c as $part)
+				if ($isFirst)
+					$isFirst = false;
+				else
 				{
-					if ($isFirst)
-						$isFirst = false;
-					else
-					{
-						$file = substr($part, 0, strpos($part, ')')); //get the image, as icon.png
-						$part = str_replace($file, asset_path($file, ASSET_IMAGE), $part); //replace it with it's real location, as /InfiniteCMS/assets/_shared/items ...
-					}
-
-					$content[] = $part;
+					$file = substr($part, 0, strpos($part, ')')); //get the image, as icon.png
+					if (!$asset = asset_path($file, ASSET_IMAGE))
+						throw new InvalidArgumentException('ASSET : Unable to compute file ' . $file . ' because the image ' . $file . ' does not exist.');
+					$part = str_replace($file, $asset, $part); //replace it with it's real location, as /InfiniteCMS/assets/_shared/items ...
 				}
-				echo implode('', $content);
+
+				$content[] = $part;
 			}
-			unset($content, $import);
-			$cache->save(Cache::SKIP, Cache::NO_JS);
-		}
-		unset($cache);
+			return implode('', $content);
+		});
 
 		$stylesheets = array();
-		return tag('link', array('rel' => 'stylesheet', 'href' => getPath() . Cache::getDir() . $path . $token . '.css'));
+		return tag('link', array('rel' => 'stylesheet', 'href' => getPath() . Cache::getDir() . $url));
 	}
 
 	$stylesheets = array_unique(array_merge($stylesheets, $args));
@@ -432,29 +423,53 @@ function javascript_tag()
 	{
 		$js = array();
 		foreach ($jsFiles as $jsFile)
-		{
 			$js[] = asset_path($jsFile, ASSET_JAVASCRIPT);
-		}
-		$token = md5(implode(',', array_map(function ($f)
-		{
-			$f = str_replace(getPath(), '', $f);
-			return $f . ':' . filemtime($f);
-		}, $js)));
-
-		if ($cache = Cache::start($path . $token . '.js', -1, Cache::ACT_NOTHING))
-		{
-			Cache::ensureDir($path);
-			foreach ($js as $f)
-				echo file_get_contents(str_replace(getPath(), '', $f));
-			$cache->save(Cache::SKIP, Cache::NO_JS);
-		}
-		unset($cache, $js);
+		$url = compute($js, $path . '%s.js');
 
 		$jsFiles = array();
-		return tag('script', array('type' => 'text/javascript', 'src' => getPath() . Cache::getDir() . $path . $token . '.js'), '');
+		return tag('script', array('type' => 'text/javascript', 'src' => getPath() . Cache::getDir() . $url), '');
 	}
 
 	$jsFiles = array_unique(array_merge($jsFiles, $args));
+}
+
+/**
+ * computes files
+ */
+function compute($files, $loc = '%s', Closure $callback = NULL)
+{
+	$gPath = getPath();
+	if ($gPath == '/' || $gPath == DIRECTORY_SEPARATOR)
+		$gPath = '';
+
+	$token = md5(implode(',', array_map(function ($f) use ($gPath)
+	{
+		$f = str_replace($gPath, '', $f);
+		if ($f[0] == '/') $f = substr($f, 1);
+
+		if (!file_exists($f) || !$mtime = @filemtime($f))
+			throw new InvalidArgumentException('ASSET compute : file missing : ' . $f);
+
+		return $f . ':' . $mtime;
+	}, $files)));
+
+	$loc = explode('%s', $loc);
+	$path = $loc[0];
+	$end = isset($loc[1]) ? $loc[1] : '';
+
+	if ($cache = Cache::start($p = $path . $token . $end, -1, Cache::ACT_NOTHING))
+	{
+		Cache::ensureDir($path);
+		foreach ($files as $f)
+		{
+			$f = str_replace($gPath, '', $f);
+			if ($f[0] == '/') $f = substr($f, 1);
+
+			echo $callback ? $callback(file_get_contents($f), $f) : file_get_contents($f);
+		}
+		$cache->save(Cache::SKIP, Cache::NO_JS);
+	}
+	return $p;
 }
 
 /**
@@ -477,14 +492,14 @@ function asset_path($file, $type, $force = NULL, $getPath = NULL)
 		ASSET_JAVASCRIPT	=> '%s/js/%s.js',
 		ASSET_STYLESHEET	=> '%s/css/%s.css',
 		ASSET_IMAGE			=> '%s/images/%s',
-	);
+	),
+		$dir = 'assets/';
 
 	if ($force === NULL)
 		$force = FORCE_NOT;
 	if (strpos($file, 'http://') === 0)
 		return $file;
 
-	$dir = 'assets/';
 	if (isset($types[$type]))
 		$type = (array) $types[$type];
 	else
@@ -496,10 +511,7 @@ function asset_path($file, $type, $force = NULL, $getPath = NULL)
 	if ($file === NULL)
 	{
 		$pathMask = substr($pathMask, 0, strpos($pathMask, '%s', strpos($pathMask, '%s') + 1));
-		if ($force == FORCE_SHARED)
-			return sprintf($pathMask, '_shared');
-		else
-			return sprintf($pathMask, $config['TEMPLATE']);
+		return sprintf($pathMask, $force == FORCE_SHARED ? '_shared' : $config['TEMPLATE']);
 	}
 
 	$prePath = $getPath ? getPath() : '';
@@ -710,28 +722,32 @@ function replace_url($url, $strict = true, $objectMethods = true)
  *
  * @example string $url the URL
  *
+ * @param string $url
+ * @param bool $absolute
  * @return string script's path
  */
-function getPath($url = NULL)
+function getPath($url = NULL, $absolute = false)
 {
 	global $router;
-	static $absPath = NULL;
-	if ($absPath === NULL)
+	static $path = NULL,
+		$absAbsolutePath = NULL;
+	if ($path === NULL)
 	{
 		if (isset($_SERVER['SCRIPT_NAME']))
 		{
 			$abs = explode(DS, $_SERVER['SCRIPT_NAME']);
 			unset($abs[count($abs) - 1]);
-			$abs = implode(DS, $abs);
+			$path = implode(DS, $abs);
 		}
 		else
-			$abs = '.' . DS;
+			$path = '.' . DS;
+
+		$absAbsolutePath = 'http://' . $_SERVER['HTTP_HOST'] . $path;
 	}
-	$p = '';
-	if ($router->rewrite())
-	{
-		$p = $abs . DS;
-	}
+
+	$p = ( $absolute ? $absAbsolutePath : $path ) . DS;
+
+
 	if ($url === NULL)
 		return $p;
 	if ($url[0] === '/')

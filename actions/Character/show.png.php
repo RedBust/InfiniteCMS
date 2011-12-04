@@ -1,6 +1,6 @@
 <?php
 $table = CharacterTable::getInstance();
-$router->codeUnless(404, $charac = $table->retrieve();
+$router->codeUnless(404, $charac = $table->retrieve());
 /* @var $charac Character */
 
 if (!function_exists('gd_info'))
@@ -12,9 +12,9 @@ header('Content-type: image/png');
 
 Cache::ensureDir('profileCards');
 Cache::ensureDir('profileCards/Character');
-$filename = Cache::getDir() . 'profileCards/Character/' . $charac->name . '.' . EXT_PNG;
+$filename = Cache::getDir() . 'profileCards/Character/' . $charac->name . EXT_PNG;
 if (file_exists($filename) && !date_passed(filemtime($filename), '+6 hours'))
-{
+{ //cache is not useful here
 	readfile($filename);
 	ob_end_flush();
 	exit;

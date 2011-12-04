@@ -262,6 +262,15 @@ class Character extends BaseCharacter
 		}
 		return false;
 	}
+	public function hasJobs()
+	{
+		foreach ($this->getJobs() as $cat => $jobs)
+		{
+			if (count($jobs))
+				return true;
+		}
+		return false;
+	}
 
 	/**
 	 * getSpellPos

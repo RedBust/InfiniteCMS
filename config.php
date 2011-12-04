@@ -214,7 +214,7 @@ return array(
 	//Utiliser la réecriture d'adresse ? (/News/show/[id] à la place de
 	//  ?controller=news&action=show&id=[id])
 	// Si vous avez une erreur 404 (not found) avec true, passez à false (ou changez d'hébergeur).
-	'REWRITE' => true,
+	'REWRITE' => false,
 
 	//Type of AJaX-Load (no-refresh)
 	//Type de chargement AJaX (pas de rechargement)
